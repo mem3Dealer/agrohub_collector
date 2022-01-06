@@ -1,15 +1,21 @@
+import 'package:agrohub_collector_flutter/shared/myScaffold.dart';
 import 'package:flutter/material.dart';
 
 class CollectingOrderPage extends StatelessWidget {
-  const CollectingOrderPage({Key? key}) : super(key: key);
+  String orderNumber;
+  String deliveryTime;
+  static const String routeName = '/collectingOrder';
+  CollectingOrderPage(this.orderNumber, this.deliveryTime, {Key? key})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(),
-      body: const Center(
-        child: Text('Экран сбора заказа'),
-      ),
+    print(orderNumber);
+    return MyScaffold(
+      false,
+      title: "Заказ №$orderNumber",
+      body: Container(),
+      deliveryTime: deliveryTime,
     );
   }
 }
