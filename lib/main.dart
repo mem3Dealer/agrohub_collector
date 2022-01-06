@@ -1,4 +1,5 @@
 import 'package:agrohub_collector_flutter/model/orderTile.dart';
+import 'package:agrohub_collector_flutter/pages/collectingOrderPage.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -13,9 +14,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(
-        title: '',
-      ),
+      home: const CollectingOrderPage(),
     );
   }
 }
