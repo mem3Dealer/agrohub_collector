@@ -6,3 +6,4 @@ const orderTitle =
 //наимнование товара
 const weight = 3.2;
 const tomato = 'Помидоры азербайджанские красные';
+const strRrice = 'Цена';
