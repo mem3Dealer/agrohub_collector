@@ -7,9 +7,12 @@ import 'package:flutter/material.dart';
 import 'orderInfo.dart';
 
 class CollectingOrderPage extends StatelessWidget {
-  const CollectingOrderPage(String number, String time, {Key? key})
+  const CollectingOrderPage(
+      {Key? key, required this.number, required this.time})
       : super(key: key);
   static const String routeName = '/collectingOrder';
+  final String number;
+  final String time;
 
   //Экран сбора заказа
   @override
@@ -28,8 +31,8 @@ class CollectingOrderPage extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        'Заказ №З1313',
+                      Text(
+                        'Заказ №$number',
                         style: orderTitle,
                       ),
                       GestureDetector(
@@ -38,7 +41,7 @@ class CollectingOrderPage extends StatelessWidget {
                               context,
                               MaterialPageRoute<void>(
                                 builder: (BuildContext context) =>
-                                    OrderInfoPage('34', '45'),
+                                    OrderInfoPage(number, time),
                               ));
                         },
                         child: const Icon(
@@ -50,12 +53,12 @@ class CollectingOrderPage extends StatelessWidget {
                     ],
                   ),
                 ),
-                const Align(
+                Align(
                   child: Padding(
-                    padding: EdgeInsets.only(left: 20.0),
+                    padding: const EdgeInsets.only(left: 20.0),
                     child: Text(
-                      '10:00 - 12:00',
-                      style: TextStyle(
+                      time,
+                      style: const TextStyle(
                           fontFamily: 'Roboto',
                           fontSize: 16,
                           fontWeight: FontWeight.w500,

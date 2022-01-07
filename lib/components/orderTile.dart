@@ -102,7 +102,7 @@ class _OrderTileState extends State<OrderTile> {
                           context,
                           MaterialPageRoute<void>(
                             builder: (BuildContext context) =>
-                                CollectingOrderPage(number, time),
+                                CollectingOrderPage(number: number, time: time),
                           ),
                         );
                       },
