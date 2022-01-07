@@ -27,7 +27,7 @@ class CollectingOrderPage extends StatelessWidget {
             Column(
               children: [
                 Padding(
-                  padding: const EdgeInsets.all(20.0),
+                  padding: const EdgeInsets.all(16.0),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -55,14 +55,10 @@ class CollectingOrderPage extends StatelessWidget {
                 ),
                 Align(
                   child: Padding(
-                    padding: const EdgeInsets.only(left: 20.0),
+                    padding: const EdgeInsets.only(left: 16.0),
                     child: Text(
                       time,
-                      style: const TextStyle(
-                          fontFamily: 'Roboto',
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.red),
+                      style: orderTime,
                     ),
                   ),
                   alignment: Alignment.bottomLeft,
@@ -72,16 +68,21 @@ class CollectingOrderPage extends StatelessWidget {
                 ),
               ],
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                OutlinedButton(
+            Padding(
+              padding: const EdgeInsets.only(left: 16.0, right: 16.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  OutlinedButtonSizer(
+                    buttonTitle: 'Собрать',
                     onPressed: () {},
-                    child: const OrderBoxes(title: 'Собрать')),
-                OutlinedButton(
+                  ),
+                  OutlinedButtonSizer(
+                    buttonTitle: 'Собрано',
                     onPressed: () {},
-                    child: const OrderBoxes(title: 'Собрано')),
-              ],
+                  ),
+                ],
+              ),
             ),
             const SizedBox(
               height: 20.0,
@@ -94,31 +95,40 @@ class CollectingOrderPage extends StatelessWidget {
   }
 }
 
-class OrderBoxes extends StatelessWidget {
-  const OrderBoxes({
+class OutlinedButtonSizer extends StatelessWidget {
+  const OutlinedButtonSizer({
     Key? key,
-    required this.title,
-    //this.quantity
+    required this.buttonTitle,
+    required this.onPressed,
   }) : super(key: key);
-  final String title;
-  //final int quantity;
+  final String buttonTitle;
+  final Function onPressed;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(title),
-          const SizedBox(height: 10.0),
-          Text(UncollectedOrderProductList.listOrder.length.toString()),
-        ],
-      ),
-      width: 120,
-      height: 60,
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.blue),
-        borderRadius: BorderRadius.circular(10.0),
+    return SizedBox(
+      width: 173,
+      height: 82,
+      child: OutlinedButton(
+        onPressed: () {
+          onPressed.call();
+        },
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              buttonTitle,
+              style: const TextStyle(color: Colors.black),
+            ),
+            const SizedBox(
+              height: 10.0,
+            ),
+            const Text(
+              '(12)',
+              style: TextStyle(color: Colors.black),
+            ),
+          ],
+        ),
       ),
     );
   }

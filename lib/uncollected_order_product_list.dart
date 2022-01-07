@@ -7,17 +7,17 @@ import 'package:agrohub_collector_flutter/cont/constants.dart';
 class UncollectedOrderProductList extends StatelessWidget {
   const UncollectedOrderProductList({Key? key}) : super(key: key);
   static final List<ExpandableProductTiles> listOrder = [
-    const ExpandableProductTiles(stringPrice: strRrice, price: 113.8),
-    const ExpandableProductTiles(stringPrice: strRrice, price: 113.8),
-    const ExpandableProductTiles(stringPrice: strRrice, price: 113.8),
-    const ExpandableProductTiles(stringPrice: strRrice, price: 113.8),
+    const ExpandableProductTiles(stringPrice: strPrice, price: 113.8),
+    const ExpandableProductTiles(stringPrice: strPrice, price: 113.8),
+    const ExpandableProductTiles(stringPrice: strPrice, price: 113.8),
+    const ExpandableProductTiles(stringPrice: strPrice, price: 113.8),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Expanded(
       child: Padding(
-        padding: const EdgeInsets.all(20.0),
+        padding: const EdgeInsets.all(16.0),
         child: ListView(
           children: listOrder,
         ),
@@ -100,23 +100,50 @@ class ProductTiles extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      child: Row(children: [
-        const Placeholder(
-          fallbackHeight: 150,
-          fallbackWidth: 150,
-        ),
-        Expanded(
-          child: Column(
-            children: [
-              Text(title),
-              Align(
-                child: Text('$weight кг'),
-                alignment: Alignment.bottomLeft,
-              ),
-            ],
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Row(children: [
+          const Placeholder(
+            fallbackHeight: 150.0,
+            fallbackWidth: 150.0,
           ),
-        ),
-      ]),
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.only(left: 10.0),
+              height: 150.0,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    flex: 10,
+                    child: Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            title,
+                            style: const TextStyle(fontSize: 18.0),
+                          ),
+                        ),
+                        const Icon(
+                          Icons.chevron_right,
+                          size: 40.0,
+                        )
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    flex: 2,
+                    child: Text(
+                      '$weight кг',
+                      style: const TextStyle(fontWeight: FontWeight.w900),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ]),
+      ),
     );
   }
 }
