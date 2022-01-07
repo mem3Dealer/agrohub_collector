@@ -1,3 +1,5 @@
+import 'package:agrohub_collector_flutter/bloc/bloc/auth_bloc.dart';
+import 'package:agrohub_collector_flutter/bloc/bloc/auth_events.dart';
 import 'package:agrohub_collector_flutter/components/orderTile.dart';
 import 'package:agrohub_collector_flutter/shared/myScaffold.dart';
 import 'package:flutter/material.dart';
@@ -14,7 +16,7 @@ class AllOrdersPage extends StatelessWidget {
             // shrinkWrap: true,
             children: [
               OrderTile(number: 'З1313', time: '12:10-13:40'),
-              OrderTile(number: '345432', time: '12:10-13:40'),
+              OrderTile(number: '34543', time: '12:10-13:40'),
               OrderTile(number: '32132', time: '12:10-13:40'),
               OrderTile(number: '64564', time: '12:10-13:40'),
               OrderTile(number: '64564', time: '12:10-13:40'),
