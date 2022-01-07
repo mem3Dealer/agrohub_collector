@@ -2,9 +2,16 @@ import 'package:agrohub_collector_flutter/components/orderTile.dart';
 import 'package:agrohub_collector_flutter/pages/allOrdersPage.dart';
 import 'package:agrohub_collector_flutter/shared/myScaffold.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import 'bloc/collecting_lists_bloc.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    BlocProvider<CollectingListsBloc>(
+        create: (BuildContext context) => CollectingListsBloc(),
+        child: const MyApp()),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -16,7 +23,8 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       home: const AllOrdersPage(),
-      // routes: ,
     );
+
+    // routes: ,
   }
 }

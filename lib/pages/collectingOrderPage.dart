@@ -1,8 +1,9 @@
+import 'package:agrohub_collector_flutter/bloc/collecting_lists_bloc.dart';
+import 'package:agrohub_collector_flutter/components/collected_order_product_list.dart';
 import 'package:agrohub_collector_flutter/cont/constants.dart';
-import 'package:agrohub_collector_flutter/uncollected_order_product_list.dart';
-import 'package:flutter/cupertino.dart';
-
+import 'package:agrohub_collector_flutter/components/uncollected_order_product_list.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'orderInfo.dart';
 
@@ -75,11 +76,19 @@ class CollectingOrderPage extends StatelessWidget {
                 children: [
                   OutlinedButtonSizer(
                     buttonTitle: 'Собрать',
-                    onPressed: () {},
+                    onPressed: () {
+                      context
+                          .read<CollectingListsBloc>()
+                          .add(UnCollectingListPressed());
+                    },
                   ),
                   OutlinedButtonSizer(
                     buttonTitle: 'Собрано',
-                    onPressed: () {},
+                    onPressed: () {
+                      context
+                          .read<CollectingListsBloc>()
+                          .add(CollectingListPressed());
+                    },
                   ),
                 ],
               ),
@@ -87,7 +96,10 @@ class CollectingOrderPage extends StatelessWidget {
             const SizedBox(
               height: 20.0,
             ),
-            const UncollectedOrderProductList(),
+            BlocBuilder<CollectingListsBloc, CollectingListsState>(
+                builder: (context, state) => state is CollectingListState
+                    ? const CollectedOrderProductList()
+                    : const UncollectedOrderProductList()),
           ],
         ),
       ),

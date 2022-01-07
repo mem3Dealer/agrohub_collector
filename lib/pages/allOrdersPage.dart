@@ -1,10 +1,14 @@
+import 'package:agrohub_collector_flutter/bloc/collecting_lists_bloc.dart';
 import 'package:agrohub_collector_flutter/components/orderTile.dart';
 import 'package:agrohub_collector_flutter/shared/myScaffold.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class AllOrdersPage extends StatelessWidget {
   static const String routeName = '/allOrders';
+
   const AllOrdersPage({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return MyScaffold(false,
@@ -22,15 +26,15 @@ class AllOrdersPage extends StatelessWidget {
           ),
         ));
   }
-  // @override
-  // Widget build(BuildContext context) {
-  //   return Scaffold(
-  //     appBar: AppBar(),
-  //     body: const Center(
-  //       child: Text('Экран всех заказов'),
-  //     ),
-  //   );
-  // }
+// @override
+// Widget build(BuildContext context) {
+//   return Scaffold(
+//     appBar: AppBar(),
+//     body: const Center(
+//       child: Text('Экран всех заказов'),
+//     ),
+//   );
+// }
 
 //   class MyHomePage extends StatefulWidget {
 //   const MyHomePage({

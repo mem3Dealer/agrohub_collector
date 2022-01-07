@@ -1,5 +1,7 @@
+import 'package:agrohub_collector_flutter/bloc/collecting_lists_bloc.dart';
 import 'package:agrohub_collector_flutter/pages/orderInfo.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class MyScaffold extends StatelessWidget {
   Widget body;
@@ -31,7 +33,7 @@ class MyScaffold extends StatelessWidget {
                       onPressed: () {
                         Navigator.pop(context);
                       },
-                      icon: Icon(Icons.arrow_back_ios_new_outlined)),
+                      icon: const Icon(Icons.arrow_back_ios_new_outlined)),
                 Text(
                   title,
                   style: const TextStyle(
