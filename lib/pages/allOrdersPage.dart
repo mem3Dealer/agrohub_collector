@@ -1,4 +1,4 @@
-import 'package:agrohub_collector_flutter/bloc/collecting_lists_bloc.dart';
+import 'package:agrohub_collector_flutter/bloc/business_logic_layer/collecting_lists_bloc.dart';
 import 'package:agrohub_collector_flutter/components/orderTile.dart';
 import 'package:agrohub_collector_flutter/shared/myScaffold.dart';
 import 'package:flutter/material.dart';

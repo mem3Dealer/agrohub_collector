@@ -1,4 +1,4 @@
-import 'package:agrohub_collector_flutter/bloc/collecting_lists_bloc.dart';
+import 'package:agrohub_collector_flutter/bloc/business_logic_layer/collecting_lists_bloc.dart';
 import 'package:agrohub_collector_flutter/components/collected_order_product_list.dart';
 import 'package:agrohub_collector_flutter/cont/constants.dart';
 import 'package:agrohub_collector_flutter/components/uncollected_order_product_list.dart';
@@ -81,6 +81,9 @@ class CollectingOrderPage extends StatelessWidget {
                           .read<CollectingListsBloc>()
                           .add(UnCollectingListPressed());
                     },
+                    list: context
+                        .read<CollectingListsBloc>()
+                        .uncollectedListOrder,
                   ),
                   OutlinedButtonSizer(
                     buttonTitle: 'Собрано',
@@ -89,6 +92,8 @@ class CollectingOrderPage extends StatelessWidget {
                           .read<CollectingListsBloc>()
                           .add(CollectingListPressed());
                     },
+                    list:
+                        context.read<CollectingListsBloc>().collectedListOrder,
                   ),
                 ],
               ),
@@ -112,9 +117,11 @@ class OutlinedButtonSizer extends StatelessWidget {
     Key? key,
     required this.buttonTitle,
     required this.onPressed,
+    required this.list,
   }) : super(key: key);
   final String buttonTitle;
   final Function onPressed;
+  final List list;
 
   @override
   Widget build(BuildContext context) {
@@ -135,9 +142,9 @@ class OutlinedButtonSizer extends StatelessWidget {
             const SizedBox(
               height: 10.0,
             ),
-            const Text(
-              '(12)',
-              style: TextStyle(color: Colors.black),
+            Text(
+              '${list.length}',
+              style: const TextStyle(color: Colors.black),
             ),
           ],
         ),

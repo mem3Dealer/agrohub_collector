@@ -1,16 +1,13 @@
+import 'package:agrohub_collector_flutter/bloc/business_logic_layer/collecting_lists_bloc.dart';
+import 'package:agrohub_collector_flutter/bloc/data_provider/products_provider.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agrohub_collector_flutter/cont/constants.dart';
+import 'package:provider/src/provider.dart';
 
 class UncollectedOrderProductList extends StatelessWidget {
   const UncollectedOrderProductList({Key? key}) : super(key: key);
-  static final List<ExpandableProductTiles> uncollectedListOrder = [
-    const ExpandableProductTiles(stringPrice: strPrice, price: 113.8),
-    const ExpandableProductTiles(stringPrice: strPrice, price: 113.8),
-    const ExpandableProductTiles(stringPrice: strPrice, price: 113.8),
-    const ExpandableProductTiles(stringPrice: strPrice, price: 113.8),
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +15,7 @@ class UncollectedOrderProductList extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: ListView(
-          children: uncollectedListOrder,
+          children: context.read<CollectingListsBloc>().uncollectedListOrder,
         ),
       ),
     );
