@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:agrohub_collector_flutter/main.dart';
 import 'package:agrohub_collector_flutter/repositories/auth_rep.dart';
 import 'package:bloc/bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -63,31 +64,41 @@ class AuthenticationBloc
         onSuccess: event.onSuccess,
       ));
       Map<String, dynamic> payload = Jwt.parseJwt(token);
-
       String role = '';
       int? farmerId = payload['farmer_id'];
+      int? collectorId = payload['user_id'];
       bool? isChangePrice;
-      String storeId = '';
+      int storeId = payload['store_id'];
       if (farmerId != null) {
-        // await FirebaseMessaging.instance.subscribeToTopic('farmer');
+        role = 'farmer';
         farmerId = payload['farmer_id'];
-        storeId = payload['store_id'].toString();
-        isChangePrice = storeToEditable.contains(payload['store_id']);
       } else {
-        // await FirebaseMessaging.instance.subscribeToTopic('collector');
         role = 'collector';
       }
+      isChangePrice = storeToEditable.contains(payload['store_id']);
+
+      // if (farmerId != null) {
+      //   // await FirebaseMessaging.instance.subscribeToTopic('farmer');
+      //   farmerId = payload['farmer_id'];
+      //   storeId = payload['store_id'].toString();
+      // } else {
+      //   // await FirebaseMessaging.instance.subscribeToTopic('collector');
+      //   role = 'collector';
+      // }
       // await FirebaseMessaging.instance
       //     .getToken()
       //     .then((String? value) => print('token firebase $value'));
       await storage.write(key: 'role', value: role);
-      await storage.write(key: 'store', value: storeId);
+      await storage.write(key: 'storeId', value: storeId.toString());
       await storage.write(key: 'farmerId', value: farmerId.toString());
+      await storage.write(key: 'collectorId', value: collectorId.toString());
       emitter(
         state.copyWith(
           JWT: 'JWT $token',
           role: role,
+          collectorId: collectorId,
           farmerId: farmerId,
+          storeId: storeId,
           loading: false,
           isChangePrice: isChangePrice,
         ),
@@ -106,12 +117,13 @@ class AuthenticationBloc
     if (userInfo != null) {
       emitter(
         state.copyWith(
-          JWT: userInfo['token'],
-          role: userInfo['role'],
-          isChangePrice: userInfo['store'],
-          farmerId: userInfo['farmerId'],
-        ),
+            JWT: userInfo['token'],
+            role: userInfo['role'],
+            storeId: userInfo['storeId'],
+            farmerId: userInfo['farmerId'],
+            collectorId: userInfo['collectorId']),
       );
+      // print('HERE: $state');
       event.onSuccess!(userInfo['role']);
     } else {
       event.onError!();
@@ -138,12 +150,15 @@ class AuthenticationBloc
     String? token = await storage.read(key: 'token');
 
     if (token != '' && token != null) {
-      String? store = await storage.read(key: 'store');
+      String? storeId = await storage.read(key: 'storeId');
+      String? collectorId = await storage.read(key: 'collectorId');
+      print(storeId);
       if (await storage.read(key: 'role') == 'collector') {
         return <String, dynamic>{
           'role': 'collector',
           'token': token,
-          'store': false
+          'storeId': int.parse(storeId!),
+          'collectorId': int.parse(collectorId!)
         };
       } else {
         String? farmer = await ((storage.read(key: 'farmerId')));
@@ -153,7 +168,7 @@ class AuthenticationBloc
           'farmerId': farmerId,
           'role': '',
           'token': token,
-          'store': storeToEditable.contains(int.parse(store!))
+          'storeId': storeToEditable.contains(int.parse(storeId!))
         };
       }
     } else {

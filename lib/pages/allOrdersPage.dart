@@ -1,66 +1,68 @@
 import 'package:agrohub_collector_flutter/bloc/bloc/auth_bloc.dart';
 import 'package:agrohub_collector_flutter/bloc/bloc/auth_events.dart';
+import 'package:agrohub_collector_flutter/bloc/bloc/auth_state.dart';
+import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_bloc.dart';
+import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_event.dart';
+import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_state.dart';
+
 import 'package:agrohub_collector_flutter/components/orderTile.dart';
+import 'package:agrohub_collector_flutter/repositories/auth_rep.dart';
+import 'package:agrohub_collector_flutter/repositories/orders_rep.dart';
 import 'package:agrohub_collector_flutter/shared/myScaffold.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:get_it/get_it.dart';
 
-class AllOrdersPage extends StatelessWidget {
+OrdersRepository ord_rep = OrdersRepository();
+
+FlutterSecureStorage storage = FlutterSecureStorage();
+
+class AllOrdersPage extends StatefulWidget {
   static const String routeName = '/allOrders';
+
   const AllOrdersPage({Key? key}) : super(key: key);
+
+  @override
+  State<AllOrdersPage> createState() => _AllOrdersPageState();
+}
+
+class _AllOrdersPageState extends State<AllOrdersPage> {
+  final authBloc = GetIt.I.get<AuthenticationBloc>();
+  final ordersBloc = GetIt.I.get<OrdersBloc>();
+  @override
+  void initState() {
+    getOrders();
+    super.initState();
+    // authBloc.add(AuthenticationInit());
+  }
+
+  void getOrders() {
+    ordersBloc.add(OrdersGetAllOrders());
+  }
+
   @override
   Widget build(BuildContext context) {
-    return MyScaffold(false,
-        title: 'Список заказов',
-        body: Expanded(
-          child: ListView(
-            // shrinkWrap: true,
-            children: [
-              OrderTile(number: 'З1313', time: '12:10-13:40'),
-              OrderTile(number: '34543', time: '12:10-13:40'),
-              OrderTile(number: '32132', time: '12:10-13:40'),
-              OrderTile(number: '64564', time: '12:10-13:40'),
-              OrderTile(number: '64564', time: '12:10-13:40'),
-            ],
-          ),
-        ));
+    // print();
+    return BlocBuilder<OrdersBloc, OrdersState>(
+      bloc: ordersBloc,
+      builder: (context, state) {
+        // ordersBloc.add(OrdersGetAllOrders());
+        // ord_rep.getAllOrders();
+        print('THESE ARE: ${ordersBloc.state}');
+        return MyScaffold(false,
+            title: 'Список заказов',
+            body: Expanded(child: Container()
+                // ListView.builder(
+                //     itemCount: ordersBloc.state.allOrders!.length,
+                //     itemBuilder: (BuildContext context, int index) {
+                //       return OrderTile(
+                //           number: ordersBloc.state.orderId.toString(),
+                //           time: ordersBloc.state.deliveryTime!);
+                //     }))
+
+                ));
+      },
+    );
   }
-  // @override
-  // Widget build(BuildContext context) {
-  //   return Scaffold(
-  //     appBar: AppBar(),
-  //     body: const Center(
-  //       child: Text('Экран всех заказов'),
-  //     ),
-  //   );
-  // }
-
-//   class MyHomePage extends StatefulWidget {
-//   const MyHomePage({
-//     Key? key,
-//   }) : super(key: key);
-//   // final String title;
-//   @override
-//   State<MyHomePage> createState() => _MyHomePageState();
-// }
-
-// class _MyHomePageState extends State<MyHomePage> {
-//   @override
-//   Widget build(BuildContext context) {
-//     return MyScaffold(
-//         title: 'Список заказов',
-//         body: Expanded(
-//           child: ListView(
-//             // shrinkWrap: true,
-//             children: [
-//               OrderTile(number: 'З1313', time: '12:10-13:40'),
-//               OrderTile(number: '345432', time: '12:10-13:40'),
-//               OrderTile(number: '32132', time: '12:10-13:40'),
-//               OrderTile(number: '64564', time: '12:10-13:40'),
-//               OrderTile(number: '64564', time: '12:10-13:40'),
-//             ],
-//           ),
-//         ));
-//   }
-// }
-// }
 }

@@ -6,6 +6,7 @@ import 'package:agrohub_collector_flutter/pages/allOrdersPage.dart';
 import 'package:agrohub_collector_flutter/repositories/auth_rep.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:get_it/get_it.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -16,11 +17,22 @@ class LoginPage extends StatefulWidget {
 
 //TODO по-хорошему, требует доработки. Неработающая кнопка пока не заполнятся поля и всякое такое.
 class _LoginPageState extends State<LoginPage> {
+  @override
+  void initState() {
+    super.initState();
+    loadFirstPage();
+  }
+
+  @override
+  void didUpdateWidget(LoginPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+  }
+
+  final authBloc = GetIt.I.get<AuthenticationBloc>();
   final FlutterSecureStorage storage = const FlutterSecureStorage();
   final TextEditingController _login = TextEditingController();
   final TextEditingController _password = TextEditingController();
-  final authBloc =
-      AuthenticationBloc(authenticationRepository: AuthenticationRepository());
+
   bool isLoading = false;
 
   loadFirstPage() {

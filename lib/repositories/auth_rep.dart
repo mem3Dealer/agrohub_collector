@@ -7,7 +7,6 @@ class AuthenticationRepository {
     required String login,
     required String password,
   }) async {
-    print(login);
     final Response<dynamic> JWTResponse =
         await HttpService().post('/farmer/login/', <String, dynamic>{
       'username': login,

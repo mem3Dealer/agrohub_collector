@@ -10,7 +10,7 @@ class CollectingOrderPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(orderNumber);
+    // print(orderNumber);
     return MyScaffold(
       false,
       title: "Заказ №$orderNumber",
