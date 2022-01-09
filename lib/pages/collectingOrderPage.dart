@@ -7,10 +7,10 @@ import 'package:get_it/get_it.dart';
 
 class CollectingOrderPage extends StatefulWidget {
   // Product order; TODO это нужно сделать через блок с полем Product collecting;
-  int agregatorOrderId;
-  String deliveryTime;
+  final int agregatorOrderId;
+  final String deliveryTime;
   static const String routeName = '/collectingOrder';
-  CollectingOrderPage(
+  const CollectingOrderPage(
       // this.order,
       this.agregatorOrderId,
       this.deliveryTime,
@@ -36,11 +36,11 @@ class _CollectingOrderPageState extends State<CollectingOrderPage> {
 
   @override
   Widget build(BuildContext context) {
-    // print(orderNumber);
+    //print(orderNumber);
     return MyScaffold(
       false,
-      title: "Заказ №${widget.agregatorOrderId}"
-          .substring(0, 14), //TODO обсуди норм ли
+      title: "Заказ №${widget.agregatorOrderId}",
+      //TODO убрал substring, в MyScaffold поставил softwrap: false и overflow заработал-krs_83
       body: Container(),
       deliveryTime: widget.deliveryTime,
     );

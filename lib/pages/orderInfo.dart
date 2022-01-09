@@ -10,8 +10,8 @@ import 'package:get_it/get_it.dart';
 
 class OrderInfoPage extends StatelessWidget {
   final ordersBloc = GetIt.I.get<OrdersBloc>();
-  String orderNumber;
-  String deliveryTime;
+  final String orderNumber;
+  final String deliveryTime;
   static const String routeName = '/infoOrder';
   OrderInfoPage(this.deliveryTime, this.orderNumber, {Key? key})
       : super(key: key);
@@ -60,7 +60,7 @@ class OrderInfoPage extends StatelessWidget {
                       child: Row(
                         children: [
                           Text('Интервал доставки:', style: style),
-                          SizedBox(
+                          const SizedBox(
                             width: 62,
                           ),
                           Text(
@@ -80,7 +80,7 @@ class OrderInfoPage extends StatelessWidget {
                       child: Row(
                         children: [
                           Text('Количество товаров:', style: style),
-                          SizedBox(
+                          const SizedBox(
                             width: 55,
                           ),
                           Text(
@@ -96,7 +96,7 @@ class OrderInfoPage extends StatelessWidget {
                       child: Row(
                         children: [
                           Text('Общий вес:', style: style),
-                          SizedBox(
+                          const SizedBox(
                             width: 127,
                           ),
                           Text(

@@ -39,6 +39,7 @@ class MyScaffold extends StatelessWidget {
                     child: Text(
                       title,
                       overflow: TextOverflow.clip,
+                      softWrap: false,
                       style: const TextStyle(
                           fontFamily: 'Roboto',
                           fontWeight: FontWeight.w700,
