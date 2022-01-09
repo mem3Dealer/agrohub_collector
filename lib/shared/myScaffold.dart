@@ -2,11 +2,11 @@ import 'package:agrohub_collector_flutter/pages/orderInfo.dart';
 import 'package:flutter/material.dart';
 
 class MyScaffold extends StatelessWidget {
-  Widget body;
-  String title;
-  bool isItInfo;
-  String? deliveryTime;
-  MyScaffold(this.isItInfo,
+  final Widget body;
+  final String title;
+  final bool isItInfo;
+  final String? deliveryTime;
+  const MyScaffold(this.isItInfo,
       {required this.title, required this.body, this.deliveryTime, Key? key})
       : super(key: key);
 
@@ -16,7 +16,7 @@ class MyScaffold extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: const Color(0xffF1F1F1),
-      body: Container(
+      body: SizedBox(
         width: MediaQuery.of(context).size.width,
         child: Column(
           children: [
@@ -34,7 +34,7 @@ class MyScaffold extends StatelessWidget {
                         onPressed: () {
                           Navigator.pop(context);
                         },
-                        icon: Icon(Icons.arrow_back_ios_new_outlined)),
+                        icon: const Icon(Icons.arrow_back_ios_new_outlined)),
                   Flexible(
                     child: Text(
                       title,

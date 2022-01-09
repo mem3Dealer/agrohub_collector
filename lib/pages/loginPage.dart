@@ -4,6 +4,7 @@ import 'package:agrohub_collector_flutter/bloc/bloc/auth/auth_bloc.dart';
 import 'package:agrohub_collector_flutter/bloc/bloc/auth/auth_events.dart';
 import 'package:agrohub_collector_flutter/pages/allOrdersPage.dart';
 import 'package:agrohub_collector_flutter/repositories/auth_rep.dart';
+import 'package:agrohub_collector_flutter/shared/myScaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
@@ -18,6 +19,8 @@ class LoginPage extends StatefulWidget {
 //TODO по-хорошему, требует доработки. Неработающая кнопка пока не заполнятся поля и всякое такое.
 class _LoginPageState extends State<LoginPage> {
   bool isTextFieldEmpty = true;
+  Color blue = const Color(0xff1890ff);
+
   @override
   void initState() {
     super.initState();
@@ -145,8 +148,10 @@ class _LoginPageState extends State<LoginPage> {
       right: 20,
       bottom: 20,
     );
-    return Scaffold(
-      backgroundColor: const Color(0xff2d3a4b), //0xffF1F1F1
+    return MyScaffold(
+      false,
+      title: '',
+      //backgroundColor: const Color(0xff2d3a4b), //0xffF1F1F1
       body: Center(
         child: isLoading
             ? const CircularProgressIndicator()
@@ -162,7 +167,7 @@ class _LoginPageState extends State<LoginPage> {
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          color: Colors.blue,
                           fontSize: 26,
                         ),
                       ),
@@ -183,14 +188,11 @@ class _LoginPageState extends State<LoginPage> {
       child: ConstrainedBox(
         constraints: const BoxConstraints(minWidth: double.infinity),
         child: ElevatedButton(
-          style: ButtonStyle(
-            backgroundColor: MaterialStateProperty.all<Color>(
-              // isVisibleBtn
-              //     ? const Color(0xff1890ff)
-              //     :
-
-              const Color(0xff1890ff).withOpacity(0.5),
-            ),
+          style: ElevatedButton.styleFrom(
+            // backgroundColor: MaterialStateProperty.all<Color>(
+            //   blue,
+            // ),
+            onSurface: const Color(0xff4d4d4d),
           ),
           onPressed: isTextFieldEmpty ? null : loginFarmer,
           child: const Text('Войти'),
@@ -202,41 +204,14 @@ class _LoginPageState extends State<LoginPage> {
   Padding passwordField(EdgeInsets padding) {
     return Padding(
       padding: padding,
-      child: TextField(
+      child: Fields(
         controller: _password,
-        // onChanged: checkFormFields,
-        obscureText: true,
-        decoration: const InputDecoration(
-          enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.white70),
-          ),
-          border: OutlineInputBorder(
-            borderSide: BorderSide(
-              color: Color(0xB3FFFFFF),
-            ),
-          ),
-          labelText: 'Пароль',
-          labelStyle: TextStyle(color: Colors.white70),
-          fillColor: Color.fromRGBO(0, 0, 0, 0.1),
-          filled: true,
-          prefixIcon: Icon(
-            Icons.lock_outlined,
-            color: Colors.white70,
-          ),
-          // suffixIcon: InkWell(
-          //   onTap: visibleIcon,
-          //   child: visible
-          //       ? const Icon(
-          //           Icons.visibility_outlined,
-          //           color: Colors.white70,
-          //         )
-          //       : const Icon(
-          //           Icons.visibility_off_outlined,
-          //           color: Colors.white70,
-          //         ),
-          // ),
+        color: Colors.blue,
+        icon: const Icon(
+          Icons.lock_outline,
+          color: Colors.blue,
         ),
-        style: const TextStyle(color: Colors.white70),
+        title: 'Пароль',
       ),
     );
   }
@@ -244,30 +219,57 @@ class _LoginPageState extends State<LoginPage> {
   Padding loginField(EdgeInsets padding) {
     return Padding(
       padding: padding,
-      child: TextField(
+      child: Fields(
         controller: _login,
-        // onChanged: checkFormFields,
-        obscureText: false,
-        decoration: const InputDecoration(
-          enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.white70),
-          ),
-          border: OutlineInputBorder(
-            borderSide: BorderSide(
-              color: Color(0xB3FFFFFF),
-            ),
-          ),
-          labelStyle: TextStyle(color: Colors.white70),
-          fillColor: Color.fromRGBO(0, 0, 0, 0.1),
-          filled: true,
-          labelText: 'Логин',
-          prefixIcon: Icon(
-            Icons.perm_identity_outlined,
-            color: Colors.white70,
+        color: Colors.blue,
+        icon: const Icon(
+          Icons.perm_identity_outlined,
+          color: Colors.blue,
+        ),
+        title: 'Логин',
+        obscuring: true,
+      ),
+    );
+  }
+}
+
+class Fields extends StatelessWidget {
+  final TextEditingController controller;
+  final Color color;
+  final String title;
+  final Icon icon;
+  final bool? obscuring;
+
+  const Fields({
+    Key? key,
+    required this.controller,
+    required this.color,
+    required this.title,
+    required this.icon,
+    this.obscuring,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      controller: controller,
+      obscureText: true,
+      decoration: InputDecoration(
+        enabledBorder: const OutlineInputBorder(
+          borderSide: BorderSide(color: Colors.blue),
+        ),
+        border: OutlineInputBorder(
+          borderSide: BorderSide(
+            color: color,
           ),
         ),
-        style: const TextStyle(color: Colors.white70),
+        labelText: title,
+        labelStyle: const TextStyle(color: Colors.blue),
+        fillColor: const Color.fromRGBO(0, 0, 0, 0.1),
+        filled: true,
+        prefixIcon: icon,
       ),
+      style: TextStyle(color: color),
     );
   }
 }
