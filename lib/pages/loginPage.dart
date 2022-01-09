@@ -17,10 +17,27 @@ class LoginPage extends StatefulWidget {
 
 //TODO по-хорошему, требует доработки. Неработающая кнопка пока не заполнятся поля и всякое такое.
 class _LoginPageState extends State<LoginPage> {
+  bool isTextFieldEmpty = true;
   @override
   void initState() {
     super.initState();
     loadFirstPage();
+    _password.addListener(() {
+      final isTextFieldEmpty = _login.text.isEmpty || _password.text.isEmpty;
+      setState(() => this.isTextFieldEmpty = isTextFieldEmpty);
+    });
+    _login.addListener(() {
+      final isTextFieldEmpty = _login.text.isEmpty || _password.text.isEmpty;
+      setState(() => this.isTextFieldEmpty = isTextFieldEmpty);
+    });
+  }
+
+  //TODO:  я бы добавил dispose метод, чтобы закрыть все контроллеры после работы
+  @override
+  void dispose() {
+    _login.dispose();
+    _password.dispose();
+    super.dispose();
   }
 
   @override
@@ -129,7 +146,7 @@ class _LoginPageState extends State<LoginPage> {
       bottom: 20,
     );
     return Scaffold(
-      backgroundColor: const Color(0xff2d3a4b),
+      backgroundColor: const Color(0xff2d3a4b), //0xffF1F1F1
       body: Center(
         child: isLoading
             ? const CircularProgressIndicator()
@@ -175,7 +192,7 @@ class _LoginPageState extends State<LoginPage> {
               const Color(0xff1890ff).withOpacity(0.5),
             ),
           ),
-          onPressed: loginFarmer,
+          onPressed: isTextFieldEmpty ? null : loginFarmer,
           child: const Text('Войти'),
         ),
       ),
@@ -188,7 +205,7 @@ class _LoginPageState extends State<LoginPage> {
       child: TextField(
         controller: _password,
         // onChanged: checkFormFields,
-        // obscureText: visible ? false : true,
+        obscureText: true,
         decoration: const InputDecoration(
           enabledBorder: OutlineInputBorder(
             borderSide: BorderSide(color: Colors.white70),
