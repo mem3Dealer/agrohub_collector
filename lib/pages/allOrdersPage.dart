@@ -53,7 +53,7 @@ class _AllOrdersPageState extends State<AllOrdersPage> {
         onError: (e) {
           inspect(e);
         },
-        onSuccess: () => print('amaizing')));
+        onSuccess: () => print('amazing')));
   }
 
   @override
@@ -89,7 +89,10 @@ class _AllOrdersPageState extends State<AllOrdersPage> {
                                     int.parse(order.agregator_order_id!));
                           })),
                 )
-              : const Center(child: CircularProgressIndicator()),
+              : SizedBox(
+                  child: const Center(child: CircularProgressIndicator()),
+                  height: MediaQuery.of(context).size.height / 1.3,
+                ),
         );
       },
     );
