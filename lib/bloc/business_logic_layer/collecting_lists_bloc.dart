@@ -10,26 +10,10 @@ class CollectingListsBloc
     extends Bloc<CollectingListsEvent, CollectingListsState> {
   //пока пользуемся готовым листом
   final List<ExpandableProductTiles> uncollectedListOrder = [
-    const ExpandableProductTiles(
-      stringPrice: strPrice,
-      price: 11.8,
-      index: 0,
-    ),
-    const ExpandableProductTiles(
-      stringPrice: strPrice,
-      price: 13.0,
-      index: 1,
-    ),
-    const ExpandableProductTiles(
-      stringPrice: strPrice,
-      price: 22.6,
-      index: 2,
-    ),
-    const ExpandableProductTiles(
-      stringPrice: strPrice,
-      price: 54.2,
-      index: 3,
-    ),
+    const ExpandableProductTiles(),
+    const ExpandableProductTiles(),
+    const ExpandableProductTiles(),
+    const ExpandableProductTiles(),
   ];
   final List<ExpandableProductTiles> collectedListOrder = [];
 
@@ -42,6 +26,7 @@ class CollectingListsBloc
   void _movingItems(
       ProductCollectingPressed event, Emitter<CollectingListsState> state) {
     removeItemFromUncollectedList(event.item);
+    addItemToNewCollectedList(event.item);
   }
 
   void addItemToNewCollectedList(ExpandableProductTiles item) =>

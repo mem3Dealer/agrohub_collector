@@ -91,6 +91,9 @@ class CollectingOrderPage extends StatelessWidget {
                       context
                           .read<CollectingListsBloc>()
                           .add(CollectingListPressed());
+                      print(context
+                          .read<CollectingListsBloc>()
+                          .collectedListOrder);
                     },
                     list:
                         context.read<CollectingListsBloc>().collectedListOrder,
@@ -104,7 +107,7 @@ class CollectingOrderPage extends StatelessWidget {
             BlocBuilder<CollectingListsBloc, CollectingListsState>(
                 builder: (context, state) => state is CollectingListState
                     ? const CollectedOrderProductList()
-                    : const UncollectedOrderProductList()),
+                    : const ExpandableProductTiles()),
           ],
         ),
       ),

@@ -5,106 +5,82 @@ import 'package:agrohub_collector_flutter/cont/constants.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/src/provider.dart';
 
-class UncollectedOrderProductList extends StatelessWidget {
-  const UncollectedOrderProductList({Key? key}) : super(key: key);
+class ExpandableProductTiles extends StatelessWidget {
+  const ExpandableProductTiles({
+    Key? key,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     var list = context.read<CollectingListsBloc>().uncollectedListOrder;
-    return Expanded(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: ListView.builder(
-          itemCount: list.length,
-          itemBuilder: (BuildContext context, int index) {
-            return ExpandableProductTiles(
-              index: index,
-              stringPrice: '',
-              price: 0.0,
-            );
-          },
-        ),
-      ),
-    );
-  }
-}
 
-class ExpandableProductTiles extends StatefulWidget {
-  const ExpandableProductTiles({
-    Key? key,
-    required this.stringPrice,
-    required this.price,
-    required this.index,
-  }) : super(key: key);
-  final String stringPrice;
-  final double price;
-  final int index;
-
-  @override
-  State<ExpandableProductTiles> createState() => _ExpandableProductTilesState();
-}
-
-class _ExpandableProductTilesState extends State<ExpandableProductTiles> {
-  @override
-  Widget build(BuildContext context) {
     return BlocBuilder<CollectingListsBloc, CollectingListsState>(
-      builder: (context, state) {
-        return ExpandablePanel(
-          theme: const ExpandableThemeData(
-            hasIcon: false,
-          ),
-          collapsed: Container(),
-          expanded: Column(
-            children: [
-              const Divider(
-                color: Colors.blue,
-                thickness: 1,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(widget.stringPrice),
-                  Text('${widget.price} р/кг')
-                ],
-              ),
-              const SizedBox(height: 20.0),
-              const Align(
-                child: Text(
-                  'Товара собрано',
+        builder: (context, state) {
+      return Expanded(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: ListView.builder(
+            itemCount: list.length,
+            itemBuilder: (BuildContext context, int index) {
+              return ExpandablePanel(
+                theme: const ExpandableThemeData(
+                  hasIcon: false,
                 ),
-                alignment: Alignment.bottomLeft,
-              ),
-              TextFormField(
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0)),
+                collapsed: Container(),
+                expanded: Column(
+                  children: [
+                    const Divider(
+                      color: Colors.blue,
+                      thickness: 1,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('widget.stringPrice'),
+                        Text('{widget.price} р/кг')
+                      ],
+                    ),
+                    const SizedBox(height: 20.0),
+                    const Align(
+                      child: Text(
+                        'Товара собрано',
+                      ),
+                      alignment: Alignment.bottomLeft,
+                    ),
+                    TextFormField(
+                      keyboardType: TextInputType.number,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10.0)),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        context.read<CollectingListsBloc>().add(
+                            ProductCollectingPressed(context
+                                .read<CollectingListsBloc>()
+                                .uncollectedListOrder[index]));
+                      },
+                      child: const Text('Собрать'),
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                  ],
                 ),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  context.read<CollectingListsBloc>().add(
-                      ProductCollectingPressed(context
-                          .read<CollectingListsBloc>()
-                          .uncollectedListOrder[widget.index]));
-                },
-                child: const Text('Собрать'),
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-            ],
+                header: const ProductTiles(
+                  title: orange,
+                  weight: weight,
+                ),
+              );
+            },
           ),
-          header: const ProductTiles(
-            title: tomato,
-            weight: weight,
-          ),
-        );
-      },
-    );
+        ),
+      );
+    });
   }
 }
 
