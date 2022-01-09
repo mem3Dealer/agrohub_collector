@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 
+import 'package:agrohub_collector_flutter/model/product.dart';
 import 'package:agrohub_collector_flutter/model/order.dart';
 
 class OrdersState extends Equatable {
@@ -11,12 +12,12 @@ class OrdersState extends Equatable {
   int? farmerId;
   int? orderId;
   // List<FirstOrder>? firstOrder = <FirstOrder>[];
-  List<Order>? allOrders = <Order>[];
-  // List<DetailedOrder>? detailOrder = <DetailedOrder>[];
-  List<Order>? selectOrder = <Order>[];
-  List<Order>? ordersNew = <Order>[];
-  List<Order>? ordersInWork = <Order>[];
-  List<Order>? ordersCollected = <Order>[];
+  List<Order>? allOrders = [];
+  List<Product>? listOfProducts = [];
+  List<Order>? selectOrder = [];
+  List<Order>? ordersNew = [];
+  List<Order>? ordersInWork = [];
+  List<Order>? ordersCollected = [];
   Map<String, dynamic>? initialParamsDetail;
   int? idOrder;
   int? farmerOrderId;
@@ -32,8 +33,9 @@ class OrdersState extends Equatable {
     this.farmerId,
     this.orderId,
     this.allOrders,
+
     // this.firstOrder,
-    // this.detailOrder,
+    this.listOfProducts,
     this.initialParamsDetail,
     this.selectOrder,
     this.ordersNew,
@@ -54,8 +56,9 @@ class OrdersState extends Equatable {
         farmerName,
         farmerStore,
         orderId,
+
         // firstOrder,
-        // detailOrder,
+        listOfProducts,
         allOrders,
         initialParamsDetail,
         selectOrder,
@@ -77,8 +80,9 @@ class OrdersState extends Equatable {
     String? farmerStore,
     int? orderId,
     List<Order>? allOrders,
+
     // List<FirstOrder>? firstOrder,
-    // List<DetailedOrder>? detailOrder,
+    List<Product>? listOfProducts,
     Map<String, dynamic>? initialParamsDetail,
     List<Order>? selectOrder,
     List<Order>? ordersNew,
@@ -98,7 +102,7 @@ class OrdersState extends Equatable {
       farmerStore: farmerStore ?? this.farmerStore,
       orderId: orderId ?? this.orderId,
       // firstOrder: firstOrder ?? this.firstOrder,
-      // detailOrder: detailOrder ?? this.detailOrder,
+      listOfProducts: listOfProducts ?? this.listOfProducts,
       initialParamsDetail: initialParamsDetail ?? this.initialParamsDetail,
       selectOrder: selectOrder ?? this.selectOrder,
       allOrders: allOrders ?? this.allOrders,
@@ -114,6 +118,6 @@ class OrdersState extends Equatable {
 
   @override
   String toString() {
-    return 'OrdersState(loading: $loading, deliveryNumber: $deliveryNumber, deliveryTime: $deliveryTime, farmerName: $farmerName, farmerStore: $farmerStore, farmerId: $farmerId, orderId: $orderId, allOrders: $allOrders, selectOrder: $selectOrder, ordersNew: $ordersNew, ordersInWork: $ordersInWork, ordersCollected: $ordersCollected, initialParamsDetail: $initialParamsDetail, idOrder: $idOrder, farmerOrderId: $farmerOrderId, status: $status, deliveryId: $deliveryId)';
+    return 'OrdersState(loading: $loading, deliveryNumber: $deliveryNumber, deliveryTime: $deliveryTime, farmerName: $farmerName, farmerStore: $farmerStore, farmerId: $farmerId, orderId: $orderId, allOrders: $allOrders, listOfProducts: $listOfProducts, selectOrder: $selectOrder, ordersNew: $ordersNew, ordersInWork: $ordersInWork, ordersCollected: $ordersCollected, initialParamsDetail: $initialParamsDetail, idOrder: $idOrder, farmerOrderId: $farmerOrderId, status: $status, deliveryId: $deliveryId)';
   }
 }

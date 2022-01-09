@@ -1,11 +1,15 @@
-import 'package:agrohub_collector_flutter/bloc/bloc/auth_bloc.dart';
-import 'package:agrohub_collector_flutter/bloc/bloc/auth_events.dart';
-import 'package:agrohub_collector_flutter/bloc/bloc/auth_state.dart';
+import 'dart:developer';
+
+import 'package:agrohub_collector_flutter/bloc/bloc/auth/auth_bloc.dart';
+import 'package:agrohub_collector_flutter/bloc/bloc/auth/auth_events.dart';
+import 'package:agrohub_collector_flutter/bloc/bloc/auth/auth_state.dart';
 import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_bloc.dart';
 import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_event.dart';
 import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_state.dart';
-
+import 'package:expandable/expandable.dart';
+import 'package:intl/intl.dart';
 import 'package:agrohub_collector_flutter/components/orderTile.dart';
+import 'package:agrohub_collector_flutter/model/order.dart';
 import 'package:agrohub_collector_flutter/repositories/auth_rep.dart';
 import 'package:agrohub_collector_flutter/repositories/orders_rep.dart';
 import 'package:agrohub_collector_flutter/shared/myScaffold.dart';
@@ -30,6 +34,7 @@ class AllOrdersPage extends StatefulWidget {
 class _AllOrdersPageState extends State<AllOrdersPage> {
   final authBloc = GetIt.I.get<AuthenticationBloc>();
   final ordersBloc = GetIt.I.get<OrdersBloc>();
+  final ExpandableController _controller = ExpandableController();
   @override
   void initState() {
     getOrders();
@@ -37,8 +42,18 @@ class _AllOrdersPageState extends State<AllOrdersPage> {
     // authBloc.add(AuthenticationInit());
   }
 
-  void getOrders() {
-    ordersBloc.add(OrdersGetAllOrders());
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  Future<void> getOrders() async {
+    ordersBloc.add(OrdersGetAllOrders(
+        onError: (e) {
+          inspect(e);
+        },
+        onSuccess: () => print('amaizing')));
   }
 
   @override
@@ -49,19 +64,33 @@ class _AllOrdersPageState extends State<AllOrdersPage> {
       builder: (context, state) {
         // ordersBloc.add(OrdersGetAllOrders());
         // ord_rep.getAllOrders();
-        print('THESE ARE: ${ordersBloc.state}');
-        return MyScaffold(false,
-            title: 'Список заказов',
-            body: Expanded(child: Container()
-                // ListView.builder(
-                //     itemCount: ordersBloc.state.allOrders!.length,
-                //     itemBuilder: (BuildContext context, int index) {
-                //       return OrderTile(
-                //           number: ordersBloc.state.orderId.toString(),
-                //           time: ordersBloc.state.deliveryTime!);
-                //     }))
-
-                ));
+        // print('THESE ARE: ${ordersBloc.state}');
+        return MyScaffold(
+          false,
+          title: 'Список заказов',
+          body: state.allOrders != null
+              ? Expanded(
+                  child: Center(
+                      child: ListView.builder(
+                          itemCount: state.allOrders?.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            Order order = state.allOrders![index];
+                            String time =
+                                order.delivery_time!.substring(17, 22);
+                            // DateTime time1 = DateTime.parse(
+                            //     order.delivery_time.toString());
+                            // DateTime time =
+                            //     DateTime.parse(order.delivery_time это хорошая идея, но с бека приходит неправильный формат даты
+                            return OrderTile(
+                                controller: _controller,
+                                id: order.id!,
+                                time: "К $time",
+                                deliveryId:
+                                    int.parse(order.agregator_order_id!));
+                          })),
+                )
+              : const Center(child: CircularProgressIndicator()),
+        );
       },
     );
   }

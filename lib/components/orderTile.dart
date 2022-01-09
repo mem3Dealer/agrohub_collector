@@ -1,13 +1,22 @@
+import 'dart:developer';
+
+import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_bloc.dart';
+import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_event.dart';
 import 'package:agrohub_collector_flutter/pages/collectingOrderPage.dart';
 import 'package:flutter/material.dart';
 import 'package:expandable/expandable.dart';
+import 'package:get_it/get_it.dart';
 
 class OrderTile extends StatefulWidget {
-  String number;
+  int id;
   String time;
+  int deliveryId;
+  ExpandableController controller;
 
   OrderTile({
-    required this.number,
+    required this.controller,
+    required this.id,
+    required this.deliveryId,
     required this.time,
     Key? key,
   }) : super(
@@ -19,17 +28,28 @@ class OrderTile extends StatefulWidget {
 }
 
 class _OrderTileState extends State<OrderTile> {
+  final ordersBloc = GetIt.I.get<OrdersBloc>();
+
   // double _height = 116;
   // bool isVisiible = true;
+
+  Future getProduct(int id) async {
+    ordersBloc.add(OrdersGetDetailOrder(
+        id: id,
+        onError: (e) {
+          inspect(e);
+        },
+        onSuccess: () {}));
+  }
 
   @override
   Widget build(
     BuildContext context,
   ) {
-    return buildOrderTile(widget.number, widget.time);
+    return buildOrderTile(widget.id, widget.time, widget.deliveryId);
   }
 
-  Widget buildOrderTile(String number, String time) {
+  Widget buildOrderTile(int id, String time, int deliveryId) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
       child: Card(
@@ -46,7 +66,7 @@ class _OrderTileState extends State<OrderTile> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       Text(
-                        "Заказ №${widget.number}",
+                        "Заказ №${widget.deliveryId}",
                         textAlign: TextAlign.left,
                         style: const TextStyle(
                             fontFamily: 'Roboto',
@@ -97,14 +117,16 @@ class _OrderTileState extends State<OrderTile> {
                           backgroundColor: MaterialStateProperty.all(
                         const Color(0xff69A8BB),
                       )),
-                      onPressed: () {
-                        Navigator.push<void>(
-                          context,
-                          MaterialPageRoute<void>(
-                            builder: (BuildContext context) =>
-                                CollectingOrderPage(number, time),
-                          ),
-                        );
+                      onPressed: () async {
+                        await getProduct(id).then((value) {
+                          Navigator.push<void>(
+                            context,
+                            MaterialPageRoute<void>(
+                              builder: (BuildContext context) =>
+                                  CollectingOrderPage(deliveryId, time),
+                            ),
+                          );
+                        });
                       },
                       child: const Text(
                         'Начать сборку',

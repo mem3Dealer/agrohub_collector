@@ -13,3 +13,16 @@ class OrdersGetAllOrders extends OrdersEvents {
   final Function? onError;
   final Function? onSuccess;
 }
+
+// получение детального заказа
+class OrdersGetDetailOrder extends OrdersEvents {
+  OrdersGetDetailOrder({
+    required this.id,
+    this.onError,
+    this.onSuccess,
+  });
+
+  final int id;
+  final Function? onError;
+  final Function? onSuccess;
+}

@@ -1,7 +1,7 @@
 import 'dart:developer';
 
-import 'package:agrohub_collector_flutter/bloc/bloc/auth_bloc.dart';
-import 'package:agrohub_collector_flutter/bloc/bloc/auth_events.dart';
+import 'package:agrohub_collector_flutter/bloc/bloc/auth/auth_bloc.dart';
+import 'package:agrohub_collector_flutter/bloc/bloc/auth/auth_events.dart';
 import 'package:agrohub_collector_flutter/pages/allOrdersPage.dart';
 import 'package:agrohub_collector_flutter/repositories/auth_rep.dart';
 import 'package:flutter/material.dart';

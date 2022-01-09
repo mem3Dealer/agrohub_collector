@@ -1,7 +1,8 @@
 import 'dart:developer';
 
 import 'package:agrohub_collector_flutter/api/errorHandler.dart';
-import 'package:agrohub_collector_flutter/bloc/bloc/auth_bloc.dart';
+import 'package:agrohub_collector_flutter/bloc/bloc/auth/auth_bloc.dart';
+
 import 'package:agrohub_collector_flutter/repositories/auth_rep.dart';
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
@@ -13,7 +14,6 @@ class HtttpSerivceOrders {
   final String baseUrl = "https://dev-orders-api.agrohub.io";
 
   HttpServiceOrders() {
-    print('aloha');
     dio = Dio(
       BaseOptions(
         baseUrl: baseUrl,
@@ -21,7 +21,6 @@ class HtttpSerivceOrders {
         headers: <String, dynamic>{"Authorization": authBloc.state.JWT},
       ),
     );
-    print('alohahaha');
   }
 
   Future<Response<dynamic>> getRequest(

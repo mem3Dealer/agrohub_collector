@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:agrohub_collector_flutter/api/errorHandler.dart';
-import 'package:agrohub_collector_flutter/bloc/bloc/auth_bloc.dart';
+import 'package:agrohub_collector_flutter/bloc/bloc/auth/auth_bloc.dart';
 import 'package:agrohub_collector_flutter/repositories/auth_rep.dart';
 import "package:dio/dio.dart";
 
