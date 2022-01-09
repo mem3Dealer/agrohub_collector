@@ -1,8 +1,9 @@
+import 'package:agrohub_collector_flutter/bloc/business_logic_layer/collecting_lists_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/src/provider.dart';
 
 class CollectedOrderProductList extends StatelessWidget {
   const CollectedOrderProductList({Key? key}) : super(key: key);
-  static final List<CollectedProductTiles> collectedListOrder = [];
 
   @override
   Widget build(BuildContext context) {
@@ -10,7 +11,7 @@ class CollectedOrderProductList extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: ListView(
-          children: collectedListOrder,
+          children: context.read<CollectingListsBloc>().collectedListOrder,
         ),
       ),
     );

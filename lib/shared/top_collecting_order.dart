@@ -5,7 +5,7 @@ import 'package:agrohub_collector_flutter/components/uncollected_order_product_l
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'orderInfo.dart';
+import '../pages/order_info_page.dart';
 
 class CollectingOrderPage extends StatelessWidget {
   const CollectingOrderPage(

@@ -11,4 +11,7 @@ const orderTime = TextStyle(
 //наимнование товара
 const weight = 3.2;
 const tomato = 'Помидоры азербайджанские красные';
+const apple = 'Яблоки';
+const orange = 'Апельсины';
+const potato = 'Картофель';
 const strPrice = 'Цена';

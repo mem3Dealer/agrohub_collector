@@ -1,5 +1,5 @@
 import 'package:agrohub_collector_flutter/bloc/business_logic_layer/collecting_lists_bloc.dart';
-import 'package:agrohub_collector_flutter/pages/orderInfo.dart';
+import 'package:agrohub_collector_flutter/pages/order_info_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
