@@ -212,6 +212,7 @@ class _LoginPageState extends State<LoginPage> {
           color: Colors.blue,
         ),
         title: 'Пароль',
+        obscuring: true,
       ),
     );
   }
@@ -227,7 +228,7 @@ class _LoginPageState extends State<LoginPage> {
           color: Colors.blue,
         ),
         title: 'Логин',
-        obscuring: true,
+        obscuring: false,
       ),
     );
   }
@@ -238,7 +239,7 @@ class Fields extends StatelessWidget {
   final Color color;
   final String title;
   final Icon icon;
-  final bool? obscuring;
+  final bool obscuring;
 
   const Fields({
     Key? key,
@@ -246,14 +247,14 @@ class Fields extends StatelessWidget {
     required this.color,
     required this.title,
     required this.icon,
-    this.obscuring,
+    required this.obscuring,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return TextField(
       controller: controller,
-      obscureText: true,
+      obscureText: obscuring,
       decoration: InputDecoration(
         enabledBorder: const OutlineInputBorder(
           borderSide: BorderSide(color: Colors.blue),
