@@ -60,7 +60,7 @@ class OrderInfoPage extends StatelessWidget {
                       child: Row(
                         children: [
                           Text('Интервал доставки:', style: style),
-                          SizedBox(
+                          const SizedBox(
                             width: 62,
                           ),
                           Text(
@@ -80,7 +80,7 @@ class OrderInfoPage extends StatelessWidget {
                       child: Row(
                         children: [
                           Text('Количество товаров:', style: style),
-                          SizedBox(
+                          const SizedBox(
                             width: 55,
                           ),
                           Text(
@@ -96,7 +96,7 @@ class OrderInfoPage extends StatelessWidget {
                       child: Row(
                         children: [
                           Text('Общий вес:', style: style),
-                          SizedBox(
+                          const SizedBox(
                             width: 127,
                           ),
                           Text(
