@@ -70,8 +70,10 @@ class _AllOrdersPageState extends State<AllOrdersPage> {
           title: 'Список заказов',
           body: state.allOrders != null
               ? Expanded(
-                  child: Center(
-                      child: ListView.builder(
+                  child: Column(
+                    children: [
+                      ListView.builder(
+                          shrinkWrap: true,
                           itemCount: state.allOrders?.length,
                           itemBuilder: (BuildContext context, int index) {
                             Order order = state.allOrders![index];
@@ -87,7 +89,9 @@ class _AllOrdersPageState extends State<AllOrdersPage> {
                                 time: "К $time",
                                 deliveryId:
                                     int.parse(order.agregator_order_id!));
-                          })),
+                          })
+                    ],
+                  ),
                 )
               : const Center(child: CircularProgressIndicator()),
         );

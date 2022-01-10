@@ -123,7 +123,11 @@ class _OrderTileState extends State<OrderTile> {
                             context,
                             MaterialPageRoute<void>(
                               builder: (BuildContext context) =>
-                                  CollectingOrderPage(deliveryId, time),
+                                  CollectingOrderPage(
+                                // widget.imageUrl,
+                                deliveryId,
+                                time,
+                              ),
                             ),
                           );
                         });
