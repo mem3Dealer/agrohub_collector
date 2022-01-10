@@ -67,32 +67,27 @@ class _AllOrdersPageState extends State<AllOrdersPage> {
         // print('THESE ARE: ${ordersBloc.state}');
         return MyScaffold(
           false,
+          false,
           title: 'Список заказов',
           body: state.allOrders != null
-              ? Expanded(
-                  child: Column(
-                    children: [
-                      ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: state.allOrders?.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            Order order = state.allOrders![index];
-                            String time =
-                                order.delivery_time!.substring(17, 22);
-                            // DateTime time1 = DateTime.parse(
-                            //     order.delivery_time.toString());
-                            // DateTime time =
-                            //     DateTime.parse(order.delivery_time это хорошая идея, но с бека приходит неправильный формат даты
-                            return OrderTile(
-                                controller: _controller,
-                                id: order.id!,
-                                time: "К $time",
-                                deliveryId:
-                                    int.parse(order.agregator_order_id!));
-                          })
-                    ],
-                  ),
-                )
+              ? ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: state.allOrders?.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    Order order = state.allOrders![index];
+                    String time = order.delivery_time!.substring(17, 22);
+                    ExpandableController ctrl = ExpandableController();
+
+                    // DateTime time1 = DateTime.parse(
+                    //     order.delivery_time.toString());
+                    // DateTime time =
+                    //     DateTime.parse(order.delivery_time это хорошая идея, но с бека приходит неправильный формат даты
+                    return OrderTile(
+                        controller: ctrl,
+                        id: order.id!,
+                        time: "К $time",
+                        deliveryId: int.parse(order.agregator_order_id!));
+                  })
               : const Center(child: CircularProgressIndicator()),
         );
       },

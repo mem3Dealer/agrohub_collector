@@ -12,9 +12,10 @@ class OrdersBloc extends Bloc<OrdersEvents, OrdersState> {
 
   OrdersBloc(
     OrdersRepository? ordersRepository,
-  ) : super(OrdersState()) {
+  ) : super(OrdersState(version: 0)) {
     on<OrdersGetAllOrders>(_eventOrdersGetAllOrders);
     on<OrdersGetDetailOrder>(_eventOrdersGetDetailOrder);
+    on<ChangeProductStatus>(_eventChangeProductStatus);
   }
 
   Future<void> _eventOrdersGetAllOrders(
@@ -92,14 +93,33 @@ class OrdersBloc extends Bloc<OrdersEvents, OrdersState> {
         id: event.id,
         onError: event.onError,
       );
+      for (Product p in _listOfProducts!) {
+        p.status = 'to_collect';
+      }
+
       emitter(state.copyWith(
         listOfProducts: _listOfProducts,
-        //TODO мне нужно как-то его обнулять по выходу из сборки, отмене заказа или типа того
       ));
       event.onSuccess!();
     } catch (e) {
       event.onError!(e);
     }
+  }
+
+  void _eventChangeProductStatus(
+    ChangeProductStatus event,
+    Emitter<OrdersState> emitter,
+  ) {
+    if (event.newStatus == 'to_collect') {
+      event.product.status = 'to_collect';
+    } else if (event.newStatus == 'collected') {
+      event.product.status = 'collected';
+    } else if (event.newStatus == 'deleted') {
+      event.product.status = 'deleted';
+    }
+
+    emitter(state.copyWith(
+        listOfProducts: state.listOfProducts, version: state.version + 1));
   }
 
   Future<List<Product>?> detailOrder({

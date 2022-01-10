@@ -29,7 +29,7 @@ class OrderInfoPage extends StatelessWidget {
           totalPrice += e.unit_price ?? 0;
         }
 
-        return MyScaffold(true,
+        return MyScaffold(true, false,
             title: orderNumber,
             body: Padding(
               padding: const EdgeInsets.only(top: 24.0),

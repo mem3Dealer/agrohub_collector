@@ -1,13 +1,18 @@
+import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_bloc.dart';
+import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_event.dart';
+import 'package:agrohub_collector_flutter/model/product.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 
 class ProductCard extends StatefulWidget {
-  String imageUrl, name, totalPrice, orderedWeight;
+  // String imageUrl, name, totalPrice, orderedWeight;
+  Product product;
 
   ProductCard(
-      {required this.imageUrl,
-      required this.name,
-      required this.orderedWeight,
-      required this.totalPrice,
+      {required this.product,
+      // required this.name,
+      // required this.orderedWeight,
+      // required this.totalPrice,
       Key? key})
       : super(key: key);
 
@@ -17,6 +22,7 @@ class ProductCard extends StatefulWidget {
 
 class ProductCardState extends State<ProductCard> {
   bool _isCollapsed = true;
+  final ordersBloc = GetIt.I.get<OrdersBloc>();
   final _controller = TextEditingController();
 
   _expandCard() {
@@ -63,8 +69,14 @@ class ProductCardState extends State<ProductCard> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         IconButton(
+                            alignment: Alignment.topRight,
                             onPressed: () {},
-                            icon: Icon(Icons.arrow_forward_ios_sharp)),
+                            icon: _isCollapsed
+                                ? Icon(Icons.arrow_forward_ios_sharp)
+                                : RotatedBox(
+                                    quarterTurns: 1,
+                                    child: Icon(Icons.arrow_forward_ios_sharp),
+                                  )),
                       ],
                     )
                   ],
@@ -103,14 +115,24 @@ class ProductCardState extends State<ProductCard> {
                             //
                             //'удалить'
                             Button(
+                              product: widget.product,
+                              // changeStatus: () {
+                              //   print('does it?');
+                              //   changeStatus(widget.product, 'deleted');
+                              // },
                               style: _style,
                               color: const Color(0xffE14D43),
-                              text: 'удалить',
+                              text: 'Удалить',
                             ),
                             const SizedBox(
                               width: 4,
                             ),
                             Button(
+                              product: widget.product,
+                              // changeStatus: () =>
+                              //     changeStatus(widget.product, 'collected'),
+
+                              // changeStatus(widget.product, 'collected'),
                               style: _style,
                               color: const Color(0xff69A8BB),
                               text: 'Собрать',
@@ -138,22 +160,20 @@ class ProductCardState extends State<ProductCard> {
             border: Border.all(
               color: const Color(0xffCACED0),
             )),
-        child: Expanded(
-          child: TextField(
-            // textAlignVertical:
-            //     TextAlignVertical.top,
-            style: _style,
-            // autofocus: true,
-            maxLines: 1,
-            // maxLength: 5,
-            controller: _controller,
-            keyboardType: TextInputType.number,
-            cursorHeight: 30,
-            decoration: InputDecoration(
-                hintStyle: _style.copyWith(color: Color(0xff999999)),
-                hintText: 'Введите', //TODO КРИВО!
-                border: InputBorder.none),
-          ),
+        child: TextField(
+          // textAlignVertical:
+          //     TextAlignVertical.top,
+          style: _style,
+          // autofocus: true,
+          maxLines: 1,
+          // maxLength: 5,
+          controller: _controller,
+          keyboardType: TextInputType.number,
+          cursorHeight: 30,
+          decoration: InputDecoration(
+              hintStyle: _style.copyWith(color: Color(0xff999999)),
+              hintText: 'Введите', //TODO КРИВО!
+              border: InputBorder.none),
         ));
   }
 
@@ -161,7 +181,7 @@ class ProductCardState extends State<ProductCard> {
     return Container(
       padding: const EdgeInsets.fromLTRB(8, 8, 16, 0),
       child: Text(
-        widget.orderedWeight,
+        '${widget.product.ordered_quantity} кг',
         // state
         //   .listOfProducts!.first.ordered_quantity
         //   .toString(),
@@ -175,20 +195,31 @@ class Button extends StatelessWidget {
   Color color;
   String text;
   TextStyle style;
+  Product product;
   Button({
+    required this.product,
     required this.color,
     required this.text,
     required this.style,
     Key? key,
   }) : super(key: key);
-
+  final ordersBloc = GetIt.I.get<OrdersBloc>();
   // final TextStyle _style;
+  changeStatus(Product product, String newStatus) {
+    ordersBloc.add(ChangeProductStatus(product: product, newStatus: newStatus));
+  }
 
   @override
   Widget build(BuildContext context) {
     return Expanded(
       child: InkWell(
-        onTap: () {},
+        onTap: () {
+          if (text == 'Собрать') {
+            changeStatus(product, 'collected');
+          } else if (text == 'Удалить') {
+            changeStatus(product, 'deleted');
+          }
+        },
         child: Container(
           // width: 182,
           height: 56,
@@ -227,7 +258,7 @@ class PriceRow extends StatelessWidget {
           style: _style,
         ),
         Text(
-          "${widget.totalPrice} руб./кг",
+          "${widget.product.total_price} руб./кг",
           style: _style.copyWith(fontWeight: FontWeight.w500, fontSize: 16),
         )
       ],
@@ -253,7 +284,7 @@ class ProductName extends StatelessWidget {
       height: 96,
       width: 170,
       child: Text(
-        widget.name,
+        widget.product.name!,
         maxLines: 4,
         overflow: TextOverflow.visible,
         style: _style,
@@ -277,7 +308,7 @@ class ImagePlacer extends StatelessWidget {
       width: 132,
       decoration: BoxDecoration(
           image: DecorationImage(
-              fit: BoxFit.cover, image: NetworkImage(widget.imageUrl))),
+              fit: BoxFit.cover, image: NetworkImage(widget.product.image!))),
     );
   }
 }

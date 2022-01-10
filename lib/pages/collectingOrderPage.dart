@@ -1,6 +1,8 @@
 import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_bloc.dart';
+import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_event.dart';
 import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_state.dart';
 import 'package:agrohub_collector_flutter/components/productCard.dart';
+import 'package:agrohub_collector_flutter/model/order.dart';
 import 'package:agrohub_collector_flutter/model/product.dart';
 import 'package:agrohub_collector_flutter/pages/allOrdersPage.dart';
 import 'package:agrohub_collector_flutter/shared/myScaffold.dart';
@@ -23,7 +25,7 @@ class CollectingOrderPage extends StatefulWidget {
 
 class _CollectingOrderPageState extends State<CollectingOrderPage> {
   final ordersBloc = GetIt.I.get<OrdersBloc>();
-
+  bool toCollect = true;
   @override
   void initState() {
     super.initState();
@@ -35,11 +37,15 @@ class _CollectingOrderPageState extends State<CollectingOrderPage> {
     super.dispose();
   }
 
+  void _switcher() {
+    setState(() {
+      toCollect = !toCollect;
+    });
+    print('hehe');
+  }
+
   @override
   Widget build(BuildContext context) {
-    double _buttonHeight = 82.0;
-    double _buttonWidth = 183.0;
-
     // print(orderNumber);
     TextStyle _style = const TextStyle(
         fontFamily: 'Roboto',
@@ -47,74 +53,94 @@ class _CollectingOrderPageState extends State<CollectingOrderPage> {
         color: Color(0xff363B3F),
         fontSize: 18);
 
-    return MyScaffold(false,
+    return MyScaffold(false, true,
         title: "Заказ №${widget.agregatorOrderId}",
         deliveryTime: widget.deliveryTime,
         body: BlocBuilder<OrdersBloc, OrdersState>(
             bloc: ordersBloc,
             builder: (context, state) {
-              return Center(
-                child: state.listOfProducts != null &&
-                        state.listOfProducts?.isNotEmpty == true
-                    ? Column(
-                        children: <Widget>[
-                          ButtonsPanel(
-                              buttonHeight: _buttonHeight,
-                              buttonWidth: _buttonWidth),
-                          ListView.builder(
+              int totalCollected = 0;
+              int totalToCollect = 0;
+
+              for (Product p in state.listOfProducts!) {
+                if (p.status == 'to_collect') {
+                  totalToCollect++;
+                } else if (p.status == 'collected') {
+                  totalCollected++;
+                }
+              }
+
+              return Column(
+                children: [
+                  ButtonsPanel(
+                      switcher: _switcher,
+                      totalCollected: totalCollected,
+                      totalToCollect: totalToCollect),
+                  Expanded(
+                    child: Container(
+                      child: state.listOfProducts != null &&
+                              state.listOfProducts?.isNotEmpty == true
+                          ? ListView.builder(
+                              padding: const EdgeInsets.only(top: 10),
                               shrinkWrap: true,
                               itemCount: state.listOfProducts!.length,
-                              itemBuilder: (BuildContext context, int index) {
+                              itemBuilder: (context, int index) {
                                 Product product = state.listOfProducts![index];
-                                return ProductCard(
-                                    imageUrl: product.image!,
-                                    name: product.name!,
-                                    orderedWeight:
-                                        product.ordered_quantity.toString(),
-                                    totalPrice: product.total_price.toString());
+                                // print(product.status);
+                                if (product.status == 'to_collect') {
+                                  return Column(
+                                    children: [
+                                      ProductCard(
+                                        product: product,
+                                      ),
+                                      const SizedBox(
+                                        height: 16,
+                                      )
+                                    ],
+                                  );
+                                } else {
+                                  return Container();
+                                }
                               })
-                        ],
-                      )
-                    : const CircularProgressIndicator(),
+                          : const Center(child: CircularProgressIndicator()),
+                    ),
+                  ),
+                ],
               );
             }));
   }
 }
 
-showToCollect() {}
-showCollected() {}
-
 class ButtonsPanel extends StatelessWidget {
-  const ButtonsPanel({
-    Key? key,
-    required double buttonHeight,
-    required double buttonWidth,
-  })  : _buttonHeight = buttonHeight,
-        _buttonWidth = buttonWidth,
-        super(key: key);
+  final int totalToCollect;
+  final int totalCollected;
+  final Function switcher;
 
-  final double _buttonHeight;
-  final double _buttonWidth;
+  const ButtonsPanel({
+    required this.switcher,
+    required this.totalCollected,
+    required this.totalToCollect,
+    Key? key,
+  }) : super(key: key);
+
+  final double _buttonHeight = 82.0;
+  final double _buttonWidth = 183.0;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(0, 24, 0, 25),
+      padding: const EdgeInsets.fromLTRB(0, 12, 0, 16),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         //КНОПКИ
         children: [
           Button(
-            buttonHeight: _buttonHeight,
-            buttonWidth: _buttonWidth,
-            onTap: () {},
-            text: 'Собрать\n(10)',
+            onTap: switcher,
+            text: 'Собрать $totalToCollect',
           ),
           Button(
-            buttonHeight: _buttonHeight,
-            buttonWidth: _buttonWidth,
-            onTap: () {},
-            text: 'Собрано\n(0)',
+            onTap: switcher,
+            text: 'Собрано $totalCollected',
           ),
         ],
       ),
@@ -125,25 +151,23 @@ class ButtonsPanel extends StatelessWidget {
 class Button extends StatelessWidget {
   const Button({
     Key? key,
-    required double buttonHeight,
-    required double buttonWidth,
     required Function onTap,
     required String text,
-  })  : _buttonHeight = buttonHeight,
-        _buttonWidth = buttonWidth,
-        _onTap = onTap,
+  })  : _onTap = onTap,
         _text = text,
         super(key: key);
 
-  final double _buttonHeight;
-  final double _buttonWidth;
+  final double _buttonHeight = 54.6;
+  final double _buttonWidth = 122;
   final Function _onTap;
   final String _text;
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () => _onTap,
+      onTap: () {
+        _onTap;
+      },
       child: Container(
         height: _buttonHeight,
         width: _buttonWidth,
@@ -154,7 +178,7 @@ class Button extends StatelessWidget {
             style: const TextStyle(
                 fontFamily: "Roboto",
                 fontWeight: FontWeight.w400,
-                fontSize: 18),
+                fontSize: 16),
           ),
         ),
         decoration: BoxDecoration(
