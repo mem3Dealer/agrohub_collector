@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:agrohub_collector_flutter/bloc/bloc/auth/auth_bloc.dart';
 import 'package:agrohub_collector_flutter/bloc/bloc/auth/auth_events.dart';
 import 'package:agrohub_collector_flutter/bloc/bloc/auth/auth_state.dart';
+import 'package:agrohub_collector_flutter/bloc/bloc/network/network_bloc.dart';
 import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_bloc.dart';
 import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_event.dart';
 import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_state.dart';
@@ -17,10 +18,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 OrdersRepository ord_rep = OrdersRepository();
 
-FlutterSecureStorage storage = FlutterSecureStorage();
+FlutterSecureStorage storage = const FlutterSecureStorage();
 
 class AllOrdersPage extends StatefulWidget {
   static const String routeName = '/allOrders';
@@ -34,7 +36,9 @@ class AllOrdersPage extends StatefulWidget {
 class _AllOrdersPageState extends State<AllOrdersPage> {
   final authBloc = GetIt.I.get<AuthenticationBloc>();
   final ordersBloc = GetIt.I.get<OrdersBloc>();
+  final networkBloc = GetIt.I.get<NetworkBloc>();
   final ExpandableController _controller = ExpandableController();
+
   @override
   void initState() {
     getOrders();
@@ -58,13 +62,34 @@ class _AllOrdersPageState extends State<AllOrdersPage> {
 
   @override
   Widget build(BuildContext context) {
-    // print();
+    return BlocBuilder<NetworkBloc, NetworkState>(
+        bloc: networkBloc,
+        builder: (context, networkState) {
+          context.read<NetworkBloc>().add(ListenConnection());
+          print(networkState);
+          return networkState is ConnectionFailure
+              ? const Center(child: Text('Нет Интернет соединения'))
+              : ListOrderShow(ordersBloc: ordersBloc, controller: _controller);
+        });
+  }
+}
+
+class ListOrderShow extends StatelessWidget {
+  const ListOrderShow({
+    Key? key,
+    required this.ordersBloc,
+    required ExpandableController controller,
+  })  : _controller = controller,
+        super(key: key);
+
+  final OrdersBloc ordersBloc;
+  final ExpandableController _controller;
+
+  @override
+  Widget build(BuildContext context) {
     return BlocBuilder<OrdersBloc, OrdersState>(
       bloc: ordersBloc,
       builder: (context, state) {
-        // ordersBloc.add(OrdersGetAllOrders());
-        // ord_rep.getAllOrders();
-        // print('THESE ARE: ${ordersBloc.state}');
         return MyScaffold(
           false,
           title: 'Список заказов',

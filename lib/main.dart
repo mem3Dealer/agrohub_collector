@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:agrohub_collector_flutter/api/apiOrders.dart';
+import 'package:agrohub_collector_flutter/bloc/bloc/network/network_bloc.dart';
 import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_bloc.dart';
 import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_state.dart';
 import 'package:agrohub_collector_flutter/repositories/orders_rep.dart';
@@ -30,13 +31,15 @@ void main() async {
         AuthenticationBloc(authenticationRepository: _authenticationRepository))
     // ..registerFactory(() => Dio())
     ..registerSingleton<OrdersBloc>(OrdersBloc(_ordersRepository))
-    ..registerSingleton<HtttpSerivceOrders>(HtttpSerivceOrders());
+    ..registerSingleton<HtttpSerivceOrders>(HtttpSerivceOrders())
+    ..registerSingleton<NetworkBloc>(NetworkBloc());
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
   final authBloc = GetIt.I.get<AuthenticationBloc>();
   final ordersBloc = GetIt.I.get<OrdersBloc>();
+  final networkBloc = GetIt.I.get<NetworkBloc>();
   MyApp({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
@@ -47,6 +50,9 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider<OrdersBloc>(
           create: (BuildContext context) => ordersBloc,
+        ),
+        BlocProvider<NetworkBloc>(
+          create: (BuildContext context) => networkBloc,
         ),
       ],
       child: MaterialApp(
