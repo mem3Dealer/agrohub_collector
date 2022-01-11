@@ -16,6 +16,7 @@ class OrdersBloc extends Bloc<OrdersEvents, OrdersState> {
     on<OrdersGetAllOrders>(_eventOrdersGetAllOrders);
     on<OrdersGetDetailOrder>(_eventOrdersGetDetailOrder);
     on<ChangeProductStatus>(_eventChangeProductStatus);
+    // on<CollectProduct>(_eventCollectProduct);
   }
 
   Future<void> _eventOrdersGetAllOrders(
@@ -106,16 +107,29 @@ class OrdersBloc extends Bloc<OrdersEvents, OrdersState> {
     }
   }
 
+  // _eventCollectProduct(
+  //   CollectProduct event,
+  //   Emitter<OrdersState> emitter,
+  // ) {
+  //   event.product.collected_quantity = event.collectedQuantity;
+  //   emitter(state.copyWith(
+  //       listOfProducts: state.listOfProducts, version: state.version + 1));
+  // }
+
   void _eventChangeProductStatus(
     ChangeProductStatus event,
     Emitter<OrdersState> emitter,
   ) {
     if (event.newStatus == 'to_collect') {
       event.product.status = 'to_collect';
+      event.product.collected_quantity = 0.0;
     } else if (event.newStatus == 'collected') {
       event.product.status = 'collected';
+      event.product.collected_quantity = event.collectedQuantity;
     } else if (event.newStatus == 'deleted') {
-      event.product.status = 'deleted';
+      event.product.collected_quantity = 0.0;
+      event.isOnDelete = true;
+      // event.product.status = 'deleted';
     }
 
     emitter(state.copyWith(

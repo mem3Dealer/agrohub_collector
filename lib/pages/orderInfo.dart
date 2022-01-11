@@ -32,104 +32,109 @@ class OrderInfoPage extends StatelessWidget {
         return MyScaffold(true, false,
             title: orderNumber,
             body: Padding(
-              padding: const EdgeInsets.only(top: 24.0),
-              child: Container(
-                decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(4)),
-                height: 216,
-                width: 382,
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: const [
-                        Padding(
-                          padding: EdgeInsets.only(left: 16, top: 16),
-                          child: Text('Детали заказа',
-                              style: TextStyle(
+              padding: const EdgeInsets.fromLTRB(
+                  12, 24.0, 12, 320), //TODO это неправильно и надо переделать!!
+              child: SizedBox(
+                child: Card(
+                  color: Colors.white,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(4)),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: const [
+                          Padding(
+                            padding: EdgeInsets.only(left: 16, top: 16),
+                            child: Text('Детали заказа',
+                                style: TextStyle(
+                                    fontFamily: 'Roboto',
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 24)),
+                          ),
+                        ],
+                      ),
+                      Padding(
+                        padding:
+                            const EdgeInsets.only(left: 18, right: 50, top: 10),
+                        child: Row(
+                          children: [
+                            Text('Интервал доставки:', style: style),
+                            const SizedBox(
+                              width: 62,
+                            ),
+                            Text(
+                              deliveryTime,
+                              style: const TextStyle(
+                                  color: Color(0xffE14D43),
                                   fontFamily: 'Roboto',
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 24)),
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700),
+                            )
+                          ],
                         ),
-                      ],
-                    ),
-                    Padding(
-                      padding:
-                          const EdgeInsets.only(left: 18, right: 50, top: 10),
-                      child: Row(
-                        children: [
-                          Text('Интервал доставки:', style: style),
-                          const SizedBox(
-                            width: 62,
-                          ),
-                          Text(
-                            deliveryTime,
-                            style: const TextStyle(
-                                color: Color(0xffE14D43),
-                                fontFamily: 'Roboto',
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700),
-                          )
-                        ],
                       ),
-                    ),
-                    Padding(
-                      padding:
-                          const EdgeInsets.only(left: 18, right: 60, top: 10),
-                      child: Row(
-                        children: [
-                          Text('Количество товаров:', style: style),
-                          const SizedBox(
-                            width: 55,
-                          ),
-                          Text(
-                            '${_list.length} шт.',
-                            style: style.copyWith(fontWeight: FontWeight.w500),
-                          )
-                        ],
+                      Padding(
+                        padding:
+                            const EdgeInsets.only(left: 18, right: 60, top: 10),
+                        child: Row(
+                          children: [
+                            Text('Количество товаров:', style: style),
+                            const SizedBox(
+                              width: 55,
+                            ),
+                            Text(
+                              '${_list.length} шт.',
+                              style:
+                                  style.copyWith(fontWeight: FontWeight.w500),
+                            )
+                          ],
+                        ),
                       ),
-                    ),
-                    Padding(
-                      padding:
-                          const EdgeInsets.only(left: 18, right: 60, top: 10),
-                      child: Row(
-                        children: [
-                          Text('Общий вес:', style: style),
-                          const SizedBox(
-                            width: 127,
-                          ),
-                          Text(
-                            '$totalWeight кг',
-                            style: style.copyWith(fontWeight: FontWeight.w500),
-                          )
-                        ],
+                      Padding(
+                        padding:
+                            const EdgeInsets.only(left: 18, right: 60, top: 10),
+                        child: Row(
+                          children: [
+                            Text('Общий вес:', style: style),
+                            const SizedBox(
+                              width: 127,
+                            ),
+                            Text(
+                              '$totalWeight кг',
+                              style:
+                                  style.copyWith(fontWeight: FontWeight.w500),
+                            )
+                          ],
+                        ),
                       ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(
-                          left: 18, right: 60, top: 10, bottom: 25),
-                      child: Row(
-                        children: [
-                          Text('Сумма заказа:', style: style),
-                          const SizedBox(
-                            width: 103,
-                          ),
-                          Text(
-                            '$totalPrice руб.',
-                            style: style.copyWith(fontWeight: FontWeight.w500),
-                          )
-                        ],
+                      Padding(
+                        padding: const EdgeInsets.only(
+                            left: 18, right: 60, top: 10, bottom: 25),
+                        child: Row(
+                          children: [
+                            Text('Сумма заказа:', style: style),
+                            const SizedBox(
+                              width: 103,
+                            ),
+                            Text(
+                              '$totalPrice руб.',
+                              style:
+                                  style.copyWith(fontWeight: FontWeight.w500),
+                            )
+                          ],
+                        ),
                       ),
-                    ),
-                    const Divider(
-                      indent: 16,
-                      endIndent: 16,
-                      // height: 2,
-                      thickness: 1.5,
-                      color: Color(0xff69A8BB),
-                    ),
-                  ],
+                      const Divider(
+                        indent: 16,
+                        endIndent: 16,
+                        // height: 2,
+                        thickness: 1.5,
+                        color: Color(0xff69A8BB),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ));

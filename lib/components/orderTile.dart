@@ -11,11 +11,11 @@ class OrderTile extends StatefulWidget {
   int id;
   String time;
   int deliveryId;
-  ExpandableController controller;
+  // ExpandableController controller;
   // Key myKey;
 
   OrderTile({
-    required this.controller,
+    // required this.controller,
     required this.id,
     // required this.myKey,
     required this.deliveryId,
@@ -31,6 +31,18 @@ class OrderTile extends StatefulWidget {
 
 class _OrderTileState extends State<OrderTile> {
   final ordersBloc = GetIt.I.get<OrdersBloc>();
+  late var _exContrl = ExpandableController();
+  @override
+  void initState() {
+    super.initState();
+    _exContrl = ExpandableController(initialExpanded: false);
+  }
+
+  @override
+  void dispose() {
+    _exContrl.dispose();
+    super.dispose();
+  }
 
   // double _height = 116;
   // bool isVisiible = true;
@@ -57,7 +69,7 @@ class _OrderTileState extends State<OrderTile> {
       child: Card(
         child: ExpandablePanel(
           // key: widget.myKey,
-          // controller: widget.controller,
+          controller: _exContrl,
           theme: const ExpandableThemeData(
             hasIcon: false,
           ),

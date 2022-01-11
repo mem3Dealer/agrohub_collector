@@ -71,6 +71,7 @@ class _AllOrdersPageState extends State<AllOrdersPage> {
           title: 'Список заказов',
           body: state.allOrders != null
               ? ListView.builder(
+                  padding: EdgeInsets.only(top: 20),
                   shrinkWrap: true,
                   itemCount: state.allOrders?.length,
                   itemBuilder: (BuildContext context, int index) {
@@ -83,12 +84,14 @@ class _AllOrdersPageState extends State<AllOrdersPage> {
                     // DateTime time =
                     //     DateTime.parse(order.delivery_time это хорошая идея, но с бека приходит неправильный формат даты
                     return OrderTile(
-                        controller: ctrl,
                         id: order.id!,
                         time: "К $time",
                         deliveryId: int.parse(order.agregator_order_id!));
                   })
-              : const Center(child: CircularProgressIndicator()),
+              : const Center(
+                  child: CircularProgressIndicator(
+                  color: Color(0xffE14D43),
+                )),
         );
       },
     );

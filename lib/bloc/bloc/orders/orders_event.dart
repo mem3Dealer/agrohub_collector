@@ -1,3 +1,4 @@
+import 'package:agrohub_collector_flutter/model/order.dart';
 import 'package:agrohub_collector_flutter/model/product.dart';
 
 abstract class OrdersEvents {
@@ -30,11 +31,23 @@ class OrdersGetDetailOrder extends OrdersEvents {
 }
 
 class ChangeProductStatus extends OrdersEvents {
-  ChangeProductStatus({
+  ChangeProductStatus(
+    this.collectedQuantity,
+    this.isOnDelete, {
     required this.product,
     required this.newStatus,
   });
-
+  bool isOnDelete = false;
+  double collectedQuantity = 0.0;
   final Product product;
   final String newStatus;
 }
+
+// class CollectProduct extends OrdersEvents {
+//   CollectProduct({
+//     required this.collectedQuantity,
+//     required this.product,
+//   });
+//   double collectedQuantity;
+//   Product product;
+// }

@@ -17,7 +17,7 @@ class MyScaffold extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: const Color(0xffF1F1F1),
-      resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: true,
       body: Column(
         mainAxisSize: MainAxisSize.max,
         children: [
@@ -91,9 +91,7 @@ class Header extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: deliveryTime == null
-          ? const EdgeInsets.fromLTRB(16, 64, 40, 0)
-          : const EdgeInsets.fromLTRB(16, 64, 16, 24),
+      padding: const EdgeInsets.fromLTRB(16, 45, 16, 10),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -114,6 +112,9 @@ class Header extends StatelessWidget {
                 fontFamily: 'Roboto',
                 fontWeight: FontWeight.w700,
                 fontSize: 30),
+          ),
+          Spacer(
+            flex: 2,
           ),
           deliveryTime == null
               ? Container()
