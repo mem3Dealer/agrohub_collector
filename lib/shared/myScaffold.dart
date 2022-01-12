@@ -1,5 +1,8 @@
+import 'package:agrohub_collector_flutter/bloc/bloc/auth/auth_bloc.dart';
+import 'package:agrohub_collector_flutter/bloc/bloc/auth/auth_events.dart';
 import 'package:agrohub_collector_flutter/pages/orderInfo.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/src/provider.dart';
 
 class MyScaffold extends StatelessWidget {
   final Widget body;
@@ -15,6 +18,7 @@ class MyScaffold extends StatelessWidget {
     // deliveryTime = '12:00-15:00';
 
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       backgroundColor: const Color(0xffF1F1F1),
       body: SizedBox(
         width: MediaQuery.of(context).size.width,
@@ -36,14 +40,18 @@ class MyScaffold extends StatelessWidget {
                         },
                         icon: const Icon(Icons.arrow_back_ios_new_outlined)),
                   Flexible(
-                    child: Text(
-                      title,
-                      overflow: TextOverflow.clip,
-                      softWrap: false,
-                      style: const TextStyle(
-                          fontFamily: 'Roboto',
-                          fontWeight: FontWeight.w700,
-                          fontSize: 40),
+                    child: Row(
+                      children: [
+                        Text(
+                          title,
+                          overflow: TextOverflow.clip,
+                          softWrap: false,
+                          style: const TextStyle(
+                              fontFamily: 'Roboto',
+                              fontWeight: FontWeight.w700,
+                              fontSize: 40),
+                        ),
+                      ],
                     ),
                   ),
                   deliveryTime == null

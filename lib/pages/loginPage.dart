@@ -19,7 +19,7 @@ class LoginPage extends StatefulWidget {
 //TODO по-хорошему, требует доработки. Неработающая кнопка пока не заполнятся поля и всякое такое.
 class _LoginPageState extends State<LoginPage> {
   bool isTextFieldEmpty = true;
-  Color blue = const Color(0xff1890ff);
+  static const Color black = Color(0xff363B3F);
 
   @override
   void initState() {
@@ -167,7 +167,7 @@ class _LoginPageState extends State<LoginPage> {
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: Colors.blue,
+                          color: black,
                           fontSize: 26,
                         ),
                       ),
@@ -206,10 +206,10 @@ class _LoginPageState extends State<LoginPage> {
       padding: padding,
       child: Fields(
         controller: _password,
-        color: Colors.blue,
+        color: black,
         icon: const Icon(
           Icons.lock_outline,
-          color: Colors.blue,
+          color: black,
         ),
         title: 'Пароль',
         obscuring: true,
@@ -222,10 +222,10 @@ class _LoginPageState extends State<LoginPage> {
       padding: padding,
       child: Fields(
         controller: _login,
-        color: Colors.blue,
+        color: black,
         icon: const Icon(
           Icons.perm_identity_outlined,
-          color: Colors.blue,
+          color: black,
         ),
         title: 'Логин',
         obscuring: false,
@@ -257,7 +257,7 @@ class Fields extends StatelessWidget {
       obscureText: obscuring,
       decoration: InputDecoration(
         enabledBorder: const OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.blue),
+          borderSide: BorderSide(color: Color(0xff363B3F)),
         ),
         border: OutlineInputBorder(
           borderSide: BorderSide(
@@ -265,7 +265,7 @@ class Fields extends StatelessWidget {
           ),
         ),
         labelText: title,
-        labelStyle: const TextStyle(color: Colors.blue),
+        labelStyle: const TextStyle(color: Color(0xff363B3F)),
         fillColor: const Color.fromRGBO(0, 0, 0, 0.1),
         filled: true,
         prefixIcon: icon,
