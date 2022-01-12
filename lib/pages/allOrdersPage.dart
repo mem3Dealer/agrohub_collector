@@ -70,24 +70,26 @@ class _AllOrdersPageState extends State<AllOrdersPage> {
           false,
           title: 'Список заказов',
           body: state.allOrders != null
-              ? ListView.builder(
-                  padding: EdgeInsets.only(top: 20),
-                  shrinkWrap: true,
-                  itemCount: state.allOrders?.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    Order order = state.allOrders![index];
-                    String time = order.delivery_time!.substring(17, 22);
-                    ExpandableController ctrl = ExpandableController();
-
-                    // DateTime time1 = DateTime.parse(
-                    //     order.delivery_time.toString());
-                    // DateTime time =
-                    //     DateTime.parse(order.delivery_time это хорошая идея, но с бека приходит неправильный формат даты
-                    return OrderTile(
-                        id: order.id!,
-                        time: "К $time",
-                        deliveryId: int.parse(order.agregator_order_id!));
-                  })
+              ? state.allOrders!.isNotEmpty
+                  ? ListView.builder(
+                      padding: EdgeInsets.only(top: 20),
+                      shrinkWrap: true,
+                      itemCount: state.allOrders?.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        Order order = state.allOrders![index];
+                        return OrderTile(order: order);
+                      })
+                  : Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: const [
+                          Text(
+                            'Кажется, у нас какие-то неполадки.\nСвяжитесь с администратором.',
+                            textAlign: TextAlign.center,
+                          )
+                        ],
+                      ),
+                    )
               : const Center(
                   child: CircularProgressIndicator(
                   color: Color(0xffE14D43),

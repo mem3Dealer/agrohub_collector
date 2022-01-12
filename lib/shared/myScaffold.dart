@@ -11,24 +11,30 @@ class MyScaffold extends StatelessWidget {
       {required this.title, required this.body, this.deliveryTime, Key? key})
       : super(key: key);
 
+  final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
+      GlobalKey<ScaffoldMessengerState>();
+
   @override
   Widget build(BuildContext context) {
     // deliveryTime = '12:00-15:00';
 
-    return Scaffold(
-      backgroundColor: const Color(0xffF1F1F1),
-      resizeToAvoidBottomInset: true,
-      body: Column(
-        mainAxisSize: MainAxisSize.max,
-        children: [
-          HeadColumn(
-            deliveryTime: deliveryTime,
-            isItInfo: isItInfo,
-            title: title,
-            isCollecting: isCollecting,
-          ),
-          Expanded(child: body)
-        ],
+    return ScaffoldMessenger(
+      key: scaffoldMessengerKey,
+      child: Scaffold(
+        backgroundColor: const Color(0xffF1F1F1),
+        resizeToAvoidBottomInset: true,
+        body: Column(
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            HeadColumn(
+              deliveryTime: deliveryTime,
+              isItInfo: isItInfo,
+              title: title,
+              isCollecting: isCollecting,
+            ),
+            Expanded(child: body)
+          ],
+        ),
       ),
     );
   }

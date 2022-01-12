@@ -21,7 +21,7 @@ Order _$OrderFromJson(Map<String, dynamic> json) => Order(
       agregator_order_time: json['agregator_order_time'] as String?,
       agrohub_order_time: json['agrohub_order_time'] as String?,
       delivery_id: json['delivery_id'] as String?,
-      delivery_time: json['delivery_time'] as String?,
+      delivery_time: json['delivery_time'],
       farmer_id: json['farmer_id'] as int?,
       farmer_order_id: json['farmer_order_id'] as int?,
       id: json['id'] as int?,

@@ -9,15 +9,14 @@ import 'package:agrohub_collector_flutter/shared/myScaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
+import 'package:intl/intl.dart';
 
 class CollectingOrderPage extends StatefulWidget {
   // Product order; TODO это нужно сделать через блок с полем Product collecting;
-  int agregatorOrderId;
-  String deliveryTime;
+  Order order;
 
   static const String routeName = '/collectingOrder';
-  CollectingOrderPage(this.agregatorOrderId, this.deliveryTime, {Key? key})
-      : super(key: key);
+  CollectingOrderPage(this.order, {Key? key}) : super(key: key);
 
   @override
   State<CollectingOrderPage> createState() => _CollectingOrderPageState();
@@ -26,7 +25,8 @@ class CollectingOrderPage extends StatefulWidget {
 class _CollectingOrderPageState extends State<CollectingOrderPage> {
   final ordersBloc = GetIt.I.get<OrdersBloc>();
   bool toCollect = true;
-  String _pageStatus = 'to_collect';
+
+  // final String _pageStatus = 'to_collect';
   @override
   void initState() {
     super.initState();
@@ -40,6 +40,8 @@ class _CollectingOrderPageState extends State<CollectingOrderPage> {
 
   @override
   Widget build(BuildContext context) {
+    DateFormat format = DateFormat('HH:MM');
+    String _time = format.format(widget.order.delivery_time!);
     // print(orderNumber);
     TextStyle _style = const TextStyle(
         fontFamily: 'Roboto',
@@ -50,8 +52,8 @@ class _CollectingOrderPageState extends State<CollectingOrderPage> {
     return DefaultTabController(
       length: 2,
       child: MyScaffold(false, true,
-          title: "Заказ №${widget.agregatorOrderId}",
-          deliveryTime: widget.deliveryTime,
+          title: "Заказ №${widget.order.agregator_order_id}",
+          deliveryTime: _time,
           body: BlocBuilder<OrdersBloc, OrdersState>(
               bloc: ordersBloc,
               builder: (context, state) {
@@ -118,7 +120,7 @@ class _CollectingOrderPageState extends State<CollectingOrderPage> {
   }
 }
 
-class _TabToCollect extends StatelessWidget {
+class _TabToCollect extends StatefulWidget {
   OrdersState state;
   _TabToCollect({
     required this.state,
@@ -130,16 +132,26 @@ class _TabToCollect extends StatelessWidget {
   final String _pageStatus;
 
   @override
+  State<_TabToCollect> createState() => _TabToCollectState();
+}
+
+class _TabToCollectState extends State<_TabToCollect>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool wantKeepAlive = true;
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context);
     return ListView.builder(
         padding: const EdgeInsets.only(top: 10),
         shrinkWrap: true,
-        itemCount: state.listOfProducts!.length,
+        itemCount: widget.state.listOfProducts!.length,
         itemBuilder: (context, int index) {
-          Product product = state.listOfProducts![index];
+          Product product = widget.state.listOfProducts![index];
           // print(product.status);
           // double height = MediaQuery.of(context).size.height / 4;
-          if (product.status == _pageStatus) {
+          if (product.status == widget._pageStatus) {
             return Column(
               children: [
                 ProductCard(

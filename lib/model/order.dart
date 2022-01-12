@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
+import 'package:intl/intl.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'order.g.dart';
@@ -25,7 +26,7 @@ class Order {
   String? agregator_order_time;
   String? agrohub_order_time;
   String? delivery_id;
-  String? delivery_time;
+  DateTime? delivery_time;
   int? farmer_id;
   int? farmer_order_id;
   int? id;
@@ -51,12 +52,15 @@ class Order {
   Map<String, dynamic> toJson() => _$OrderToJson(this);
 
   factory Order.fromMap(Map<String, dynamic> map) {
+    // DateTime? _time =
+    //     DateFormat('EEE, dd MMM yyyy HH:MM').parse(order.delivery_time!);
     return Order(
       agregator_order_id: map['agregator_order_id'],
       agregator_order_time: map['agregator_order_time'],
       agrohub_order_time: map['agrohub_order_time'],
       delivery_id: map['delivery_id'],
-      delivery_time: map['delivery_time'],
+      delivery_time:
+          DateFormat('EEE, dd MMM yyyy HH:MM').parse(map['delivery_time']),
       farmer_id: map['farmer_id']?.toInt(),
       farmer_order_id: map['farmer_order_id']?.toInt(),
       id: map['id']?.toInt(),
@@ -76,7 +80,7 @@ class Order {
     String? agregator_order_time,
     String? agrohub_order_time,
     String? delivery_id,
-    String? delivery_time,
+    DateTime? delivery_time,
     int? farmer_id,
     int? farmer_order_id,
     int? id,

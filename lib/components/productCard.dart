@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:developer';
+
 import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_bloc.dart';
 import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_event.dart';
 import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_state.dart';
@@ -29,6 +32,7 @@ class ProductCardState extends State<ProductCard> {
 
   final ordersBloc = GetIt.I.get<OrdersBloc>();
   late var _controller = TextEditingController();
+  late Timer t;
 
   @override
   void initState() {
@@ -38,6 +42,7 @@ class ProductCardState extends State<ProductCard> {
           ? '${widget.product.collected_quantity}'
           : '',
     );
+
     _controller.addListener(() {
       final _isActive = _controller.text.isNotEmpty;
       setState(() => this.isActive = _isActive);
@@ -57,11 +62,60 @@ class ProductCardState extends State<ProductCard> {
     });
   }
 
+  @override
+  bool get mounted => super.mounted;
+
   final TextStyle _style = const TextStyle(
       fontFamily: 'Roboto',
       fontWeight: FontWeight.w400,
       color: Color(0xff363B3F),
       fontSize: 18);
+
+  void setDeleteState() {
+    Duration _duration = const Duration(seconds: 5);
+    setState(() {
+      isOnDelete = true;
+      _isCollapsed = true;
+      t = Timer(_duration, () {
+        ordersBloc.add(ChangeProductStatus(0.0,
+            product: widget.product, newStatus: 'deleted'));
+      });
+
+      SnackBar _snackBarOnDelete = SnackBar(
+          behavior: SnackBarBehavior.floating,
+          duration: _duration,
+          width: 360,
+          backgroundColor: Color(0xffFAE2E1),
+          content: SizedBox(
+            height: 48,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Text(
+                  'Товар будет удален через 5 сек',
+                  style: _style.copyWith(
+                      fontWeight: FontWeight.w300, fontSize: 16),
+                ),
+                TextButton(
+                    onPressed: () {
+                      mounted == true
+                          ? setState(() {
+                              isOnDelete = false;
+                              t.cancel();
+                              _isCollapsed = true;
+                            })
+                          : null;
+                      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                    },
+                    child: Text('Отменить',
+                        style: _style.copyWith(
+                            fontWeight: FontWeight.w700, fontSize: 16)))
+              ],
+            ),
+          ));
+      ScaffoldMessenger.of(context).showSnackBar(_snackBarOnDelete);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -69,14 +123,18 @@ class ProductCardState extends State<ProductCard> {
     return BlocBuilder<OrdersBloc, OrdersState>(
       builder: (context, state) {
         return InkWell(
-          onTap: () => _expandCard(),
+          onTap: isOnDelete
+              ? null
+              : () {
+                  _expandCard();
+                },
           child: Container(
               width: 382,
               height: _isCollapsed ? 164 : 400,
               foregroundDecoration: isOnDelete
-                  ? const BoxDecoration(
-                      color: Colors.grey,
-                      backgroundBlendMode: BlendMode.saturation,
+                  ? BoxDecoration(
+                      color: Colors.grey.shade400.withOpacity(0.7),
+                      // backgroundBlendMode: BlendMode.color,
                     )
                   : null,
               decoration: BoxDecoration(
@@ -95,7 +153,6 @@ class ProductCardState extends State<ProductCard> {
                           children: [
                             //имя продукта
                             ProductName(widget: widget, style: _style),
-                            // Text(isOnDelete.toString()),
                             //общий вес
                             OrderedWeight()
                           ],
@@ -108,8 +165,8 @@ class ProductCardState extends State<ProductCard> {
                                 alignment: Alignment.topRight,
                                 onPressed: () {},
                                 icon: _isCollapsed
-                                    ? Icon(Icons.arrow_forward_ios_sharp)
-                                    : RotatedBox(
+                                    ? const Icon(Icons.arrow_forward_ios_sharp)
+                                    : const RotatedBox(
                                         quarterTurns: 1,
                                         child:
                                             Icon(Icons.arrow_forward_ios_sharp),
@@ -153,12 +210,8 @@ class ProductCardState extends State<ProductCard> {
                                 //'удалить'
                                 Expanded(
                                   child: MyButton(
-                                    isOnDelete: isOnDelete,
                                     product: widget.product,
-                                    // changeStatus: () {
-                                    //   print('does it?');
-                                    //   changeStatus(widget.product, 'deleted');
-                                    // },
+                                    onDelete: setDeleteState,
                                     style: _style,
                                     color: const Color(0xffE14D43),
                                     text: 'Удалить',
@@ -169,15 +222,11 @@ class ProductCardState extends State<ProductCard> {
                                 ),
                                 Expanded(
                                   child: MyButton(
+                                    controller: _controller,
                                     collectedQuantity:
                                         double.tryParse(_controller.text),
                                     isActive: isItCollected ? true : isActive,
-                                    // controller: _controller,
                                     product: widget.product,
-                                    // changeStatus: () =>
-                                    //     changeStatus(widget.product, 'collected'),
-
-                                    // changeStatus(widget.product, 'collected'),
                                     style: _style,
                                     color: isActive || isItCollected
                                         ? const Color(0xff69A8BB)
@@ -194,16 +243,14 @@ class ProductCardState extends State<ProductCard> {
                       )
                   ],
                 ),
-              )
-              // ignore: dead_code
-
-              ),
+              )),
         );
       },
     );
   }
 
   Container _TextField() {
+    bool _isCollected = widget.product.status == 'collected';
     return Container(
         width: 350,
         height: 56,
@@ -218,18 +265,30 @@ class ProductCardState extends State<ProductCard> {
             // initialValue:
             // textAlignVertical:
             //     TextAlignVertical.top,
-            style: _style,
+            onEditingComplete: _isCollected ? () => _expandCard() : null,
+            onChanged: _isCollected
+                ? (text) {
+                    if (text.isNotEmpty) {
+                      widget.product.collected_quantity = double.tryParse(text);
+                    }
+                  }
+                : null,
+            style: _isCollected
+                ? _style.copyWith(
+                    fontWeight: FontWeight.w900, color: Colors.green)
+                : _style,
             autofocus: true,
             maxLines: 1,
             // maxLength: 5,
             controller: _controller,
             keyboardType: TextInputType.number,
             // cursorHeight: 30,
+
             decoration: InputDecoration(
                 suffixIcon: _controller.text.isNotEmpty
                     ? IconButton(
                         padding: EdgeInsets.zero,
-                        icon: Icon(
+                        icon: const Icon(
                           Icons.clear_sharp,
                           color: Color(0xffE14D43),
                         ),
@@ -250,7 +309,9 @@ class ProductCardState extends State<ProductCard> {
     return Container(
       padding: const EdgeInsets.fromLTRB(8, 8, 16, 0),
       child: Text(
-        '${widget.product.ordered_quantity} кг',
+        widget.product.product_type == 'per_kilo'
+            ? '${widget.product.ordered_quantity} кг'
+            : '${widget.product.ordered_quantity} шт',
         // state
         //   .listOfProducts!.first.ordered_quantity
         //   .toString(),
@@ -266,10 +327,12 @@ class MyButton extends StatefulWidget {
   TextStyle style;
   Product product;
   bool? isActive;
-  bool? isOnDelete;
+  VoidCallback? onDelete;
   double? collectedQuantity;
+  TextEditingController? controller;
   MyButton({
-    this.isOnDelete,
+    this.controller,
+    this.onDelete,
     this.collectedQuantity,
     required this.product,
     this.color,
@@ -288,9 +351,8 @@ class _ButtonState extends State<MyButton> {
   final ordersBloc = GetIt.I.get<OrdersBloc>();
 
   // final TextStyle _style;
-  changeStatus(Product product, String newStatus) {
-    ordersBloc.add(ChangeProductStatus(
-        widget.collectedQuantity ?? 0.0, widget.isOnDelete ?? false,
+  void changeStatus(Product product, String newStatus) async {
+    ordersBloc.add(ChangeProductStatus(widget.collectedQuantity ?? 0.0,
         product: product, newStatus: newStatus));
   }
 
@@ -303,13 +365,13 @@ class _ButtonState extends State<MyButton> {
               // print('WT: ${widget.text}, incoming: ${widget.product.status}');
               setState(() {
                 if (widget.text == 'Удалить') {
-                  changeStatus(widget.product, 'deleted');
-                  widget.isOnDelete = true;
-                  print('pressed, ${widget.isOnDelete}');
+                  // changeStatus(widget.product, 'deleted');
+                  widget.onDelete!();
                 } else if (widget.text == 'Вернуть в Собрать') {
                   changeStatus(widget.product, 'to_collect');
                 } else if (widget.text == 'Собрать') {
                   changeStatus(widget.product, 'collected');
+                  widget.controller!.clear();
                 }
               });
             }
@@ -353,7 +415,9 @@ class PriceRow extends StatelessWidget {
           style: _style,
         ),
         Text(
-          "${widget.product.total_price} руб./кг",
+          widget.product.product_type == 'per_kilo'
+              ? '${widget.product.unit_price} руб./кг'
+              : '${widget.product.unit_price} руб./шт',
           style: _style.copyWith(fontWeight: FontWeight.w500, fontSize: 16),
         )
       ],
@@ -398,12 +462,20 @@ class ImagePlacer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String _url = 'https://bit.ly/3razGGb';
+    ImageProvider image;
+    try {
+      image = NetworkImage(widget.product.image!);
+    } catch (e) {
+      inspect(e);
+      image = NetworkImage(_url);
+    }
+
     return Container(
       height: 132,
       width: 132,
       decoration: BoxDecoration(
-          image: DecorationImage(
-              fit: BoxFit.cover, image: NetworkImage(widget.product.image!))),
+          image: DecorationImage(fit: BoxFit.cover, image: image)),
     );
   }
 }

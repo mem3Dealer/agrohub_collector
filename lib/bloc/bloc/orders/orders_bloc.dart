@@ -29,25 +29,28 @@ class OrdersBloc extends Bloc<OrdersEvents, OrdersState> {
         data: event.params,
       );
 
-      List<Order> ordersNew = orders
-          .where((Order element) => element.status == 'ready_to_collect')
-          .toList();
-      sortingOrder(ordersNew);
-      List<Order> ordersInWork = orders
-          .where((Order element) => element.status == 'collecting')
-          .toList();
-      sortingOrder(ordersInWork);
-      List<Order> ordersCollected = orders
-          .where((Order element) => element.status == 'ready_to_ship')
-          .toList();
-      sortingOrder(orders);
+      // List<Order> ordersNew = orders
+      //     .where((Order element) => element.status == 'ready_to_collect')
+      //     .toList();
+      // sortingOrder(ordersNew);
+      // List<Order> ordersInWork = orders
+      //     .where((Order element) => element.status == 'collecting')
+      //     .toList();
+      // sortingOrder(ordersInWork);
+      // List<Order> ordersCollected = orders
+      //     .where((Order element) => element.status == 'ready_to_ship')
+      // .toList();
+
+      orders.sort((a, b) {
+        return a.delivery_time!.compareTo(b.delivery_time!);
+      });
       emitter(
         state.copyWith(
           loading: false,
           allOrders: orders,
-          ordersNew: ordersNew,
-          ordersInWork: ordersInWork,
-          ordersCollected: ordersCollected,
+          // ordersNew: ordersNew,
+          // ordersInWork: ordersInWork,
+          // ordersCollected: ordersCollected,
         ),
       );
       event.onSuccess!();
@@ -79,8 +82,8 @@ class OrdersBloc extends Bloc<OrdersEvents, OrdersState> {
 
   void sortingOrder(List<Order> orders) {
     orders.sort((Order a, Order b) {
-      String adate = a.delivery_time!;
-      String bdate = b.delivery_time!;
+      DateTime adate = a.delivery_time!;
+      DateTime bdate = b.delivery_time!;
       return adate.compareTo(bdate);
     });
   }
@@ -128,8 +131,7 @@ class OrdersBloc extends Bloc<OrdersEvents, OrdersState> {
       event.product.collected_quantity = event.collectedQuantity;
     } else if (event.newStatus == 'deleted') {
       event.product.collected_quantity = 0.0;
-      event.isOnDelete = true;
-      // event.product.status = 'deleted';
+      event.product.status = 'deleted';
     }
 
     emitter(state.copyWith(

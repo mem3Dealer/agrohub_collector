@@ -2,24 +2,19 @@ import 'dart:developer';
 
 import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_bloc.dart';
 import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_event.dart';
+import 'package:agrohub_collector_flutter/model/order.dart';
 import 'package:agrohub_collector_flutter/pages/collectingOrderPage.dart';
 import 'package:flutter/material.dart';
 import 'package:expandable/expandable.dart';
 import 'package:get_it/get_it.dart';
+import 'package:intl/intl.dart';
+import 'package:jiffy/jiffy.dart';
 
 class OrderTile extends StatefulWidget {
-  int id;
-  String time;
-  int deliveryId;
-  // ExpandableController controller;
-  // Key myKey;
+  Order order;
 
   OrderTile({
-    // required this.controller,
-    required this.id,
-    // required this.myKey,
-    required this.deliveryId,
-    required this.time,
+    required this.order,
     Key? key,
   }) : super(
           key: key,
@@ -60,10 +55,15 @@ class _OrderTileState extends State<OrderTile> {
   Widget build(
     BuildContext context,
   ) {
-    return buildOrderTile(widget.id, widget.time, widget.deliveryId);
+    return buildOrderTile(widget.order);
   }
 
-  Widget buildOrderTile(int id, String time, int deliveryId) {
+  Widget buildOrderTile(Order order) {
+    // DateTime? _time =
+    //     DateFormat('EEE, dd MMM yyyy HH:MM').parse(order.delivery_time!);
+    DateFormat format = DateFormat('HH:MM');
+    String _time = format.format(order.delivery_time!);
+    // print(_time);
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
       child: Card(
@@ -82,7 +82,7 @@ class _OrderTileState extends State<OrderTile> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       Text(
-                        "Заказ №${widget.deliveryId}",
+                        "Заказ №${order.agregator_order_id}",
                         textAlign: TextAlign.left,
                         style: const TextStyle(
                             fontFamily: 'Roboto',
@@ -103,7 +103,7 @@ class _OrderTileState extends State<OrderTile> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Text(
-                      widget.time,
+                      _time,
                       textAlign: TextAlign.end,
                       style: const TextStyle(
                           fontFamily: 'Roboto',
@@ -128,22 +128,18 @@ class _OrderTileState extends State<OrderTile> {
                     height: 56,
                     child: ElevatedButton(
                       style: ButtonStyle(
-                          // padding:
-                          //     MaterialStateProperty.all(EdgeInsets.all(16)),
                           backgroundColor: MaterialStateProperty.all(
                         const Color(0xff69A8BB),
                       )),
                       onPressed: () async {
-                        await getProduct(id).then((value) {
+                        await getProduct(widget.order.id!).then((value) {
                           Navigator.push<void>(
                             context,
                             MaterialPageRoute<void>(
                               builder: (BuildContext context) =>
                                   CollectingOrderPage(
-                                // widget.imageUrl,
-                                deliveryId,
-                                time,
-                              ),
+                                      // widget.imageUrl,
+                                      widget.order),
                             ),
                           );
                         });

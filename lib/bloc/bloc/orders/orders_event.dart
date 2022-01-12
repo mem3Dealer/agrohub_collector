@@ -32,12 +32,10 @@ class OrdersGetDetailOrder extends OrdersEvents {
 
 class ChangeProductStatus extends OrdersEvents {
   ChangeProductStatus(
-    this.collectedQuantity,
-    this.isOnDelete, {
+    this.collectedQuantity, {
     required this.product,
     required this.newStatus,
   });
-  bool isOnDelete = false;
   double collectedQuantity = 0.0;
   final Product product;
   final String newStatus;
