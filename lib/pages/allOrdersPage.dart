@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:agrohub_collector_flutter/bloc/bloc/auth/auth_bloc.dart';
@@ -44,12 +45,16 @@ class _AllOrdersPageState extends State<AllOrdersPage> {
     getOrders();
     super.initState();
     // authBloc.add(AuthenticationInit());
+    setState(() {
+      context.read<NetworkBloc>().connectivityResult;
+    });
   }
 
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
+    context.read<NetworkBloc>().dispose();
   }
 
   Future<void> getOrders() async {
@@ -66,8 +71,8 @@ class _AllOrdersPageState extends State<AllOrdersPage> {
         bloc: networkBloc,
         builder: (context, networkState) {
           context.read<NetworkBloc>().add(ListenConnection());
-          print(networkState);
           return networkState is ConnectionFailure
+              // TODO можно отдельным классом оформить
               ? const Center(child: Text('Нет Интернет соединения'))
               : ListOrderShow(ordersBloc: ordersBloc, controller: _controller);
         });

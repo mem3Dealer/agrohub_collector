@@ -10,20 +10,26 @@ part 'network_state.dart';
 class NetworkBloc extends Bloc<NetworkEvent, NetworkState> {
   ConnectivityResult connectivityResult = ConnectivityResult.none;
   final Connectivity _connectivity = Connectivity();
+  late StreamSubscription<ConnectivityResult> _connectivitySubscription;
 
   NetworkBloc() : super(ConnectionInitial()) {
     on<ListenConnection>(_checkNetworkConnection);
   }
 
-  Future _checkNetworkConnection(
-      ListenConnection event, Emitter<NetworkState> emit) async {
-    StreamSubscription<ConnectivityResult> _connectivitySubscription =
-        _connectivity.onConnectivityChanged.listen((result) {
-      add(result);
-    });
+  void _checkNetworkConnection(
+      ListenConnection event, Emitter<NetworkState> emit) {
+    _connectivitySubscription =
+        _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
+    connectivityResult == ConnectivityResult.none
+        ? emit(ConnectionFailure())
+        : emit(ConnectionSuccess());
   }
 
-  //make dispose method
-//_subscription.cancel();
-//call this method in dispose in parent class
+  Future<void> _updateConnectionStatus(ConnectivityResult result) async {
+    connectivityResult = result;
+  }
+
+  void dispose() {
+    _connectivitySubscription.cancel();
+  }
 }
