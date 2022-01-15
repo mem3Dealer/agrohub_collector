@@ -5,10 +5,15 @@ class MyScaffold extends StatelessWidget {
   Widget body;
   String title;
   bool isItInfo, isCollecting;
+  Widget? fab;
 
   String? deliveryTime;
   MyScaffold(this.isItInfo, this.isCollecting,
-      {required this.title, required this.body, this.deliveryTime, Key? key})
+      {required this.title,
+      required this.body,
+      this.deliveryTime,
+      this.fab,
+      Key? key})
       : super(key: key);
 
   final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
@@ -21,6 +26,7 @@ class MyScaffold extends StatelessWidget {
     return ScaffoldMessenger(
       key: scaffoldMessengerKey,
       child: Scaffold(
+        floatingActionButton: fab,
         backgroundColor: const Color(0xffF1F1F1),
         resizeToAvoidBottomInset: true,
         body: Column(
@@ -130,8 +136,7 @@ class Header extends StatelessWidget {
                     Navigator.push<void>(
                       context,
                       MaterialPageRoute<void>(
-                        builder: (BuildContext context) =>
-                            OrderInfoPage(deliveryTime!, title),
+                        builder: (BuildContext context) => OrderInfoPage(),
                       ),
                     );
                   },

@@ -2,7 +2,11 @@ import 'dart:developer';
 
 import 'package:agrohub_collector_flutter/bloc/bloc/auth/auth_bloc.dart';
 import 'package:agrohub_collector_flutter/bloc/bloc/auth/auth_events.dart';
+import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_bloc.dart';
+import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_event.dart';
+import 'package:agrohub_collector_flutter/model/order.dart';
 import 'package:agrohub_collector_flutter/pages/allOrdersPage.dart';
+import 'package:agrohub_collector_flutter/pages/collectingOrderPage.dart';
 import 'package:agrohub_collector_flutter/repositories/auth_rep.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -15,11 +19,11 @@ class LoginPage extends StatefulWidget {
   _LoginPageState createState() => _LoginPageState();
 }
 
-//TODO по-хорошему, требует доработки. Неработающая кнопка пока не заполнятся поля и всякое такое.
 class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     super.initState();
+
     loadFirstPage();
   }
 
@@ -29,11 +33,22 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   final authBloc = GetIt.I.get<AuthenticationBloc>();
+  final ordersBloc = GetIt.I.get<OrdersBloc>();
   final FlutterSecureStorage storage = const FlutterSecureStorage();
   final TextEditingController _login = TextEditingController();
   final TextEditingController _password = TextEditingController();
 
   bool isLoading = false;
+  bool visible = true;
+
+  // Future<void> _initCollectingOrder(int id) async {
+  //   await ordersBloc.add(InitCollectingOrder(collectingOrderId: id));
+  // }
+  visibleIcon() {
+    setState(() {
+      visible = !visible;
+    });
+  }
 
   loadFirstPage() {
     setState(() {
@@ -47,13 +62,31 @@ class _LoginPageState extends State<LoginPage> {
             isLoading = false;
           });
         },
-        onSuccess: (String role) {
+        onSuccess: (String role, int currentCollectingOrderId) {
           if (role == 'collector') {
-            Navigator.pushReplacement<void, void>(
-                context,
-                MaterialPageRoute<void>(
-                  builder: (BuildContext context) => const AllOrdersPage(),
-                ));
+            if (currentCollectingOrderId != 0) {
+              // print('it comes here');
+              ordersBloc.add(InitCollectingOrder(
+                  collectingOrderId: currentCollectingOrderId,
+                  context: context));
+
+              // if (ordersBloc.state.currentOrder != null) {
+              // } else {
+              //   Navigator.pushReplacement<void, void>(
+              //       context,
+              //       MaterialPageRoute<void>(
+              //         builder: (BuildContext context) => const AllOrdersPage(),
+              //       ));
+              // }
+            } else {
+              // print('it drops here');
+              Navigator.pushReplacement<void, void>(
+                  context,
+                  MaterialPageRoute<void>(
+                    builder: (BuildContext context) => const AllOrdersPage(),
+                  ));
+            }
+
             // ordersBloc.add(
             //   OrdersGetFirstOrder(
             //     onError: (dynamic e) {
@@ -67,6 +100,7 @@ class _LoginPageState extends State<LoginPage> {
             //   ),
             // );
           } else {
+            print('he was a farmer');
             // productsBloc.add(
             //   ProductsSetFilterParams(
             //     onError: (dynamic e) {
@@ -123,134 +157,129 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    EdgeInsets padding = const EdgeInsets.only(
-      left: 20,
-      right: 20,
-      bottom: 20,
+    TextStyle _style = const TextStyle(
+        fontFamily: 'Roboto',
+        fontWeight: FontWeight.w400,
+        color: Color(0xff363B3F),
+        fontSize: 16);
+    InputDecoration inDec = const InputDecoration(
+      focusedBorder: OutlineInputBorder(
+        borderSide: BorderSide(color: Color(0xff69A8BB)),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderSide: BorderSide(color: Color(0xffCACED0)),
+      ),
+      border: OutlineInputBorder(
+        borderSide: BorderSide(
+          color: Color(0xff69A8BB),
+        ),
+      ),
+      labelStyle: TextStyle(color: Color(0xffCACED0)),
+      fillColor: Colors.white,
+      filled: true,
+      labelText: 'Логин',
+      prefixIcon: Icon(
+        Icons.perm_identity_outlined,
+        color: Color(0xffCACED0),
+      ),
     );
+
     return Scaffold(
-      backgroundColor: const Color(0xff2d3a4b),
+      backgroundColor: const Color(0xffF1F1F1),
       body: Center(
         child: isLoading
-            ? const CircularProgressIndicator()
-            : Center(
-                child: ListView(
-                  shrinkWrap: true,
-                  padding: const EdgeInsets.all(20.0),
-                  children: <Widget>[
-                    const Padding(
-                      padding: EdgeInsets.only(bottom: 40),
-                      child: Text(
-                        'Форма входа',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                          fontSize: 26,
-                        ),
+            ? const CircularProgressIndicator(color: Color(0xffE14D43))
+            : ListView(
+                shrinkWrap: true,
+                padding: const EdgeInsets.only(
+                  left: 16,
+                  bottom: 40,
+                  right: 16,
+                  top: 64,
+                ),
+                children: <Widget>[
+                  const Padding(
+                    padding: EdgeInsets.only(bottom: 32.0),
+                    child: Text(
+                      'Форма входа',
+                      // textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xff363B3F),
+                        fontSize: 42,
                       ),
                     ),
-                    loginField(padding),
-                    passwordField(padding),
-                    enterButton(padding),
-                  ],
-                ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 16.0),
+                    child: loginField(_style, inDec),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: passwordField(_style, inDec),
+                  ),
+                  enterButton(),
+                ],
               ),
       ),
     );
   }
 
-  Padding enterButton(EdgeInsets padding) {
-    return Padding(
-      padding: padding,
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(minWidth: double.infinity),
-        child: ElevatedButton(
-          style: ButtonStyle(
-            backgroundColor: MaterialStateProperty.all<Color>(
+  SizedBox enterButton() {
+    return SizedBox(
+      height: 56,
+      width: 382,
+      child: ElevatedButton(
+        style: ButtonStyle(
+          backgroundColor: MaterialStateProperty.all<Color>(
               // isVisibleBtn
               //     ? const Color(0xff1890ff)
               //     :
 
-              const Color(0xff1890ff).withOpacity(0.5),
-            ),
+              const Color(0xff69A8BB)),
+        ),
+        onPressed: loginFarmer,
+        child: const Text(
+          'Войти',
+          style: TextStyle(
+            // color: Colors.white,
+            fontFamily: "Roboto",
+            fontWeight: FontWeight.w400,
+            fontSize: 16,
           ),
-          onPressed: loginFarmer,
-          child: const Text('Войти'),
         ),
       ),
     );
   }
 
-  Padding passwordField(EdgeInsets padding) {
-    return Padding(
-      padding: padding,
-      child: TextField(
-        controller: _password,
-        // onChanged: checkFormFields,
-        // obscureText: visible ? false : true,
-        decoration: const InputDecoration(
-          enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.white70),
-          ),
-          border: OutlineInputBorder(
-            borderSide: BorderSide(
-              color: Color(0xB3FFFFFF),
-            ),
-          ),
+  Widget passwordField(TextStyle style, InputDecoration dec) {
+    return TextField(
+      controller: _password,
+      // onChanged: checkFormFields,
+      obscureText: visible,
+      obscuringCharacter: '*',
+      decoration: dec.copyWith(
           labelText: 'Пароль',
-          labelStyle: TextStyle(color: Colors.white70),
-          fillColor: Color.fromRGBO(0, 0, 0, 0.1),
-          filled: true,
-          prefixIcon: Icon(
+          prefixIcon: const Icon(
             Icons.lock_outlined,
-            color: Colors.white70,
+            color: Color(0xffCACED0),
           ),
-          // suffixIcon: InkWell(
-          //   onTap: visibleIcon,
-          //   child: visible
-          //       ? const Icon(
-          //           Icons.visibility_outlined,
-          //           color: Colors.white70,
-          //         )
-          //       : const Icon(
-          //           Icons.visibility_off_outlined,
-          //           color: Colors.white70,
-          //         ),
-          // ),
-        ),
-        style: const TextStyle(color: Colors.white70),
-      ),
+          suffixIcon: IconButton(
+            icon: Icon(Icons.remove_red_eye_outlined),
+            iconSize: 35,
+            color: Color(0xff363B3F),
+            onPressed: visibleIcon,
+          )),
+      style: style.copyWith(),
     );
   }
 
-  Padding loginField(EdgeInsets padding) {
-    return Padding(
-      padding: padding,
-      child: TextField(
-        controller: _login,
-        // onChanged: checkFormFields,
-        obscureText: false,
-        decoration: const InputDecoration(
-          enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.white70),
-          ),
-          border: OutlineInputBorder(
-            borderSide: BorderSide(
-              color: Color(0xB3FFFFFF),
-            ),
-          ),
-          labelStyle: TextStyle(color: Colors.white70),
-          fillColor: Color.fromRGBO(0, 0, 0, 0.1),
-          filled: true,
-          labelText: 'Логин',
-          prefixIcon: Icon(
-            Icons.perm_identity_outlined,
-            color: Colors.white70,
-          ),
-        ),
-        style: const TextStyle(color: Colors.white70),
-      ),
+  TextField loginField(TextStyle style, InputDecoration dec) {
+    return TextField(
+      controller: _login,
+      obscureText: false,
+      decoration: dec,
+      style: style,
     );
   }
 }

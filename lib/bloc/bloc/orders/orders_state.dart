@@ -26,6 +26,7 @@ class OrdersState extends Equatable {
   String? status;
   String? deliveryId;
   int version = 0;
+  Order? currentOrder;
   OrdersState({
     this.loading,
     this.deliveryNumber,
@@ -46,6 +47,7 @@ class OrdersState extends Equatable {
     this.status,
     this.deliveryId,
     required this.version,
+    this.currentOrder,
   });
 
   OrdersState copyWith({
@@ -68,6 +70,7 @@ class OrdersState extends Equatable {
     String? status,
     String? deliveryId,
     int? version,
+    Order? currentOrder,
   }) {
     return OrdersState(
       loading: loading ?? this.loading,
@@ -89,6 +92,7 @@ class OrdersState extends Equatable {
       status: status ?? this.status,
       deliveryId: deliveryId ?? this.deliveryId,
       version: version ?? this.version,
+      currentOrder: currentOrder ?? this.currentOrder,
     );
   }
 
@@ -113,6 +117,7 @@ class OrdersState extends Equatable {
       'status': status,
       'deliveryId': deliveryId,
       'version': version,
+      'currentOrder': currentOrder?.toMap(),
     };
   }
 
@@ -152,6 +157,9 @@ class OrdersState extends Equatable {
       status: map['status'],
       deliveryId: map['deliveryId'],
       version: map['version']?.toInt() ?? 0,
+      currentOrder: map['currentOrder'] != null
+          ? Order.fromMap(map['currentOrder'])
+          : null,
     );
   }
 
@@ -162,29 +170,32 @@ class OrdersState extends Equatable {
 
   @override
   String toString() {
-    return 'OrdersState(loading: $loading, deliveryNumber: $deliveryNumber, deliveryTime: $deliveryTime, farmerName: $farmerName, farmerStore: $farmerStore, farmerId: $farmerId, orderId: $orderId, allOrders: $allOrders, listOfProducts: $listOfProducts, selectOrder: $selectOrder, ordersNew: $ordersNew, ordersInWork: $ordersInWork, ordersCollected: $ordersCollected, initialParamsDetail: $initialParamsDetail, idOrder: $idOrder, farmerOrderId: $farmerOrderId, status: $status, deliveryId: $deliveryId, version: $version)';
+    return 'OrdersState(loading: $loading, deliveryNumber: $deliveryNumber, deliveryTime: $deliveryTime, farmerName: $farmerName, farmerStore: $farmerStore, farmerId: $farmerId, orderId: $orderId, allOrders: $allOrders, listOfProducts: $listOfProducts, selectOrder: $selectOrder, ordersNew: $ordersNew, ordersInWork: $ordersInWork, ordersCollected: $ordersCollected, initialParamsDetail: $initialParamsDetail, idOrder: $idOrder, farmerOrderId: $farmerOrderId, status: $status, deliveryId: $deliveryId, version: $version, currentOrder: $currentOrder)';
   }
 
   @override
-  List<dynamic> get props => [
-        loading,
-        deliveryNumber,
-        deliveryTime,
-        farmerName,
-        farmerStore,
-        farmerId,
-        orderId,
-        allOrders,
-        listOfProducts,
-        selectOrder,
-        ordersNew,
-        ordersInWork,
-        ordersCollected,
-        initialParamsDetail,
-        idOrder,
-        farmerOrderId,
-        status,
-        deliveryId,
-        version,
-      ];
+  List<dynamic> get props {
+    return [
+      loading,
+      deliveryNumber,
+      deliveryTime,
+      farmerName,
+      farmerStore,
+      farmerId,
+      orderId,
+      allOrders,
+      listOfProducts,
+      selectOrder,
+      ordersNew,
+      ordersInWork,
+      ordersCollected,
+      initialParamsDetail,
+      idOrder,
+      farmerOrderId,
+      status,
+      deliveryId,
+      version,
+      currentOrder,
+    ];
+  }
 }

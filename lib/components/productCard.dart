@@ -29,6 +29,7 @@ class ProductCardState extends State<ProductCard> {
   bool _isCollapsed = true;
   bool isActive = false;
   bool isOnDelete = false;
+  final formKey = GlobalKey<FormState>();
 
   final ordersBloc = GetIt.I.get<OrdersBloc>();
   late var _controller = TextEditingController();
@@ -262,6 +263,7 @@ class ProductCardState extends State<ProductCard> {
         child: Padding(
           padding: const EdgeInsets.only(left: 8.0, right: 8),
           child: TextFormField(
+            key: formKey,
             // initialValue:
             // textAlignVertical:
             //     TextAlignVertical.top,
@@ -285,6 +287,7 @@ class ProductCardState extends State<ProductCard> {
             // cursorHeight: 30,
 
             decoration: InputDecoration(
+                // errorText: 'Поле не может быть пустым',
                 suffixIcon: _controller.text.isNotEmpty
                     ? IconButton(
                         padding: EdgeInsets.zero,
@@ -306,17 +309,37 @@ class ProductCardState extends State<ProductCard> {
   }
 
   Container OrderedWeight() {
+    bool _isCollected = widget.product.status == 'collected';
+    double _collectedQuantity = widget.product.collected_quantity!;
+    double _orderedQuantity = widget.product.ordered_quantity!;
+
+    RichText _richText = RichText(
+        text: TextSpan(children: [
+      TextSpan(
+          text: '$_collectedQuantity ',
+          style: _style.copyWith(
+              fontWeight: FontWeight.w900, color: Colors.green)),
+      TextSpan(
+          text: widget.product.product_type == 'per_kilo'
+              ? '/ $_orderedQuantity кг'
+              : '/ $_orderedQuantity шт',
+          style: _style.copyWith(fontWeight: FontWeight.w900))
+    ]));
+
     return Container(
       padding: const EdgeInsets.fromLTRB(8, 8, 16, 0),
-      child: Text(
-        widget.product.product_type == 'per_kilo'
-            ? '${widget.product.ordered_quantity} кг'
-            : '${widget.product.ordered_quantity} шт',
-        // state
-        //   .listOfProducts!.first.ordered_quantity
-        //   .toString(),
-        style: _style.copyWith(fontWeight: FontWeight.w900),
-      ),
+      child: _isCollected
+          ? _richText
+          : Text(
+              widget.product.product_type == 'per_kilo'
+                  ? '$_orderedQuantity кг'
+                  : '$_orderedQuantity шт',
+              // : '$_orderedQuantity шт',
+              // state
+              //   .listOfProducts!.first.ordered_quantity
+              //   .toString(),
+              style: _style.copyWith(fontWeight: FontWeight.w900),
+            ),
     );
   }
 }

@@ -19,6 +19,7 @@ class OrdersRepository {
   Future<List<Order>> getAllOrders() async {
     Response<dynamic> response = await http.get("/orders/get_all_orders/");
     List list = response.data['results'];
+
     List<Order> ord = list.map<Order>((e) => Order.fromMap(e)).toList();
     return ord;
   }
@@ -30,8 +31,21 @@ class OrdersRepository {
     Response<dynamic> response =
         await http.get("/orders/get_detailed_order/?order_id=$id");
     List list = response.data;
+
     List<Product> listOfProducts =
         list.map<Product>((e) => Product.fromMap(e)).toList();
     return listOfProducts;
+  }
+
+  Future<Order> getThisOrder(int id) async {
+    Response<dynamic> response =
+        await http.get('/orders/order_search/?order_id=$id');
+    // print(response);
+    Order res = Order.fromMap(response.data['result']);
+    return res;
+  }
+
+  void setOrderStatus({required int id, required String status}) {
+    //TODO оформить это надобно
   }
 }

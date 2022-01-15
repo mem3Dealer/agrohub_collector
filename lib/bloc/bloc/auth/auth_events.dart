@@ -34,10 +34,10 @@ class AuthenticationLogout extends AuthenticationEvent {
 
 class AuthenticationInit extends AuthenticationEvent {
   const AuthenticationInit({
-    this.onSuccess,
-    this.onError,
+    required this.onSuccess,
+    required this.onError,
   });
 
-  final Function? onSuccess;
-  final Function? onError;
+  final Function onSuccess;
+  final Function onError;
 }

@@ -121,12 +121,15 @@ class AuthenticationBloc
             role: userInfo['role'],
             storeId: userInfo['storeId'],
             farmerId: userInfo['farmerId'],
-            collectorId: userInfo['collectorId']),
+            collectorId: userInfo['collectorId'],
+            currentCollectingOrderId: userInfo['currentCollectingOrderId']),
       );
-      // print('HERE: $state');
-      event.onSuccess!(userInfo['role']);
+      // print('HERE currentCollectingOrderId: ${state.currentCollectingOrderId}');
+      event.onSuccess(userInfo['role'], userInfo['currentCollectingOrderId']);
+      // event.onSuccess(userInfo['currentCollectingOrderId']) ??
+      //     event.onSuccess(0);
     } else {
-      event.onError!();
+      event.onError();
     }
   }
 
@@ -150,11 +153,14 @@ class AuthenticationBloc
     String? token = await storage.read(key: 'token');
 
     if (token != '' && token != null) {
+      String? _source = await storage.read(key: 'currentOrderId');
+      // print('THAS: $_source');
+      int? _id = int.tryParse(_source ?? '0');
       String? storeId = await storage.read(key: 'storeId');
       String? collectorId = await storage.read(key: 'collectorId');
-      print(storeId);
       if (await storage.read(key: 'role') == 'collector') {
         return <String, dynamic>{
+          'currentCollectingOrderId': _id,
           'role': 'collector',
           'token': token,
           'storeId': int.parse(storeId!),

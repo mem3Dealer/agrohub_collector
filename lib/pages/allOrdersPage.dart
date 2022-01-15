@@ -72,12 +72,18 @@ class _AllOrdersPageState extends State<AllOrdersPage> {
           body: state.allOrders != null
               ? state.allOrders!.isNotEmpty
                   ? ListView.builder(
-                      padding: EdgeInsets.only(top: 20),
+                      padding: const EdgeInsets.only(top: 0),
                       shrinkWrap: true,
                       itemCount: state.allOrders?.length,
                       itemBuilder: (BuildContext context, int index) {
                         Order order = state.allOrders![index];
-                        return OrderTile(order: order);
+                        if (order.status != 'IN PROGRESS') {
+                          return OrderTile(order: order);
+                        } else {
+                          return Container(
+                            child: Text(order.status.toString()),
+                          );
+                        }
                       })
                   : Center(
                       child: Column(
@@ -99,3 +105,109 @@ class _AllOrdersPageState extends State<AllOrdersPage> {
     );
   }
 }
+
+// class AnotherOne extends StatelessWidget {
+//   const AnotherOne({
+//     Key? key,
+//   }) : super(key: key);
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return SingleChildScrollView(
+//        child: ExpansionPanelList.radio(
+//          children: widget.state.allOrders!
+//              .map<ExpansionPanelRadio>((Order order) {
+//            return ExpansionPanelRadio(
+//              value: order.id!,
+//              headerBuilder:
+//                  (BuildContext context, bool isExpanded) {
+//                return Card(
+//                  child: Column(
+//                    mainAxisAlignment: MainAxisAlignment.center,
+//                    children: [
+//                      Padding(
+//                          padding: const EdgeInsets.fromLTRB(
+//                              16, 12, 56, 12),
+//                          child: Row(
+//                            mainAxisAlignment:
+//                                MainAxisAlignment.start,
+//                            children: [
+//                              Text(
+//                                "Заказ №${order.agregator_order_id}",
+//                                textAlign: TextAlign.left,
+//                                style: const TextStyle(
+//                                    fontFamily: 'Roboto',
+//                                    fontSize: 24,
+//                                    fontWeight: FontWeight.w500),
+//                              ),
+//                            ],
+//                          )),
+//                      const Divider(
+//                        // height: 2,
+//                        thickness: 1.5,
+//                        color: Color(0xff69A8BB),
+//                      ),
+//                      Padding(
+//                        padding: const EdgeInsets.fromLTRB(
+//                            265, 12, 0, 10),
+//                        child: Row(
+//                          mainAxisSize: MainAxisSize.min,
+//                          mainAxisAlignment:
+//                              MainAxisAlignment.end,
+//                          children: [
+//                            Text(
+//                              '12:30',
+//                              textAlign: TextAlign.end,
+//                              style: const TextStyle(
+//                                  fontFamily: 'Roboto',
+//                                  fontSize: 16,
+//                                  fontWeight: FontWeight.w500),
+//                            ),
+//                          ],
+//                        ),
+//                      ),
+//                    ],
+//                  ),
+//                );
+//              },
+//              body: ListTile(
+//                title: Container(
+//                  decoration: BoxDecoration(
+//                      borderRadius: BorderRadius.circular(4)),
+//                  width: 350,
+//                  height: 56,
+//                  child: ElevatedButton(
+//                    style: ButtonStyle(
+//                        backgroundColor:
+//                            MaterialStateProperty.all(
+//                      const Color(0xff69A8BB),
+//                    )),
+//                    onPressed: () {
+//                      // getProduct(widget.order).then((value) {
+//                      //   Navigator.push<void>(
+//                      //     context,
+//                      //     MaterialPageRoute<void>(
+//                      //       builder: (BuildContext context) =>
+//                      //           CollectingOrderPage(
+//                      //               // widget.imageUrl,
+//                      //               widget.order),
+//                      //     ),
+//                      //   );
+//                      // });
+//                    },
+//                    child: const Text(
+//                      'Начать сборку',
+//                      style: TextStyle(
+//                          fontFamily: 'Roboto',
+//                          fontWeight: FontWeight.w400,
+//                          fontSize: 16),
+//                    ),
+//                  ),
+//                ),
+//              ),
+//            );
+//          }).toList(),
+//        ),
+//      );
+//   }
+// }

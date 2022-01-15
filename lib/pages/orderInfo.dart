@@ -2,18 +2,22 @@ import 'dart:ui';
 
 import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_bloc.dart';
 import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_state.dart';
+import 'package:agrohub_collector_flutter/model/order.dart';
 import 'package:agrohub_collector_flutter/model/product.dart';
 import 'package:agrohub_collector_flutter/shared/myScaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
+import 'package:intl/intl.dart';
 
 class OrderInfoPage extends StatelessWidget {
   final ordersBloc = GetIt.I.get<OrdersBloc>();
-  String orderNumber;
-  String deliveryTime;
+  // String orderNumber;
+  // String deliveryTime;
   static const String routeName = '/infoOrder';
-  OrderInfoPage(this.deliveryTime, this.orderNumber, {Key? key})
+  OrderInfoPage(
+      // this.deliveryTime, this.orderNumber,
+      {Key? key})
       : super(key: key);
 
   @override
@@ -22,15 +26,18 @@ class OrderInfoPage extends StatelessWidget {
       bloc: ordersBloc,
       builder: (context, state) {
         List<Product> _list = ordersBloc.state.listOfProducts!;
+        Order order = ordersBloc.state.currentOrder!;
+        DateFormat format = DateFormat('HH:MM');
+        String _time = format.format(order.delivery_time!);
         double totalWeight = 0.0;
-        double totalPrice = 0.0;
-        for (var e in _list) {
+        // double totalPrice = 0.0;
+        for (Product e in _list) {
           totalWeight += e.ordered_quantity ?? 0;
-          totalPrice += e.unit_price ?? 0;
+          // totalPrice += e.unit_price ?? 0;
         }
 
         return MyScaffold(true, false,
-            title: orderNumber,
+            title: "Заказ №${order.agregator_order_id}",
             body: Padding(
               padding: const EdgeInsets.fromLTRB(
                   12, 24.0, 12, 320), //TODO это неправильно и надо переделать!!
@@ -60,12 +67,12 @@ class OrderInfoPage extends StatelessWidget {
                             const EdgeInsets.only(left: 18, right: 50, top: 10),
                         child: Row(
                           children: [
-                            Text('Интервал доставки:', style: style),
+                            Text('Время доставки:', style: style),
                             const SizedBox(
-                              width: 62,
+                              width: 85,
                             ),
                             Text(
-                              deliveryTime,
+                              _time.toString(),
                               style: const TextStyle(
                                   color: Color(0xffE14D43),
                                   fontFamily: 'Roboto',
@@ -102,7 +109,7 @@ class OrderInfoPage extends StatelessWidget {
                               width: 127,
                             ),
                             Text(
-                              '$totalWeight кг',
+                              "$totalWeight кг",
                               style:
                                   style.copyWith(fontWeight: FontWeight.w500),
                             )
@@ -119,7 +126,7 @@ class OrderInfoPage extends StatelessWidget {
                               width: 103,
                             ),
                             Text(
-                              '$totalPrice руб.',
+                              '${order.total_price.toString()} руб.',
                               style:
                                   style.copyWith(fontWeight: FontWeight.w500),
                             )

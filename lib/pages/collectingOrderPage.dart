@@ -5,6 +5,8 @@ import 'package:agrohub_collector_flutter/components/productCard.dart';
 import 'package:agrohub_collector_flutter/model/order.dart';
 import 'package:agrohub_collector_flutter/model/product.dart';
 import 'package:agrohub_collector_flutter/pages/allOrdersPage.dart';
+import 'package:agrohub_collector_flutter/pages/completedCollectionPage.dart';
+import 'package:agrohub_collector_flutter/repositories/orders_rep.dart';
 import 'package:agrohub_collector_flutter/shared/myScaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -22,36 +24,54 @@ class CollectingOrderPage extends StatefulWidget {
   State<CollectingOrderPage> createState() => _CollectingOrderPageState();
 }
 
-class _CollectingOrderPageState extends State<CollectingOrderPage> {
+class _CollectingOrderPageState extends State<CollectingOrderPage>
+    with SingleTickerProviderStateMixin {
   final ordersBloc = GetIt.I.get<OrdersBloc>();
+  final ordRep = OrdersRepository();
   bool toCollect = true;
+  late TabController _tabController;
 
   // final String _pageStatus = 'to_collect';
   @override
   void initState() {
+    ordersBloc.checkStatus(context, widget.order);
     super.initState();
+    _tabController = TabController(length: 2, vsync: this);
   }
+
+  final TextStyle _style = const TextStyle(
+      fontFamily: 'Roboto',
+      fontWeight: FontWeight.w400,
+      color: Color(0xff363B3F),
+      fontSize: 18);
 
   @override
   void dispose() {
-    ordersBloc.emit(ordersBloc.state.copyWith(listOfProducts: []));
+    // ordersBloc.emit(ordersBloc.state.copyWith(listOfProducts: []));
+    _tabController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    // ordRep.getThisOrder(widget.order.id!);
+    // _order =  await ordRep.getThisOrder(widget.order.id!);
     DateFormat format = DateFormat('HH:MM');
     String _time = format.format(widget.order.delivery_time!);
     // print(orderNumber);
-    TextStyle _style = const TextStyle(
+    TextStyle style = const TextStyle(
         fontFamily: 'Roboto',
         fontWeight: FontWeight.w400,
         color: Color(0xff363B3F),
         fontSize: 18);
 
-    return DefaultTabController(
-      length: 2,
-      child: MyScaffold(false, true,
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: DefaultTabController(
+        length: 2,
+        child: MyScaffold(
+          false,
+          true,
           title: "Заказ №${widget.order.agregator_order_id}",
           deliveryTime: _time,
           body: BlocBuilder<OrdersBloc, OrdersState>(
@@ -59,9 +79,8 @@ class _CollectingOrderPageState extends State<CollectingOrderPage> {
               builder: (context, state) {
                 int totalCollected = 0;
                 int totalToCollect = 0;
-
                 if (state.listOfProducts != null &&
-                    state.listOfProducts?.isNotEmpty == true) {
+                    state.listOfProducts != []) {
                   for (Product p in state.listOfProducts!) {
                     if (p.status == 'to_collect') {
                       totalToCollect++;
@@ -69,53 +88,117 @@ class _CollectingOrderPageState extends State<CollectingOrderPage> {
                       totalCollected++;
                     }
                   }
-                  return SizedBox(
-                    height: 10000,
-                    child: Column(
-                      children: [
-                        TabBar(
-                            labelColor: const Color(0xff363B3F),
-                            labelStyle:
-                                _style.copyWith(fontWeight: FontWeight.w500),
-                            indicatorColor: const Color(0xffE14D43),
-                            tabs: [
-                              Tab(
-                                text: 'Собрать $totalToCollect',
-                              ),
-                              Tab(
-                                text: 'Собрано $totalCollected',
-                              )
-                            ]),
-                        Expanded(
-                          child: TabBarView(children: [
-                            Container(
-                              child: _TabToCollect(
-                                state: state,
-                                pageStatus: 'to_collect',
-                              ),
-                            ),
-                            Container(
-                              child: _TabToCollect(
-                                state: state,
-                                pageStatus: 'collected',
-                              ),
-                            ),
-                          ]),
-                        ),
-                        // Expanded(
-                        //   child: Container(
-                        //       child: _TabToCollect(pageStatus: _pageStatus, state: state,)),
-                        // ),
-                      ],
-                    ),
-                  );
-                } else {
-                  return const Center(
+
+                  if (state.listOfProducts?.isNotEmpty == true) {
+                    if (totalToCollect == 0) {
+                      _tabController.animateTo(1);
+                    }
+                    return SizedBox(
+                      height: 10000,
+                      child: Column(
+                        children: [
+                          TabBar(
+                              controller: _tabController,
+                              labelColor: const Color(0xff363B3F),
+                              labelStyle:
+                                  _style.copyWith(fontWeight: FontWeight.w500),
+                              indicatorColor: const Color(0xffE14D43),
+                              tabs: [
+                                Tab(
+                                  text: 'Собрать $totalToCollect',
+                                ),
+                                Tab(
+                                  text: 'Собрано $totalCollected',
+                                )
+                              ]),
+                          Expanded(
+                            child: TabBarView(
+                                controller: _tabController,
+                                children: [
+                                  Container(
+                                    child: _TabToCollect(
+                                      state: state,
+                                      pageStatus: 'to_collect',
+                                    ),
+                                  ),
+                                  Container(
+                                    child: _TabToCollect(
+                                      state: state,
+                                      pageStatus: 'collected',
+                                    ),
+                                  ),
+                                ]),
+                          ),
+                        ],
+                      ),
+                    );
+                  } else {
+                    return Center(
                       child: CircularProgressIndicator(
-                    color: Color(0xffE14D43),
-                  ));
+                        color: Color(0xffE14D43),
+                      ),
+                    );
+                  }
+
+                  // } else {
+                  //   return Center(
+                  //     child: Text(
+                  //       '${state.listOfProducts}',
+                  //       style: _style,
+                  //       textAlign: TextAlign.center,
+                  //     ),
+                  //   );
+                  // }
+                } else {
+                  return Center(
+                    child: CircularProgressIndicator(color: Color(0xffE14D43)),
+                  );
                 }
-              })),
+              }),
+          fab: BlocBuilder<OrdersBloc, OrdersState>(
+            bloc: ordersBloc,
+            builder: (context, state) {
+              bool _isCollected = false;
+
+              state.listOfProducts?.forEach((e) {
+                // print('${e.name} собрано ${e.collected_quantity}');
+                if (e.collected_quantity != null &&
+                    e.collected_quantity != 0.0) {
+                  _isCollected = true;
+                } else {
+                  _isCollected = false;
+                }
+              });
+              return Visibility(
+                visible: _isCollected,
+                child: FloatingActionButton(
+                    tooltip: 'Завершить заказ',
+                    child: const Icon(Icons.check),
+                    backgroundColor: const Color(0xff7FB069),
+                    onPressed: _isCollected
+                        ? () {
+                            ordersBloc
+                                .checkStatus(context, widget.order)
+                                .then((value) {
+                              Navigator.push<void>(
+                                context,
+                                MaterialPageRoute<void>(
+                                  builder: (BuildContext context) =>
+                                      CompletedCollectionPage(
+                                    order: widget.order,
+                                  ),
+                                ),
+                              );
+                            });
+                          }
+                        : () {
+                            print('заказ не сдается');
+                          }),
+              );
+            },
+          ),
+        ),
+      ),
     );
   }
 }
@@ -164,20 +247,20 @@ class _TabToCollectState extends State<_TabToCollect>
             );
           } else {
             return
-                // index == 0
-                //     ? Padding(
-                //         padding: EdgeInsets.only(top: height, right: 50, left: 50),
-                //         child: const Text(
-                //           'Было бы замечательно если работа выполнялась сама собой.\nНо чтобы здесь что-то появилось, надо что-то собрать',
-                //           textAlign: TextAlign.center,
-                //           style: TextStyle(
-                //               fontFamily: 'Roboto',
-                //               fontWeight: FontWeight.w400,
-                //               color: Color(0xff363B3F),
-                //               fontSize: 15),
-                //         ),
-                //       )
-                //     :
+                //       // index == 0
+                //       //     ? Padding(
+                //       //         padding: EdgeInsets.only(top: height, right: 50, left: 50),
+                //       //         child: const Text(
+                //       //           'Было бы замечательно если работа выполнялась сама собой.\nНо чтобы здесь что-то появилось, надо что-то собрать',
+                //       //           textAlign: TextAlign.center,
+                //       //           style: TextStyle(
+                //       //               fontFamily: 'Roboto',
+                //       //               fontWeight: FontWeight.w400,
+                //       //               color: Color(0xff363B3F),
+                //       //               fontSize: 15),
+                //       //         ),
+                //       //       )
+                //       //     :
 
                 Container();
           }
