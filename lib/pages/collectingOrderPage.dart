@@ -161,7 +161,7 @@ class _CollectingOrderPageState extends State<CollectingOrderPage>
               bool _isCollected = false;
 
               state.listOfProducts?.forEach((e) {
-                // print('${e.name} собрано ${e.collected_quantity}');
+                // print(e);
                 if (e.collected_quantity != null &&
                     e.collected_quantity != 0.0) {
                   _isCollected = true;
@@ -169,6 +169,7 @@ class _CollectingOrderPageState extends State<CollectingOrderPage>
                   _isCollected = false;
                 }
               });
+
               return Visibility(
                 visible: _isCollected,
                 child: FloatingActionButton(

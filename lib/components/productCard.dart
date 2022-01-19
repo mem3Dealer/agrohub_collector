@@ -6,6 +6,7 @@ import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_event.dart';
 import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_state.dart';
 import 'package:agrohub_collector_flutter/model/product.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 
@@ -78,7 +79,7 @@ class ProductCardState extends State<ProductCard> {
       isOnDelete = true;
       _isCollapsed = true;
       t = Timer(_duration, () {
-        ordersBloc.add(ChangeProductStatus(0.0,
+        ordersBloc.add(ChangeProductStatus(0.1,
             product: widget.product, newStatus: 'deleted'));
       });
 
@@ -263,6 +264,9 @@ class ProductCardState extends State<ProductCard> {
         child: Padding(
           padding: const EdgeInsets.only(left: 8.0, right: 8),
           child: TextFormField(
+            inputFormatters: <TextInputFormatter>[
+              FilteringTextInputFormatter.allow(RegExp("[0-9.]")),
+            ],
             key: formKey,
             // initialValue:
             // textAlignVertical:
@@ -310,7 +314,7 @@ class ProductCardState extends State<ProductCard> {
 
   Container OrderedWeight() {
     bool _isCollected = widget.product.status == 'collected';
-    double _collectedQuantity = widget.product.collected_quantity!;
+    double _collectedQuantity = widget.product.collected_quantity ?? 0.0;
     double _orderedQuantity = widget.product.ordered_quantity!;
 
     RichText _richText = RichText(
@@ -466,7 +470,7 @@ class ProductName extends StatelessWidget {
       height: 96,
       width: 170,
       child: Text(
-        widget.product.name!,
+        widget.product.name_y ?? 'noname',
         maxLines: 4,
         overflow: TextOverflow.visible,
         style: _style,

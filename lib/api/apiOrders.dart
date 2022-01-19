@@ -23,6 +23,28 @@ class HtttpSerivceOrders {
     );
   }
 
+  Future<Response<dynamic>> post(
+      String endPoint, Map<String, dynamic> data) async {
+    Response<dynamic> response;
+    Dio _dio = Dio(
+      BaseOptions(
+        baseUrl: baseUrl,
+        contentType: 'application/json',
+        headers: <String, dynamic>{"Authorization": authBloc.state.JWT},
+      ),
+    );
+    try {
+      response = await _dio.post(endPoint, data: data);
+      return response;
+    } catch (exception) {
+      inspect(exception);
+      final String errorMessage =
+          DioExceptions.fromDioError(exception as DioError).toString();
+      print(errorMessage);
+      throw Exception(errorMessage);
+    }
+  }
+
   Future<Response<dynamic>> getRequest(
     String endPoint, {
     Map<String, dynamic>? query,

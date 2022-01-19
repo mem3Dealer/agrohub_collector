@@ -4,9 +4,11 @@ import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_event.dart';
 import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_state.dart';
 import 'package:agrohub_collector_flutter/model/product.dart';
 import 'package:agrohub_collector_flutter/model/order.dart';
+import 'package:agrohub_collector_flutter/model/response.dart';
 import 'package:agrohub_collector_flutter/pages/allOrdersPage.dart';
 import 'package:agrohub_collector_flutter/pages/collectingOrderPage.dart';
 import 'package:agrohub_collector_flutter/repositories/orders_rep.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -121,14 +123,18 @@ class OrdersBloc extends Bloc<OrdersEvents, OrdersState> {
   ) async {
     try {
       Order _order = await ord_rep.getThisOrder(event.order.id!);
-      if (_order.status != 'IN PROGRESS' &&
-          _order.status != 'READY' &&
+      if (_order.status != 'IN PROGRESS' ||
+          _order.status != 'READY' ||
           _order.status != 'CANCELLED') {
         List<Product>? _listOfProducts = await detailOrder(
           id: event.order.id!,
           onError: event.onError,
         );
 
+        Map<String, dynamic> _postData = {
+          'id': _order.id,
+          'status': 'IN PROGRESS'
+        };
         String? _currentOrder = await storage.read(key: 'currentOrderId');
         // print('THIS IS IT: $_currentOrder');
         if (_currentOrder == null || _currentOrder == '0') {
@@ -139,12 +145,12 @@ class OrdersBloc extends Bloc<OrdersEvents, OrdersState> {
           p.status = 'to_collect';
           p.collected_quantity = 0.0;
         }
-
+        ord_rep.updateOrderStatus(data: _postData);
         emitter(state.copyWith(
             listOfProducts: _listOfProducts,
             currentOrder: event.order.copyWith(status: 'IN PROGRESS')));
 
-        ord_rep.setOrderStatus(id: 85, status: 'IN PROGRESS');
+        // ord_rep.setOrderStatus(id: 85, status: 'IN PROGRESS');
         event.onSuccess!();
       }
     } catch (e) {
@@ -155,19 +161,25 @@ class OrdersBloc extends Bloc<OrdersEvents, OrdersState> {
   Future<void> _eventFinishCollecting(
       FinishCollecting event, Emitter<OrdersState> emitter) async {
     await storage.write(key: 'currentOrderId', value: '0');
+    MyResponse _orderPost = MyResponse(
+        orderId: state.currentOrder?.id,
+        farmerOrderId: state.currentOrder?.farmer_order_id,
+        listShortProduct: <ShortProduct>[]);
 
-    state.currentOrder?.status = 'READY';
-    Map<String, dynamic> _packedOrder = state.currentOrder!.toJson();
+    for (Product product in state.listOfProducts!) {
+      if (product.status == 'deleted') {
+        product.collected_quantity = 0.0;
+      }
+      _orderPost.listShortProduct?.add(product.toShortProduct);
+    }
+    Map<String, dynamic> _statusPost = {
+      'id': state.currentOrder?.id,
+      'status': 'READY'
+    };
 
-    List<Map<String, dynamic>> _packedListOfProducts = [];
+    ord_rep.updateOrderStatus(data: _statusPost);
+    ord_rep.postProducts(data: _orderPost.toServerMap());
 
-    state.listOfProducts!.forEach((product) {
-      _packedListOfProducts.add(product.toJson());
-    });
-    // print('BLOC: ${_packedListOfProducts}');
-    // var _postdata = [_packedOrder, _packedListOfProducts];
-    // print(_postdata);
-    // print('PRINT FROM BLOC ${state.currentOrder}');
     emitter(state.copyWith(listOfProducts: [], currentOrder: Order()));
     authBloc.emit(authBloc.state.copyWith(currentCollectingOrderId: 0));
 
@@ -185,7 +197,7 @@ class OrdersBloc extends Bloc<OrdersEvents, OrdersState> {
       event.product.status = 'collected';
       event.product.collected_quantity = event.collectedQuantity;
     } else if (event.newStatus == 'deleted') {
-      event.product.collected_quantity = 0.0;
+      event.product.collected_quantity = 0.1;
       event.product.status = 'deleted';
     }
 

@@ -19,6 +19,7 @@ class OrdersRepository {
   Future<List<Order>> getAllOrders() async {
     Response<dynamic> response = await http.get("/orders/get_all_orders/");
     List list = response.data['results'];
+    // print(list);
 
     List<Order> ord = list.map<Order>((e) => Order.fromMap(e)).toList();
     return ord;
@@ -45,7 +46,13 @@ class OrdersRepository {
     return res;
   }
 
-  void setOrderStatus({required int id, required String status}) {
-    //TODO оформить это надобно
+  void updateOrderStatus({required Map<String, dynamic> data}) {
+    http.post('/orders/change_status_order/', data);
+    print('SENT:$data');
+  }
+
+  void postProducts({required Map<String, dynamic> data}) {
+    http.post('/orders/collect_product/', data);
+    print('SENT:$data');
   }
 }

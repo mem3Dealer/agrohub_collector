@@ -12,7 +12,8 @@ class Product {
   int? farmer_order_id;
   int? id;
   String? image;
-  String? name;
+  String? name_x;
+  String? name_y;
   int? order_id;
   bool? out_of_stock;
   int? product_id;
@@ -29,7 +30,8 @@ class Product {
     this.farmer_order_id,
     this.id,
     this.image,
-    this.name,
+    this.name_x,
+    this.name_y,
     this.order_id,
     this.out_of_stock,
     this.product_id,
@@ -40,6 +42,15 @@ class Product {
     this.unit_price,
     this.ordered_quantity,
   });
+
+  ShortProduct get toShortProduct {
+    return ShortProduct(
+      productId: product_id,
+      status: status,
+      formedQuantity: collected_quantity,
+    );
+  }
+
   factory Product.fromJson(Map<String, dynamic> json) =>
       _$ProductFromJson(json);
 
@@ -51,7 +62,8 @@ class Product {
     int? farmer_order_id,
     int? id,
     String? image,
-    String? name,
+    String? name_x,
+    String? name_y,
     int? order_id,
     bool? out_of_stock,
     int? product_id,
@@ -68,7 +80,8 @@ class Product {
       farmer_order_id: farmer_order_id ?? this.farmer_order_id,
       id: id ?? this.id,
       image: image ?? this.image,
-      name: name ?? this.name,
+      name_x: name_x ?? this.name_x,
+      name_y: name_y ?? this.name_y,
       order_id: order_id ?? this.order_id,
       out_of_stock: out_of_stock ?? this.out_of_stock,
       product_id: product_id ?? this.product_id,
@@ -88,7 +101,8 @@ class Product {
       'farmer_order_id': farmer_order_id,
       'id': id,
       'image': image,
-      'name': name,
+      'name_x': name_x,
+      'name_y': name_y,
       'order_id': order_id,
       'out_of_stock': out_of_stock,
       'product_id': product_id,
@@ -108,7 +122,8 @@ class Product {
       farmer_order_id: map['farmer_order_id']?.toInt(),
       id: map['id']?.toInt(),
       image: map['image'],
-      name: map['name'],
+      name_x: map['name_x'],
+      name_y: map['name_y'],
       order_id: map['order_id']?.toInt(),
       out_of_stock: map['out_of_stock'],
       product_id: map['product_id']?.toInt(),
@@ -123,7 +138,7 @@ class Product {
 
   @override
   String toString() {
-    return 'Product(agrohub_price: $agrohub_price, collected_quantity: $collected_quantity, farmer_order_id: $farmer_order_id, id: $id, image: $image, name: $name, order_id: $order_id, out_of_stock: $out_of_stock, product_id: $product_id, product_type: $product_type, status: $status, store_id: $store_id, total_price: $total_price, unit_price: $unit_price, ordered_quantity: $ordered_quantity)';
+    return 'Product(agrohub_price: $agrohub_price, collected_quantity: $collected_quantity, farmer_order_id: $farmer_order_id, id: $id, image: $image, name_x: $name_x, name_y: $name_y, order_id: $order_id, out_of_stock: $out_of_stock, product_id: $product_id, product_type: $product_type, status: $status, store_id: $store_id, total_price: $total_price, unit_price: $unit_price, ordered_quantity: $ordered_quantity)';
   }
 
   @override
@@ -136,7 +151,8 @@ class Product {
         other.farmer_order_id == farmer_order_id &&
         other.id == id &&
         other.image == image &&
-        other.name == name &&
+        other.name_x == name_x &&
+        other.name_y == name_y &&
         other.order_id == order_id &&
         other.out_of_stock == out_of_stock &&
         other.product_id == product_id &&
@@ -155,7 +171,8 @@ class Product {
         farmer_order_id.hashCode ^
         id.hashCode ^
         image.hashCode ^
-        name.hashCode ^
+        name_x.hashCode ^
+        name_y.hashCode ^
         order_id.hashCode ^
         out_of_stock.hashCode ^
         product_id.hashCode ^
@@ -166,4 +183,66 @@ class Product {
         unit_price.hashCode ^
         ordered_quantity.hashCode;
   }
+}
+
+class ShortProduct {
+  int? productId;
+  String? status;
+  double? formedQuantity;
+  ShortProduct({
+    this.productId,
+    this.status,
+    this.formedQuantity,
+  });
+
+  ShortProduct copyWith({
+    int? productId,
+    String? status,
+    double? formedQuantity,
+  }) {
+    return ShortProduct(
+      productId: productId ?? this.productId,
+      status: status ?? this.status,
+      formedQuantity: formedQuantity ?? this.formedQuantity,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'product_id': productId,
+      'status': status,
+      'formedQuantity': formedQuantity,
+    };
+  }
+
+  factory ShortProduct.fromMap(Map<String, dynamic> map) {
+    return ShortProduct(
+      productId: map['productId']?.toInt(),
+      status: map['status'],
+      formedQuantity: map['formedQuantity']?.toDouble(),
+    );
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory ShortProduct.fromJson(String source) =>
+      ShortProduct.fromMap(json.decode(source));
+
+  @override
+  String toString() =>
+      'ShortProduct(productId: $productId, status: $status, formedQuantity: $formedQuantity)';
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is ShortProduct &&
+        other.productId == productId &&
+        other.status == status &&
+        other.formedQuantity == formedQuantity;
+  }
+
+  @override
+  int get hashCode =>
+      productId.hashCode ^ status.hashCode ^ formedQuantity.hashCode;
 }

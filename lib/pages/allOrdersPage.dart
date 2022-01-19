@@ -53,7 +53,7 @@ class _AllOrdersPageState extends State<AllOrdersPage> {
         onError: (e) {
           inspect(e);
         },
-        onSuccess: () => print('amaizing')));
+        onSuccess: () => print('you are very successful ')));
   }
 
   @override
