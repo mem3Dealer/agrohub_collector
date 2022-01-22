@@ -12,8 +12,7 @@ class Product {
   int? farmer_order_id;
   int? id;
   String? image;
-  String? name_x;
-  String? name_y;
+  String? name;
   int? order_id;
   bool? out_of_stock;
   int? product_id;
@@ -30,8 +29,7 @@ class Product {
     this.farmer_order_id,
     this.id,
     this.image,
-    this.name_x,
-    this.name_y,
+    this.name,
     this.order_id,
     this.out_of_stock,
     this.product_id,
@@ -62,8 +60,7 @@ class Product {
     int? farmer_order_id,
     int? id,
     String? image,
-    String? name_x,
-    String? name_y,
+    String? name,
     int? order_id,
     bool? out_of_stock,
     int? product_id,
@@ -80,8 +77,7 @@ class Product {
       farmer_order_id: farmer_order_id ?? this.farmer_order_id,
       id: id ?? this.id,
       image: image ?? this.image,
-      name_x: name_x ?? this.name_x,
-      name_y: name_y ?? this.name_y,
+      name: name ?? this.name,
       order_id: order_id ?? this.order_id,
       out_of_stock: out_of_stock ?? this.out_of_stock,
       product_id: product_id ?? this.product_id,
@@ -101,8 +97,7 @@ class Product {
       'farmer_order_id': farmer_order_id,
       'id': id,
       'image': image,
-      'name_x': name_x,
-      'name_y': name_y,
+      'name': name,
       'order_id': order_id,
       'out_of_stock': out_of_stock,
       'product_id': product_id,
@@ -122,8 +117,7 @@ class Product {
       farmer_order_id: map['farmer_order_id']?.toInt(),
       id: map['id']?.toInt(),
       image: map['image'],
-      name_x: map['name_x'],
-      name_y: map['name_y'],
+      name: map['name'],
       order_id: map['order_id']?.toInt(),
       out_of_stock: map['out_of_stock'],
       product_id: map['product_id']?.toInt(),
@@ -138,7 +132,7 @@ class Product {
 
   @override
   String toString() {
-    return 'Product(agrohub_price: $agrohub_price, collected_quantity: $collected_quantity, farmer_order_id: $farmer_order_id, id: $id, image: $image, name_x: $name_x, name_y: $name_y, order_id: $order_id, out_of_stock: $out_of_stock, product_id: $product_id, product_type: $product_type, status: $status, store_id: $store_id, total_price: $total_price, unit_price: $unit_price, ordered_quantity: $ordered_quantity)';
+    return 'Product(agrohub_price: $agrohub_price, collected_quantity: $collected_quantity, farmer_order_id: $farmer_order_id, id: $id, image: $image, name: $name, order_id: $order_id, out_of_stock: $out_of_stock, product_id: $product_id, product_type: $product_type, status: $status, store_id: $store_id, total_price: $total_price, unit_price: $unit_price, ordered_quantity: $ordered_quantity)';
   }
 
   @override
@@ -151,8 +145,7 @@ class Product {
         other.farmer_order_id == farmer_order_id &&
         other.id == id &&
         other.image == image &&
-        other.name_x == name_x &&
-        other.name_y == name_y &&
+        other.name == name &&
         other.order_id == order_id &&
         other.out_of_stock == out_of_stock &&
         other.product_id == product_id &&
@@ -171,8 +164,7 @@ class Product {
         farmer_order_id.hashCode ^
         id.hashCode ^
         image.hashCode ^
-        name_x.hashCode ^
-        name_y.hashCode ^
+        name.hashCode ^
         order_id.hashCode ^
         out_of_stock.hashCode ^
         product_id.hashCode ^

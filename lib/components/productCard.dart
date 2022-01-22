@@ -489,7 +489,7 @@ class ProductName extends StatelessWidget {
       height: 96,
       width: 170,
       child: Text(
-        widget.product.name_y ?? 'noname',
+        widget.product.name ?? 'noname',
         maxLines: 4,
         overflow: TextOverflow.visible,
         style: _style,
