@@ -9,7 +9,7 @@ import 'package:agrohub_collector_flutter/routes/routes.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
+import 'package:splash_screen_view/SplashScreenView.dart';
 import 'package:agrohub_collector_flutter/bloc/bloc/auth/auth_bloc.dart';
 import 'package:agrohub_collector_flutter/components/orderTile.dart';
 import 'package:agrohub_collector_flutter/pages/allOrdersPage.dart';
@@ -59,8 +59,15 @@ class MyApp extends StatelessWidget {
       ],
       child: OverlaySupport.global(
         child: MaterialApp(
+          debugShowCheckedModeBanner: false,
           theme: ThemeData(),
-          home: const LoginPage(),
+          home: SplashScreenView(
+            duration: 2500,
+            imageSize: 130,
+            imageSrc: 'assets/images/logo.png',
+            backgroundColor: Color(0xffF1F1F1),
+            navigateRoute: LoginPage(),
+          ),
           routes: <String, Widget Function(BuildContext)>{
             PageRoutes.allOrders: (BuildContext context) =>
                 const AllOrdersPage()

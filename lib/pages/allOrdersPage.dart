@@ -7,6 +7,7 @@ import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_bloc.dart';
 import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_event.dart';
 import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_state.dart';
 import 'package:expandable/expandable.dart';
+import 'package:intl/date_symbols.dart';
 import 'package:intl/intl.dart';
 import 'package:agrohub_collector_flutter/components/orderTile.dart';
 import 'package:agrohub_collector_flutter/model/order.dart';
@@ -34,7 +35,7 @@ class AllOrdersPage extends StatefulWidget {
 class _AllOrdersPageState extends State<AllOrdersPage> {
   final authBloc = GetIt.I.get<AuthenticationBloc>();
   final ordersBloc = GetIt.I.get<OrdersBloc>();
-  final ExpandableController _controller = ExpandableController();
+
   @override
   void initState() {
     getOrders();
@@ -44,7 +45,7 @@ class _AllOrdersPageState extends State<AllOrdersPage> {
 
   @override
   void dispose() {
-    _controller.dispose();
+    // _controller.dispose();
     super.dispose();
   }
 
@@ -62,6 +63,55 @@ class _AllOrdersPageState extends State<AllOrdersPage> {
     return BlocBuilder<OrdersBloc, OrdersState>(
       bloc: ordersBloc,
       builder: (context, state) {
+        List _ctrlList = [];
+        // ExpandableController _lastCtrl = ExpandableController();
+        if (state.allOrders != null) {
+          _ctrlList = List<ExpandableController>.generate(
+              state.allOrders!.length, (index) {
+            final controller = ExpandableController();
+            late ExpandableController _lastCtrl;
+
+            controller.addListener(() {
+              // bool _isAny = false;
+              // // int? _index;
+              // for (var i = 0; i < state.allOrders!.length; i++) {
+              //   _ctrlList.any((element) {
+              //     // _index = element[index];
+              //     return _isAny = element.expanded;
+              //   });
+              //   if (i == index) {
+              //     // _index = i;
+              //     // _lastCtrl = _ctrlList[i];
+              //     print('yes');
+              //   } else if (i != index && _isAny == true) {
+              //     print('ee?');
+              //     // _isAny = false;
+              //     Future.delayed(Duration(milliseconds: 500), () {
+              //       _ctrlList[index].expanded = false;
+              //       // _ctrlList[i].expanded = false;
+              //       // _ctrlList[i].expanded = true;
+
+              //       // _ctrlList[i].toggle();
+              //       // print('ctrl collapsed $i');
+              //     });
+              //   }
+
+              //   // if (i != index) {
+
+              //   //   if()
+              //   //   _ctrlList[i].toggle();
+              //   // } else {
+              //   //   if (_ctrlList[i].expanded == false) {
+
+              //   //   }
+              //   // }
+              // }
+            });
+            // print(controller);
+            return controller;
+          });
+        }
+
         // ordersBloc.add(OrdersGetAllOrders());
         // ord_rep.getAllOrders();
         // print('THESE ARE: ${ordersBloc.state}');
@@ -69,22 +119,23 @@ class _AllOrdersPageState extends State<AllOrdersPage> {
           false,
           false,
           title: 'Список заказов',
-          body: state.allOrders != null
-              ? state.allOrders!.isNotEmpty
-                  ? ListView.builder(
-                      padding: const EdgeInsets.only(top: 0),
-                      shrinkWrap: true,
-                      itemCount: state.allOrders?.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        Order order = state.allOrders![index];
-                        if (order.status != 'IN PROGRESS') {
-                          return OrderTile(order: order);
-                        } else {
-                          return Container(
-                            child: Text(order.status.toString()),
-                          );
-                        }
-                      })
+          body: state.ordersNew != null
+              ? state.ordersNew!.isNotEmpty
+                  ? Center(
+                      child: Container(
+                        width: 500,
+                        child: ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: state.ordersNew?.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              Order order = state.ordersNew![index];
+                              return OrderTile(
+                                  controller: _ctrlList[index],
+                                  index: index,
+                                  order: order);
+                            }),
+                      ),
+                    )
                   : Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -100,6 +151,11 @@ class _AllOrdersPageState extends State<AllOrdersPage> {
                   child: CircularProgressIndicator(
                   color: Color(0xffE14D43),
                 )),
+          // fab: FloatingActionButton(
+          //   onPressed: () {
+          //     _ctrlList[0].toggle();
+          //   },
+          // ),
         );
       },
     );

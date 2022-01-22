@@ -46,8 +46,15 @@ class ProductCardState extends State<ProductCard> {
     );
 
     _controller.addListener(() {
+      double? input = double.tryParse(_controller.text);
       final _isActive = _controller.text.isNotEmpty;
-      setState(() => this.isActive = _isActive);
+      setState(() {
+        if (input != 0.0) {
+          this.isActive = _isActive;
+        } else {
+          this.isActive = false;
+        }
+      });
     });
   }
 
@@ -148,7 +155,9 @@ class ProductCardState extends State<ProductCard> {
                     Row(
                       children: [
                         //картинка
-                        ImagePlacer(widget: widget),
+                        ImagePlacer(
+                          url: widget.product.image!,
+                        ),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisSize: MainAxisSize.min,
@@ -230,9 +239,15 @@ class ProductCardState extends State<ProductCard> {
                                     isActive: isItCollected ? true : isActive,
                                     product: widget.product,
                                     style: _style,
-                                    color: isActive || isItCollected
-                                        ? const Color(0xff69A8BB)
-                                        : null,
+                                    // &&
+                                    //             double.tryParse(
+                                    //                     _controller.text) ==
+                                    //                 0.0
+                                    color:
+                                        isActive || //TODO не работает ничерта! я про невидимость кнопки когда введен ноль
+                                                isItCollected
+                                            ? const Color(0xff69A8BB)
+                                            : null,
                                     text: widget.product.status == 'to_collect'
                                         ? 'Собрать'
                                         : 'Вернуть в Собрать',
@@ -265,7 +280,7 @@ class ProductCardState extends State<ProductCard> {
           padding: const EdgeInsets.only(left: 8.0, right: 8),
           child: TextFormField(
             inputFormatters: <TextInputFormatter>[
-              FilteringTextInputFormatter.allow(RegExp("[0-9.]")),
+              FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d*')),
             ],
             key: formKey,
             // initialValue:
@@ -274,8 +289,9 @@ class ProductCardState extends State<ProductCard> {
             onEditingComplete: _isCollected ? () => _expandCard() : null,
             onChanged: _isCollected
                 ? (text) {
-                    if (text.isNotEmpty) {
-                      widget.product.collected_quantity = double.tryParse(text);
+                    double? _cQ = double.tryParse(text);
+                    if (text.isNotEmpty && _cQ != 0.0) {
+                      widget.product.collected_quantity = _cQ;
                     }
                   }
                 : null,
@@ -285,26 +301,29 @@ class ProductCardState extends State<ProductCard> {
                 : _style,
             autofocus: true,
             maxLines: 1,
-            // maxLength: 5,
+            maxLength: 6,
             controller: _controller,
             keyboardType: TextInputType.number,
             // cursorHeight: 30,
 
             decoration: InputDecoration(
+                counter: const SizedBox.shrink(),
                 // errorText: 'Поле не может быть пустым',
-                suffixIcon: _controller.text.isNotEmpty
-                    ? IconButton(
-                        padding: EdgeInsets.zero,
-                        icon: const Icon(
-                          Icons.clear_sharp,
-                          color: Color(0xffE14D43),
-                        ),
-                        onPressed: () => _controller.clear(),
-                      )
-                    : null,
+                suffixIconConstraints: BoxConstraints.tightForFinite(),
+                // suffixIcon: _controller.text.isNotEmpty
+                //     ? IconButton(
+                //         iconSize: 10,
+                //         padding: EdgeInsets.zero,
+                //         icon: const Icon(
+                //           Icons.clear_sharp,
+                //           color: Color(0xffE14D43),
+                //         ),
+                //         onPressed: () => _controller.clear(),
+                //       )
+                //     : null,
                 suffixText:
                     widget.product.product_type == 'per_kilo' ? 'кг.' : 'шт',
-                // contentPadding: const EdgeInsets.only(left: 12, top: 10),
+                contentPadding: const EdgeInsets.only(left: 12, top: 10),
                 hintStyle: _style.copyWith(color: Color(0xff999999)),
                 hintText: 'Введите',
                 border: InputBorder.none),
@@ -479,30 +498,57 @@ class ProductName extends StatelessWidget {
   }
 }
 
-class ImagePlacer extends StatelessWidget {
-  const ImagePlacer({
+class ImagePlacer extends StatefulWidget {
+  String url;
+  ImagePlacer({
     Key? key,
-    required this.widget,
+    required this.url,
   }) : super(key: key);
 
-  final ProductCard widget;
+  @override
+  State<ImagePlacer> createState() => _ImagePlacerState();
+}
 
+class _ImagePlacerState extends State<ImagePlacer> {
   @override
   Widget build(BuildContext context) {
-    String _url = 'https://bit.ly/3razGGb';
-    ImageProvider image;
-    try {
-      image = NetworkImage(widget.product.image!);
-    } catch (e) {
-      inspect(e);
-      image = NetworkImage(_url);
-    }
-
-    return Container(
-      height: 132,
-      width: 132,
-      decoration: BoxDecoration(
-          image: DecorationImage(fit: BoxFit.cover, image: image)),
+    //однажды я это решу :)
+// проблема была в том, что он выкидывал ошибку битой ссылки (badUrl) в моменты когда я нажимал на кнопку
+// чтобы перейти на экран инфы. В общем - так работает.
+    String badUrl = 'https://storage.yandexcloud.net/goods-images/media/';
+    String _ph =
+        'https://www.fwhealth.org/wp-content/uploads/2017/03/placeholder-500x500.jpg';
+    Image image = Image.network(
+      widget.url == badUrl ? _ph : widget.url,
+      fit: BoxFit.fill,
+      loadingBuilder: (BuildContext context, Widget child,
+          ImageChunkEvent? loadingProgress) {
+        if (loadingProgress == null) return child;
+        return Center(
+          child: CircularProgressIndicator(
+            color: const Color(0xffE14D43),
+            value: loadingProgress.expectedTotalBytes != null
+                ? loadingProgress.cumulativeBytesLoaded /
+                    loadingProgress.expectedTotalBytes!
+                : null,
+          ),
+        );
+      },
+      errorBuilder: (context, error, stackTrace) {
+        inspect(error);
+        return Image.asset('assets/images/placeholder.jpg');
+      },
     );
+
+    // FadeInImage image = FadeInImage.assetNetwork(
+    //   placeholder: 'assets/images/placeholder.jpg',
+    //   image: widget.url,
+    //   imageErrorBuilder: (context, object, stackTrace) {
+    //     return Image.asset('assets/images/placeholder.jpg');
+    //   },
+
+    // );
+
+    return SizedBox(height: 132, width: 132, child: image);
   }
 }

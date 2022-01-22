@@ -29,12 +29,14 @@ class _CollectingOrderPageState extends State<CollectingOrderPage>
   final ordersBloc = GetIt.I.get<OrdersBloc>();
   final ordRep = OrdersRepository();
   bool toCollect = true;
+  bool _isCollected = false;
   late TabController _tabController;
 
   // final String _pageStatus = 'to_collect';
   @override
   void initState() {
     ordersBloc.checkStatus(context, widget.order);
+
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
   }
@@ -59,12 +61,6 @@ class _CollectingOrderPageState extends State<CollectingOrderPage>
     DateFormat format = DateFormat('HH:MM');
     String _time = format.format(widget.order.delivery_time!);
     // print(orderNumber);
-    TextStyle style = const TextStyle(
-        fontFamily: 'Roboto',
-        fontWeight: FontWeight.w400,
-        color: Color(0xff363B3F),
-        fontSize: 18);
-
     return WillPopScope(
       onWillPop: () async => false,
       child: DefaultTabController(
@@ -133,24 +129,14 @@ class _CollectingOrderPageState extends State<CollectingOrderPage>
                       ),
                     );
                   } else {
-                    return Center(
+                    return const Center(
                       child: CircularProgressIndicator(
                         color: Color(0xffE14D43),
                       ),
                     );
                   }
-
-                  // } else {
-                  //   return Center(
-                  //     child: Text(
-                  //       '${state.listOfProducts}',
-                  //       style: _style,
-                  //       textAlign: TextAlign.center,
-                  //     ),
-                  //   );
-                  // }
                 } else {
-                  return Center(
+                  return const Center(
                     child: CircularProgressIndicator(color: Color(0xffE14D43)),
                   );
                 }
@@ -158,18 +144,13 @@ class _CollectingOrderPageState extends State<CollectingOrderPage>
           fab: BlocBuilder<OrdersBloc, OrdersState>(
             bloc: ordersBloc,
             builder: (context, state) {
-              bool _isCollected = false;
-
-              state.listOfProducts?.forEach((e) {
-                // print(e);
-                if (e.collected_quantity != null &&
-                    e.collected_quantity != 0.0) {
-                  _isCollected = true;
-                } else {
-                  _isCollected = false;
-                }
+              ordersBloc.state.listOfProducts?.any((prod) {
+                _isCollected;
+                prod.collected_quantity == 0.0
+                    ? {_isCollected = false}
+                    : {_isCollected = true};
+                return !_isCollected;
               });
-
               return Visibility(
                 visible: _isCollected,
                 child: FloatingActionButton(
@@ -181,6 +162,7 @@ class _CollectingOrderPageState extends State<CollectingOrderPage>
                             ordersBloc
                                 .checkStatus(context, widget.order)
                                 .then((value) {
+                              print(_isCollected);
                               Navigator.push<void>(
                                 context,
                                 MaterialPageRoute<void>(
@@ -192,9 +174,7 @@ class _CollectingOrderPageState extends State<CollectingOrderPage>
                               );
                             });
                           }
-                        : () {
-                            print('заказ не сдается');
-                          }),
+                        : null),
               );
             },
           ),

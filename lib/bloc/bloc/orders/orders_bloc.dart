@@ -35,11 +35,16 @@ class OrdersBloc extends Bloc<OrdersEvents, OrdersState> {
         onError: event.onError,
         data: event.params,
       );
-      for (Order order in orders) {
-        order.status = 'ACCEPTED';
-      }
+      // for (Order order in orders) {
+      //   if (order.status != 'READY' && order.status != 'IN PROGRESS') {
+      //     print(order.agregator_order_id);
+      //     print(order.status);
+      //     order.status = 'ACCEPTED';
+      //   }
+      // }
       List<Order> ordersNew = orders
-          .where((Order element) => element.status == 'ready_to_collect')
+          .where((Order element) =>
+              element.status != 'READY' && element.status != 'IN PROGRESS')
           .toList();
       sortingOrder(ordersNew);
       // List<Order> ordersInWork = orders
@@ -195,6 +200,7 @@ class OrdersBloc extends Bloc<OrdersEvents, OrdersState> {
       event.product.collected_quantity = 0.0;
     } else if (event.newStatus == 'collected') {
       event.product.status = 'collected';
+      // if(event.collectedQuantity)
       event.product.collected_quantity = event.collectedQuantity;
     } else if (event.newStatus == 'deleted') {
       event.product.collected_quantity = 0.1;

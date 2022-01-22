@@ -11,9 +11,12 @@ import 'package:intl/intl.dart';
 
 class OrderTile extends StatefulWidget {
   Order order;
-
+  ExpandableController controller;
+  int index;
   OrderTile({
     required this.order,
+    required this.controller,
+    required this.index,
     Key? key,
   }) : super(
           key: key,
@@ -25,19 +28,23 @@ class OrderTile extends StatefulWidget {
 
 class _OrderTileState extends State<OrderTile> {
   final ordersBloc = GetIt.I.get<OrdersBloc>();
-  late ExpandableController _exContrl;
+  // ExpandableController _exContrl = ExpandableController();
   late UniqueKey _key;
+  // ExpandableController _lastOpened = ExpandableController();
   @override
   void initState() {
     super.initState();
-    _exContrl = ExpandableController(initialExpanded: false);
+    // _exContrl = ExpandableController()
+    //   ..addListener(() {
+    //     print(widget.index);
+    // });
     _key = UniqueKey();
   }
 
   @override
   void dispose() {
     super.dispose();
-    _exContrl.dispose();
+    // widget.controller.dispose();
   }
 
   // double _height = 116;
@@ -60,13 +67,13 @@ class _OrderTileState extends State<OrderTile> {
     //     DateFormat('EEE, dd MMM yyyy HH:MM').parse(order.delivery_time!);
     DateFormat format = DateFormat('HH:MM');
     String _time = format.format(widget.order.delivery_time!);
-    // print(_time);
+    // print('$_exContrl, $_key');
     return Padding(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
         child: Card(
           child: ExpandablePanel(
             key: _key,
-            controller: _exContrl,
+            controller: widget.controller,
             theme: const ExpandableThemeData(
               hasIcon: false,
             ),
@@ -113,8 +120,8 @@ class _OrderTileState extends State<OrderTile> {
               ],
             ),
             collapsed: Container(
-              child: Text(widget.order.status.toString()),
-            ),
+                // child: Text(widget.order.status.toString()),
+                ),
             expanded: Center(
               child: SizedBox(
                   height: 72,
