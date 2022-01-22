@@ -1,5 +1,7 @@
+import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_bloc.dart';
 import 'package:agrohub_collector_flutter/pages/orderInfo.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 
 class MyScaffold extends StatelessWidget {
   Widget body;
@@ -18,7 +20,7 @@ class MyScaffold extends StatelessWidget {
 
   final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
       GlobalKey<ScaffoldMessengerState>();
-
+  final ordersBloc = GetIt.I.get<OrdersBloc>();
   @override
   Widget build(BuildContext context) {
     // deliveryTime = '12:00-15:00';
@@ -102,6 +104,7 @@ class Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ordersBloc = GetIt.I.get<OrdersBloc>();
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 45, 16, 10),
       child: Row(
@@ -130,17 +133,24 @@ class Header extends StatelessWidget {
           ),
           deliveryTime == null
               ? Container()
-              : IconButton(
-                  iconSize: 35,
-                  onPressed: () {
-                    Navigator.push<void>(
-                      context,
-                      MaterialPageRoute<void>(
-                        builder: (BuildContext context) => OrderInfoPage(),
-                      ),
-                    );
-                  },
-                  icon: const Icon(Icons.info_outline))
+              : Visibility(
+                  visible: ordersBloc.state.listOfProducts != null
+                      ? ordersBloc.state.listOfProducts!.isNotEmpty
+                          ? true
+                          : false
+                      : false,
+                  child: IconButton(
+                      iconSize: 35,
+                      onPressed: () {
+                        Navigator.push<void>(
+                          context,
+                          MaterialPageRoute<void>(
+                            builder: (BuildContext context) => OrderInfoPage(),
+                          ),
+                        );
+                      },
+                      icon: const Icon(Icons.info_outline)),
+                )
         ],
       ),
     );
