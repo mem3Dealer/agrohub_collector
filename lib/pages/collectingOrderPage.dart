@@ -136,8 +136,17 @@ class _CollectingOrderPageState extends State<CollectingOrderPage>
                     );
                   }
                 } else {
-                  return const Center(
-                    child: CircularProgressIndicator(color: Color(0xffE14D43)),
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Кажется, у нас какие-то неполадки.\nСвяжитесь с администратором или попробуйте позже.',
+                          textAlign: TextAlign.center,
+                          style: _style,
+                        )
+                      ],
+                    ),
                   );
                 }
               }),
