@@ -1,6 +1,8 @@
 import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_bloc.dart';
+import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_state.dart';
 import 'package:agrohub_collector_flutter/pages/orderInfo.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 
 class MyScaffold extends StatelessWidget {
@@ -133,23 +135,29 @@ class Header extends StatelessWidget {
           ),
           deliveryTime == null
               ? Container()
-              : Visibility(
-                  visible: ordersBloc.state.listOfProducts != null
-                      ? ordersBloc.state.listOfProducts!.isNotEmpty
-                          ? true
-                          : false
-                      : false,
-                  child: IconButton(
-                      iconSize: 35,
-                      onPressed: () {
-                        Navigator.push<void>(
-                          context,
-                          MaterialPageRoute<void>(
-                            builder: (BuildContext context) => OrderInfoPage(),
-                          ),
-                        );
-                      },
-                      icon: const Icon(Icons.info_outline)),
+              : BlocBuilder<OrdersBloc, OrdersState>(
+                  bloc: ordersBloc,
+                  builder: (context, state) {
+                    return Visibility(
+                      visible: state.listOfProducts != null
+                          ? state.listOfProducts!.isNotEmpty
+                              ? true
+                              : false
+                          : false,
+                      child: IconButton(
+                          iconSize: 35,
+                          onPressed: () {
+                            Navigator.push<void>(
+                              context,
+                              MaterialPageRoute<void>(
+                                builder: (BuildContext context) =>
+                                    OrderInfoPage(),
+                              ),
+                            );
+                          },
+                          icon: const Icon(Icons.info_outline)),
+                    );
+                  },
                 )
         ],
       ),

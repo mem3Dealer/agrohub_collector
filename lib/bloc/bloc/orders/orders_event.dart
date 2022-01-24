@@ -53,6 +53,11 @@ class FinishCollecting extends OrdersEvents {
   BuildContext context;
   FinishCollecting({required this.context});
 }
+
+class LoadNewOrders extends OrdersEvents {
+  // BuildContext context;
+  LoadNewOrders();
+}
 // class CollectProduct extends OrdersEvents {
 //   CollectProduct({
 //     required this.collectedQuantity,

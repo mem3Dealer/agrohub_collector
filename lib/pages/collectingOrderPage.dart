@@ -83,6 +83,7 @@ class _CollectingOrderPageState extends State<CollectingOrderPage>
                     } else if (p.status == 'collected') {
                       totalCollected++;
                     }
+                    // print("${p.name}: ${p.collected_quantity}, ${p.status}");
                   }
 
                   if (state.listOfProducts?.isNotEmpty == true) {
@@ -90,8 +91,9 @@ class _CollectingOrderPageState extends State<CollectingOrderPage>
                       _tabController.animateTo(1);
                     }
                     return SizedBox(
-                      height: 10000,
+                      height: 1000,
                       child: Column(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
                           TabBar(
                               controller: _tabController,
@@ -255,46 +257,6 @@ class _TabToCollectState extends State<_TabToCollect>
                 Container();
           }
         });
-  }
-}
-
-class ButtonsPanel extends StatelessWidget {
-  final int totalToCollect;
-  final int totalCollected;
-  String pageStatus;
-
-  ButtonsPanel({
-    required this.pageStatus,
-    required this.totalCollected,
-    required this.totalToCollect,
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(0, 12, 0, 16),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        //КНОПКИ
-        children: [
-          Button(
-            onTap: () {
-              print('yas');
-              pageStatus = 'to_collect';
-            },
-            text: 'Собрать $totalToCollect',
-          ),
-          Button(
-            onTap: () {
-              print('nah');
-              pageStatus = 'collected';
-            },
-            text: 'Собрано $totalCollected',
-          ),
-        ],
-      ),
-    );
   }
 }
 

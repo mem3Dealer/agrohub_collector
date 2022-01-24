@@ -24,6 +24,7 @@ class OrdersBloc extends Bloc<OrdersEvents, OrdersState> {
     on<InitCollectingOrder>(_eventInitCollectingOrder);
     on<FinishCollecting>(_eventFinishCollecting);
     // on<CollectProduct>(_eventCollectProduct);
+    on<LoadNewOrders>(_eventLoadNewOrders);
   }
 
   Future<void> _eventOrdersGetAllOrders(
@@ -35,18 +36,21 @@ class OrdersBloc extends Bloc<OrdersEvents, OrdersState> {
         onError: event.onError,
         data: event.params,
       );
-      // for (Order order in orders) {
-      //   if (order.status != 'READY' && order.status != 'IN PROGRESS') {
-      //     print(order.agregator_order_id);
-      //     print(order.status);
-      //     order.status = 'ACCEPTED';
-      //   }
-      // }
+      for (Order order in orders) {
+        // order.status = 'ACCEPTED';
+
+        // if (order.status != 'READY' && order.status != 'IN PROGRESS') {
+        //   print(order.agregator_order_id);
+        //   print(order.status);
+        //   order.status = 'ACCEPTED';
+        // }
+      }
       List<Order> ordersNew = orders
           .where((Order element) =>
               element.status != 'READY' && element.status != 'IN PROGRESS')
           .toList();
       sortingOrder(ordersNew);
+
       // List<Order> ordersInWork = orders
       //     .where((Order element) => element.status == 'collecting')
       //     .toList();
@@ -55,7 +59,7 @@ class OrdersBloc extends Bloc<OrdersEvents, OrdersState> {
       //     .where((Order element) => element.status == 'ready_to_ship')
       // .toList();
 
-      orders.sort((a, b) {
+      ordersNew.sort((a, b) {
         return a.delivery_time!.compareTo(b.delivery_time!);
       });
       emitter(
@@ -84,12 +88,34 @@ class OrdersBloc extends Bloc<OrdersEvents, OrdersState> {
     }
   }
 
+// Future<List<Order>>?
+  Future<void> _eventLoadNewOrders(
+    LoadNewOrders event,
+    Emitter<OrdersState> emitter,
+  ) async {
+    List<Order> _list = await ord_rep.getMoreOrders();
+
+    List<Order> _newOrders = _list
+        .where((Order element) =>
+            element.status != 'READY' && element.status != 'IN PROGRESS')
+        .toList();
+    // emitter(state.copyWith(loading: true));
+    List<Order>? _aga = state.ordersNew;
+    _aga!.addAll(_newOrders);
+    // for (Order or in _aga) {
+    //   print(or.agregator_order_id);
+    // }
+    // print(_list.length);
+    emitter(state.copyWith(allOrders: _aga, version: state.version++));
+  }
+
   Future<List<Order>> _allOrders({
     Function? onError,
     Map<String, dynamic>? data,
   }) async {
     // add(const OrdersLoading(loading: true));
     final List<Order> orders = await ordersRepository.getAllOrders();
+
     // add(const OrdersLoading(loading: false));
     return orders;
   }
@@ -150,7 +176,7 @@ class OrdersBloc extends Bloc<OrdersEvents, OrdersState> {
           p.status = 'to_collect';
           p.collected_quantity = 0.0;
         }
-        ord_rep.updateOrderStatus(data: _postData);
+        // ord_rep.updateOrderStatus(data: _postData); TODO раскоментить чтобы возобновить работу с беком
         emitter(state.copyWith(
             listOfProducts: _listOfProducts,
             currentOrder: event.order.copyWith(status: 'IN PROGRESS')));
@@ -182,8 +208,8 @@ class OrdersBloc extends Bloc<OrdersEvents, OrdersState> {
       'status': 'READY'
     };
 
-    ord_rep.updateOrderStatus(data: _statusPost);
-    ord_rep.postProducts(data: _orderPost.toServerMap());
+    // ord_rep.updateOrderStatus(data: _statusPost);
+    // ord_rep.postProducts(data: _orderPost.toServerMap()); TODO раскоментить чтобы возобновить работу с беком
 
     emitter(state.copyWith(listOfProducts: [], currentOrder: Order()));
     authBloc.emit(authBloc.state.copyWith(currentCollectingOrderId: 0));

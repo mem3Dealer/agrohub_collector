@@ -12,15 +12,33 @@ import 'package:get_it/get_it.dart';
 AuthenticationRepository authRep = AuthenticationRepository();
 final authBloc = GetIt.I.get<AuthenticationBloc>();
 final http = GetIt.I.get<HtttpSerivceOrders>();
+String? url = '';
 
 class OrdersRepository {
   //Получение всех заказов с рынка
 
   Future<List<Order>> getAllOrders() async {
-    Response<dynamic> response = await http.get("/orders/get_all_orders/");
+    Response<dynamic> response =
+        await http.get("/orders/get_all_orders/?per_page=7");
     List list = response.data['results'];
-    // print(list);
+    String _url = response.data['next'];
+    url = _url.substring(62);
 
+    List<Order> ord = list.map<Order>((e) => Order.fromMap(e)).toList();
+    return ord;
+  }
+
+  //следующие заказы
+  Future<List<Order>> getMoreOrders() async {
+    Response<dynamic> response =
+        await http.get("/orders/get_all_orders/?page=$url&per_page=7");
+    List list = response.data['results'];
+
+    if (response.data['next'].toString() != 'null') {
+      String _url = response.data['next'];
+      url = _url.substring(62);
+    }
+    // print(response.data);
     List<Order> ord = list.map<Order>((e) => Order.fromMap(e)).toList();
     return ord;
   }
@@ -38,6 +56,7 @@ class OrdersRepository {
     return listOfProducts;
   }
 
+  //узнать статус конкретного заказа
   Future<Order> getThisOrder(int id) async {
     Response<dynamic> response =
         await http.get('/orders/order_search/?order_id=$id');
@@ -46,13 +65,15 @@ class OrdersRepository {
     return res;
   }
 
+  //обновить статус заказа
   void updateOrderStatus({required Map<String, dynamic> data}) {
     http.post('/orders/change_status_order/', data);
-    print('SENT:$data');
+    // print('SENT:$data');
   }
 
+  //отправить собранную корзину продуктов
   void postProducts({required Map<String, dynamic> data}) {
     http.post('/orders/collect_product/', data);
-    print('SENT:$data');
+    // print('SENT:$data');
   }
 }

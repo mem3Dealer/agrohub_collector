@@ -39,7 +39,9 @@ class _AllOrdersPageState extends State<AllOrdersPage> {
   @override
   void initState() {
     getOrders();
+
     super.initState();
+
     // authBloc.add(AuthenticationInit());
   }
 
@@ -54,12 +56,11 @@ class _AllOrdersPageState extends State<AllOrdersPage> {
         onError: (e) {
           inspect(e);
         },
-        onSuccess: () => print('you are very successful ')));
+        onSuccess: () => print('Everything`s proceeding as I have forseen')));
   }
 
   @override
   Widget build(BuildContext context) {
-    // print();
     return BlocBuilder<OrdersBloc, OrdersState>(
       bloc: ordersBloc,
       builder: (context, state) {
@@ -69,8 +70,6 @@ class _AllOrdersPageState extends State<AllOrdersPage> {
           _ctrlList = List<ExpandableController>.generate(
               state.allOrders!.length, (index) {
             final controller = ExpandableController();
-            late ExpandableController _lastCtrl;
-
             controller.addListener(() {
               // bool _isAny = false;
               // // int? _index;
@@ -112,9 +111,12 @@ class _AllOrdersPageState extends State<AllOrdersPage> {
           });
         }
 
-        // ordersBloc.add(OrdersGetAllOrders());
-        // ord_rep.getAllOrders();
-        // print('THESE ARE: ${ordersBloc.state}');
+        if (ordersBloc.state.ordersNew != null) {
+          if (ordersBloc.state.ordersNew!.length < 7) {
+            ordersBloc.add(LoadNewOrders());
+          }
+        }
+
         return MyScaffold(
           false,
           false,
@@ -122,18 +124,22 @@ class _AllOrdersPageState extends State<AllOrdersPage> {
           body: state.ordersNew != null
               ? state.ordersNew!.isNotEmpty
                   ? Center(
-                      child: Container(
-                        width: 500,
-                        child: ListView.builder(
-                            shrinkWrap: true,
-                            itemCount: state.ordersNew?.length,
-                            itemBuilder: (BuildContext context, int index) {
-                              Order order = state.ordersNew![index];
-                              return OrderTile(
-                                  controller: _ctrlList[index],
-                                  index: index,
-                                  order: order);
-                            }),
+                      child: BlocBuilder<OrdersBloc, OrdersState>(
+                        builder: (context, state) {
+                          return Container(
+                            width: 500,
+                            child: ListView.builder(
+                                shrinkWrap: true,
+                                itemCount: state.ordersNew?.length,
+                                itemBuilder: (BuildContext context, int index) {
+                                  Order order = state.ordersNew![index];
+                                  return OrderTile(
+                                      controller: _ctrlList[index],
+                                      index: index,
+                                      order: order);
+                                }),
+                          );
+                        },
                       ),
                     )
                   : Center(
@@ -152,9 +158,7 @@ class _AllOrdersPageState extends State<AllOrdersPage> {
                   color: Color(0xffE14D43),
                 )),
           // fab: FloatingActionButton(
-          //   onPressed: () {
-          //     _ctrlList[0].toggle();
-          //   },
+          //   onPressed: () async {},
           // ),
         );
       },
