@@ -68,7 +68,7 @@ class _CollectingOrderPageState extends State<CollectingOrderPage>
         child: MyScaffold(
           false,
           true,
-          title: "Заказ №${widget.order.agregator_order_id}",
+          title: "Заказ №${widget.order.id} ",
           deliveryTime: _time,
           body: BlocBuilder<OrdersBloc, OrdersState>(
               bloc: ordersBloc,

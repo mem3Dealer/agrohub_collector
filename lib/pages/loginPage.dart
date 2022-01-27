@@ -67,8 +67,9 @@ class _LoginPageState extends State<LoginPage> {
             if (currentCollectingOrderId != 0) {
               // print('it comes here');
               ordersBloc.add(InitCollectingOrder(
-                  collectingOrderId: currentCollectingOrderId,
-                  context: context));
+                collectingOrderId: currentCollectingOrderId,
+                context: context,
+              ));
 
               // if (ordersBloc.state.currentOrder != null) {
               // } else {

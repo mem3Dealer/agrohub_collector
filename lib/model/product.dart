@@ -46,6 +46,7 @@ class Product {
         productId: product_id,
         status: status,
         farmer_order_id: farmer_order_id,
+        formedQuantity: collected_quantity,
         orderedQuantity: ordered_quantity);
   }
 

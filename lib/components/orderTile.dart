@@ -98,12 +98,12 @@ class _OrderTileState extends State<OrderTile> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 12, 56, 12),
+                    padding: const EdgeInsets.fromLTRB(16, 12, 40, 12),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Text(
-                          "Заказ №${widget.order.agregator_order_id}",
+                          "Заказ №${widget.order.agregator_order_id},id: ${widget.order.id}",
                           textAlign: TextAlign.left,
                           style: const TextStyle(
                               fontFamily: 'Roboto',

@@ -33,6 +33,10 @@ class MyScaffold extends StatelessWidget {
         floatingActionButton: fab,
         backgroundColor: const Color(0xffF1F1F1),
         resizeToAvoidBottomInset: true,
+        appBar: PreferredSize(
+            preferredSize: Size.fromHeight(100.0), // here the desired height
+            child: Header(
+                deliveryTime: deliveryTime, isItInfo: isItInfo, title: title)),
         body: Column(
           mainAxisSize: MainAxisSize.max,
           children: [
@@ -68,7 +72,7 @@ class HeadColumn extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Header(deliveryTime: deliveryTime, isItInfo: isItInfo, title: title),
+        // Header(deliveryTime: deliveryTime, isItInfo: isItInfo, title: title),
         if (deliveryTime != null)
           Row(
             mainAxisAlignment: MainAxisAlignment.start,

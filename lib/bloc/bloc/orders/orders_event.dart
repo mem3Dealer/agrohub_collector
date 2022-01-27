@@ -45,9 +45,17 @@ class ChangeProductStatus extends OrdersEvents {
 }
 
 class InitCollectingOrder extends OrdersEvents {
-  InitCollectingOrder({required this.collectingOrderId, required this.context});
+  Function? onError;
+  Function? onSuccess;
   int? collectingOrderId;
   BuildContext context;
+
+  InitCollectingOrder({
+    required this.collectingOrderId,
+    required this.context,
+    this.onError,
+    this.onSuccess,
+  });
 }
 
 class FinishCollecting extends OrdersEvents {

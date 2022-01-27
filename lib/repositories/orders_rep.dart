@@ -60,7 +60,7 @@ class OrdersRepository {
   Future<Order> getThisOrder(int id) async {
     Response<dynamic> response =
         await http.get('/orders/order_search/?order_id=$id');
-    // print(response);
+    print(response);
     Order res = Order.fromMap(response.data['result']);
     return res;
   }

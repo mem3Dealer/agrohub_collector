@@ -27,6 +27,7 @@ class OrdersBloc extends Bloc<OrdersEvents, OrdersState> {
     // on<CollectProduct>(_eventCollectProduct);
     on<LoadNewOrders>(_eventLoadNewOrders);
   }
+  List<String> _listStats = ['IN PROGRESS', 'READY', 'CANCELLED'];
 
   Future<void> _eventOrdersGetAllOrders(
     OrdersGetAllOrders event,
@@ -37,20 +38,21 @@ class OrdersBloc extends Bloc<OrdersEvents, OrdersState> {
         onError: event.onError,
         data: event.params,
       );
-      for (Order order in orders) {
-        // order.status = 'ACCEPTED';
+      // for (Order order in orders) {
+      //   // order.status = 'ACCEPTED';
 
-        // if (order.status != 'READY' && order.status != 'IN PROGRESS') {
-        //   print(order.agregator_order_id);
-        //   print(order.status);
-        //   order.status = 'ACCEPTED';
-        // }
-      }
+      //   // if (order.status != 'READY' && order.status != 'IN PROGRESS') {
+      //   //   print(order.agregator_order_id);
+      //   //   print(order.status);
+      //   //   order.status = 'ACCEPTED';
+      //   // }
+      // }
       List<Order> ordersNew = orders
-          .where((Order element) =>
-              element.status != 'READY' && element.status != 'IN PROGRESS')
+          .where(
+              (Order element) => _listStats.contains(element.status) == false)
           .toList();
       sortingOrder(ordersNew);
+
       if (ordersNew.length < 4) {
         LoadNewOrders();
       }
@@ -133,40 +135,45 @@ class OrdersBloc extends Bloc<OrdersEvents, OrdersState> {
 
   Future<void> _eventInitCollectingOrder(
       InitCollectingOrder event, Emitter<OrdersState> emitter) async {
-    List<Order> orders = await _allOrders();
-
-    // if (orders.length < 7 || orders.isEmpty) {
-    //   await LoadNewOrders();
-    // }
-    //TODO я же записываю айдишник - можно просто попробовать сделать запрос по именно этому айди и не грузить ебучие
-    Order? currentOrder;
-    print('PRINT FROM INIT: ${orders.length}');
-    currentOrder =
-        orders.firstWhere((element) => element.id == event.collectingOrderId);
-
-    await detailOrder(id: currentOrder.id!).then((value) {
-      emitter(state.copyWith(
-          currentOrder: currentOrder,
-          listOfProducts: value,
-          version: state.version + 1));
-      Navigator.pushReplacement<void, void>(
-          event.context,
-          MaterialPageRoute<void>(
-            builder: (BuildContext context) =>
-                CollectingOrderPage(currentOrder!),
-          ));
-    });
+    // List<Order> orders = await _allOrders();
+    await storage.write(key: 'currentOrderId', value: '10000042');
+    String? id = await storage.read(key: 'currentOrderId');
+    try {
+      if (id != null) {
+        Order? currentOrder;
+        currentOrder = await ord_rep.getThisOrder(int.parse(id));
+        // print(currentOrder);
+        await detailOrder(id: currentOrder.id!).then((value) {
+          emitter(state.copyWith(
+              currentOrder: currentOrder,
+              listOfProducts: value,
+              version: state.version + 1));
+          Navigator.pushReplacement<void, void>(
+              event.context,
+              MaterialPageRoute<void>(
+                builder: (BuildContext context) =>
+                    CollectingOrderPage(currentOrder!),
+              ));
+        });
+      } else {
+        print('there is no id, isnt it? $id');
+      }
+    } catch (e) {
+      {
+        inspect(e);
+        print(e);
+        event.onError;
+      }
+    }
   }
 
   Future<void> _eventOrdersGetDetailOrder(
     OrdersGetDetailOrder event,
     Emitter<OrdersState> emitter,
   ) async {
-    List<String> _listStats = ['IN PROGRESS', 'READY', 'CANCELLED'];
-    print(
-        'PRINT FROM GETDETAILORDER: ${event.order.status}, ${event.order.id}');
     try {
       Order _order = await ord_rep.getThisOrder(event.order.id!);
+      print(_listStats.contains(_order.status) == false);
       if (_listStats.contains(_order.status) == false) {
         List<Product>? _listOfProducts = await detailOrder(
           id: event.order.id!,
@@ -187,9 +194,9 @@ class OrdersBloc extends Bloc<OrdersEvents, OrdersState> {
           p.status = 'to_collect';
           p.collected_quantity = 0.0;
         }
-        ord_rep.updateOrderStatus(
-            data:
-                _postData); // TODO раскоментить чтобы возобновить работу с беком
+        // ord_rep.updateOrderStatus(
+        //     data:
+        //         _postData); // TODO раскоментить чтобы возобновить работу с беком
         emitter(state.copyWith(
             listOfProducts: _listOfProducts,
             currentOrder: event.order.copyWith(status: 'IN PROGRESS')));
@@ -227,9 +234,10 @@ class OrdersBloc extends Bloc<OrdersEvents, OrdersState> {
       'id': state.currentOrder?.id,
       'status': 'READY'
     };
-
+    print('ORDER SENT: ${_orderPost.toServerMap()}');
     // ord_rep.updateOrderStatus(data: _statusPost);
-    // ord_rep.postProducts(data: _orderPost.toServerMap()); TODO раскоментить чтобы возобновить работу с беком
+    // ord_rep.postProducts(data: _orderPost.toServerMap());
+    //  TODO раскоментить чтобы возобновить работу с беком
 
     emitter(state.copyWith(listOfProducts: [], currentOrder: Order()));
     authBloc.emit(authBloc.state.copyWith(currentCollectingOrderId: 0));
@@ -264,6 +272,7 @@ class OrdersBloc extends Bloc<OrdersEvents, OrdersState> {
     // add(const OrdersLoading(loading: true));
     final List<Product>? listOfProducts =
         await ordersRepository.getDetailOrder(id);
+    // print(listOfProducts);
     // add(const OrdersLoading(loading: false));
     return listOfProducts;
   }
