@@ -8,13 +8,13 @@ import 'package:agrohub_collector_flutter/pages/allOrdersPage.dart';
 import 'package:agrohub_collector_flutter/pages/completedCollectionPage.dart';
 import 'package:agrohub_collector_flutter/repositories/orders_rep.dart';
 import 'package:agrohub_collector_flutter/shared/myScaffold.dart';
+import 'package:agrohub_collector_flutter/shared/myWidgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:intl/intl.dart';
 
 class CollectingOrderPage extends StatefulWidget {
-  // Product order; TODO это нужно сделать через блок с полем Product collecting;
   Order order;
 
   static const String routeName = '/collectingOrder';
@@ -35,7 +35,7 @@ class _CollectingOrderPageState extends State<CollectingOrderPage>
   // final String _pageStatus = 'to_collect';
   @override
   void initState() {
-    ordersBloc.checkStatus(context, widget.order);
+    // ordersBloc.checkStatus(context, widget.order);
 
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
@@ -163,27 +163,27 @@ class _CollectingOrderPageState extends State<CollectingOrderPage>
                 return !_isCollected;
               });
               return Visibility(
-                visible: _isCollected,
+                visible: true,
                 child: FloatingActionButton(
                     tooltip: 'Завершить заказ',
                     child: const Icon(Icons.check),
                     backgroundColor: const Color(0xff7FB069),
-                    onPressed: _isCollected
+                    onPressed: true
                         ? () {
-                            ordersBloc
-                                .checkStatus(context, widget.order)
-                                .then((value) {
-                              print(_isCollected);
-                              Navigator.push<void>(
-                                context,
-                                MaterialPageRoute<void>(
-                                  builder: (BuildContext context) =>
-                                      CompletedCollectionPage(
-                                    order: widget.order,
-                                  ),
+                            // ordersBloc
+                            //     .checkStatus(context, widget.order)
+                            //     .then((value) {
+                            // print(_isCollected);
+                            Navigator.push<void>(
+                              context,
+                              MaterialPageRoute<void>(
+                                builder: (BuildContext context) =>
+                                    CompletedCollectionPage(
+                                  order: widget.order,
                                 ),
-                              );
-                            });
+                              ),
+                            );
+                            // });
                           }
                         : null),
               );

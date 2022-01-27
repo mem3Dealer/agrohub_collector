@@ -68,12 +68,12 @@ class OrdersRepository {
   //обновить статус заказа
   void updateOrderStatus({required Map<String, dynamic> data}) {
     http.post('/orders/change_status_order/', data);
-    // print('SENT:$data');
+    print('SENT:$data');
   }
 
   //отправить собранную корзину продуктов
   void postProducts({required Map<String, dynamic> data}) {
     http.post('/orders/collect_product/', data);
-    // print('SENT:$data');
+    print('SENT:$data');
   }
 }

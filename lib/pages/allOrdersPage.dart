@@ -126,8 +126,8 @@ class _AllOrdersPageState extends State<AllOrdersPage> {
                   ? Center(
                       child: BlocBuilder<OrdersBloc, OrdersState>(
                         builder: (context, state) {
-                          return Container(
-                            width: 500,
+                          return RefreshIndicator(
+                            onRefresh: getOrders,
                             child: ListView.builder(
                                 shrinkWrap: true,
                                 itemCount: state.ordersNew?.length,

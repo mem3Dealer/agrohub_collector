@@ -22,10 +22,11 @@ class OrdersGetAllOrders extends OrdersEvents {
 class OrdersGetDetailOrder extends OrdersEvents {
   OrdersGetDetailOrder({
     required this.order,
+    required this.context,
     this.onError,
     this.onSuccess,
   });
-
+  final BuildContext context;
   final Order order;
   // final int id;
   final Function? onError;

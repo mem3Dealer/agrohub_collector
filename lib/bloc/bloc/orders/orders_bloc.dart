@@ -8,6 +8,7 @@ import 'package:agrohub_collector_flutter/model/response.dart';
 import 'package:agrohub_collector_flutter/pages/allOrdersPage.dart';
 import 'package:agrohub_collector_flutter/pages/collectingOrderPage.dart';
 import 'package:agrohub_collector_flutter/repositories/orders_rep.dart';
+import 'package:agrohub_collector_flutter/shared/myWidgets.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -50,7 +51,9 @@ class OrdersBloc extends Bloc<OrdersEvents, OrdersState> {
               element.status != 'READY' && element.status != 'IN PROGRESS')
           .toList();
       sortingOrder(ordersNew);
-
+      if (ordersNew.length < 4) {
+        LoadNewOrders();
+      }
       // List<Order> ordersInWork = orders
       //     .where((Order element) => element.status == 'collecting')
       //     .toList();
@@ -88,7 +91,7 @@ class OrdersBloc extends Bloc<OrdersEvents, OrdersState> {
     }
   }
 
-// Future<List<Order>>?
+// подгруз заказов
   Future<void> _eventLoadNewOrders(
     LoadNewOrders event,
     Emitter<OrdersState> emitter,
@@ -131,7 +134,14 @@ class OrdersBloc extends Bloc<OrdersEvents, OrdersState> {
   Future<void> _eventInitCollectingOrder(
       InitCollectingOrder event, Emitter<OrdersState> emitter) async {
     List<Order> orders = await _allOrders();
-    Order currentOrder =
+
+    // if (orders.length < 7 || orders.isEmpty) {
+    //   await LoadNewOrders();
+    // }
+    //TODO я же записываю айдишник - можно просто попробовать сделать запрос по именно этому айди и не грузить ебучие
+    Order? currentOrder;
+    print('PRINT FROM INIT: ${orders.length}');
+    currentOrder =
         orders.firstWhere((element) => element.id == event.collectingOrderId);
 
     await detailOrder(id: currentOrder.id!).then((value) {
@@ -143,7 +153,7 @@ class OrdersBloc extends Bloc<OrdersEvents, OrdersState> {
           event.context,
           MaterialPageRoute<void>(
             builder: (BuildContext context) =>
-                CollectingOrderPage(currentOrder),
+                CollectingOrderPage(currentOrder!),
           ));
     });
   }
@@ -152,11 +162,12 @@ class OrdersBloc extends Bloc<OrdersEvents, OrdersState> {
     OrdersGetDetailOrder event,
     Emitter<OrdersState> emitter,
   ) async {
+    List<String> _listStats = ['IN PROGRESS', 'READY', 'CANCELLED'];
+    print(
+        'PRINT FROM GETDETAILORDER: ${event.order.status}, ${event.order.id}');
     try {
       Order _order = await ord_rep.getThisOrder(event.order.id!);
-      if (_order.status != 'IN PROGRESS' ||
-          _order.status != 'READY' ||
-          _order.status != 'CANCELLED') {
+      if (_listStats.contains(_order.status) == false) {
         List<Product>? _listOfProducts = await detailOrder(
           id: event.order.id!,
           onError: event.onError,
@@ -176,15 +187,24 @@ class OrdersBloc extends Bloc<OrdersEvents, OrdersState> {
           p.status = 'to_collect';
           p.collected_quantity = 0.0;
         }
-        // ord_rep.updateOrderStatus(data: _postData); TODO раскоментить чтобы возобновить работу с беком
+        ord_rep.updateOrderStatus(
+            data:
+                _postData); // TODO раскоментить чтобы возобновить работу с беком
         emitter(state.copyWith(
             listOfProducts: _listOfProducts,
             currentOrder: event.order.copyWith(status: 'IN PROGRESS')));
 
         // ord_rep.setOrderStatus(id: 85, status: 'IN PROGRESS');
         event.onSuccess!();
+      } else {
+        MyWidgets.buildSnackBar(
+            content: 'Заказ не доступен к собрке',
+            context: event.context,
+            button: true,
+            secs: 3);
       }
     } catch (e) {
+      // inspect(e);
       event.onError!(e);
     }
   }
@@ -248,60 +268,60 @@ class OrdersBloc extends Bloc<OrdersEvents, OrdersState> {
     return listOfProducts;
   }
 
-  Future<void> checkStatus(BuildContext context, Order _order) async {
-    Order _otherOrder = await ord_rep.getThisOrder(_order.id!);
-    // bool _isCancel = false;
-    bool isCancelled = false;
-    bool isAlreadycDone = false;
-    String _cancel = 'К сожалению, этот заказ был отменён';
-    String _done = 'К сожалению, этот заказ был уже собран';
+  // Future<void> checkStatus(BuildContext context, Order _order) async {
+  //   Order _otherOrder = await ord_rep.getThisOrder(_order.id!);
+  //   // bool _isCancel = false;
+  //   bool isCancelled = false;
+  //   bool isAlreadycDone = false;
+  //   String _cancel = 'К сожалению, этот заказ был отменён';
+  //   String _done = 'К сожалению, этот заказ был уже собран';
 
-    SnackBar _snackBar = SnackBar(
-        onVisible: () {
-          Future.delayed(const Duration(seconds: 3), () {
-            Navigator.pop(context);
-          });
-        },
-        behavior: SnackBarBehavior.floating,
-        duration: const Duration(seconds: 3),
-        width: 360,
-        backgroundColor: const Color(0xffFAE2E1),
-        content: SizedBox(
-          height: 48,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Text(isCancelled ? _cancel : _done,
-                  style: const TextStyle(
-                      fontFamily: 'Roboto',
-                      fontWeight: FontWeight.w400,
-                      color: Color(0xff363B3F),
-                      fontSize: 16)),
-              TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: const Text('Ок :(',
-                      style: TextStyle(
-                          fontFamily: 'Roboto',
-                          fontWeight: FontWeight.w700,
-                          color: Color(0xff363B3F),
-                          fontSize: 18)))
-            ],
-          ),
-        ));
+  //   SnackBar _snackBar = SnackBar(
+  //       onVisible: () {
+  //         Future.delayed(const Duration(seconds: 3), () {
+  //           Navigator.pop(context);
+  //         });
+  //       },
+  //       behavior: SnackBarBehavior.floating,
+  //       duration: const Duration(seconds: 3),
+  //       width: 360,
+  //       backgroundColor: const Color(0xffFAE2E1),
+  //       content: SizedBox(
+  //         height: 48,
+  //         child: Row(
+  //           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+  //           children: [
+  //             Text(isCancelled ? _cancel : _done,
+  //                 style: const TextStyle(
+  //                     fontFamily: 'Roboto',
+  //                     fontWeight: FontWeight.w400,
+  //                     color: Color(0xff363B3F),
+  //                     fontSize: 16)),
+  //             TextButton(
+  //                 onPressed: () {
+  //                   Navigator.pop(context);
+  //                 },
+  //                 child: const Text('Ок :(',
+  //                     style: TextStyle(
+  //                         fontFamily: 'Roboto',
+  //                         fontWeight: FontWeight.w700,
+  //                         color: Color(0xff363B3F),
+  //                         fontSize: 18)))
+  //           ],
+  //         ),
+  //       ));
 
-    if (_otherOrder.status == 'CANCELLED') {
-      // setState(() {
-      isCancelled = true;
-      // });
-      ScaffoldMessenger.of(context).showSnackBar(_snackBar);
-    } else if (_otherOrder.status == 'READY') {
-      // setState(() {
-      isAlreadycDone = true;
-      // });
-      ScaffoldMessenger.of(context).showSnackBar(_snackBar);
-      // ScaffoldMessenger.of(context).showSnackBar(_snackBarOnDone);
-    }
-  }
+  //   if (_otherOrder.status == 'CANCELLED') {
+  //     // setState(() {
+  //     isCancelled = true;
+  //     // });
+  //     ScaffoldMessenger.of(context).showSnackBar(_snackBar);
+  //   } else if (_otherOrder.status == 'READY') {
+  //     // setState(() {
+  //     isAlreadycDone = true;
+  //     // });
+  //     ScaffoldMessenger.of(context).showSnackBar(_snackBar);
+  //     // ScaffoldMessenger.of(context).showSnackBar(_snackBarOnDone);
+  //   }
+  // }
 }

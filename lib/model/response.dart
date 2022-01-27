@@ -7,12 +7,13 @@ import 'package:agrohub_collector_flutter/model/product.dart';
 class MyResponse {
   int? orderId;
   int? farmerOrderId;
+  double? orderedQuantity;
   List<ShortProduct>? listShortProduct;
-  MyResponse({
-    this.orderId,
-    this.farmerOrderId,
-    this.listShortProduct,
-  });
+  MyResponse(
+      {this.orderId,
+      this.farmerOrderId,
+      this.listShortProduct,
+      this.orderedQuantity});
 
   MyResponse copyWith({
     int? orderId,
@@ -37,8 +38,9 @@ class MyResponse {
   Map<String, dynamic> toServerMap() {
     return {
       'order_id': orderId,
-      // 'farmer_order_id': farmerOrderId,
+      'farmer_order_id': farmerOrderId,
       'product': listShortProduct?.map((x) => x.toMap()).toList(),
+      // 'ordered_quantity': orderedQuantity,
     };
   }
 

@@ -4,6 +4,7 @@ import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_bloc.dart';
 import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_event.dart';
 import 'package:agrohub_collector_flutter/model/order.dart';
 import 'package:agrohub_collector_flutter/pages/collectingOrderPage.dart';
+import 'package:agrohub_collector_flutter/shared/myWidgets.dart';
 import 'package:flutter/material.dart';
 import 'package:expandable/expandable.dart';
 import 'package:get_it/get_it.dart';
@@ -28,17 +29,10 @@ class OrderTile extends StatefulWidget {
 
 class _OrderTileState extends State<OrderTile> {
   final ordersBloc = GetIt.I.get<OrdersBloc>();
-  // ExpandableController _exContrl = ExpandableController();
-  late UniqueKey _key;
-  // ExpandableController _lastOpened = ExpandableController();
+
   @override
   void initState() {
     super.initState();
-    // _exContrl = ExpandableController()
-    //   ..addListener(() {
-    //     print(widget.index);
-    // });
-    _key = UniqueKey();
   }
 
   @override
@@ -50,13 +44,37 @@ class _OrderTileState extends State<OrderTile> {
   // double _height = 116;
   // bool isVisiible = true;
 
-  Future getProduct(Order order) async {
+  Future getProduct(
+    Order order,
+    BuildContext context,
+  ) async {
     ordersBloc.add(OrdersGetDetailOrder(
+        context: context,
         order: order,
         onError: (e) {
-          inspect(e);
+          MyWidgets.buildSnackBar(
+              content: 'Что-то пошло не так. Попробуйте другой заказ.',
+              context: context,
+              button: false,
+              secs: 3);
+
+          // if (e != null) {
+          //   MyWidgets.buildSnackBar(
+          //       content: 'Заказ не доступен к сборке',
+          //       context: context,
+          //       secs: 2);
+          // }
         },
-        onSuccess: () {}));
+        onSuccess: () {
+          Navigator.push<void>(
+            context,
+            MaterialPageRoute<void>(
+              builder: (BuildContext context) => CollectingOrderPage(
+                  // widget.imageUrl,
+                  widget.order),
+            ),
+          );
+        }));
   }
 
   @override
@@ -72,7 +90,6 @@ class _OrderTileState extends State<OrderTile> {
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
         child: Card(
           child: ExpandablePanel(
-            key: _key,
             controller: widget.controller,
             theme: const ExpandableThemeData(
               hasIcon: false,
@@ -120,8 +137,8 @@ class _OrderTileState extends State<OrderTile> {
               ],
             ),
             collapsed: Container(
-                // child: Text(widget.order.status.toString()),
-                ),
+              child: Text(widget.order.status.toString()),
+            ),
             expanded: Center(
               child: SizedBox(
                   height: 72,
@@ -138,17 +155,7 @@ class _OrderTileState extends State<OrderTile> {
                           const Color(0xff69A8BB),
                         )),
                         onPressed: () {
-                          getProduct(widget.order).then((value) {
-                            Navigator.push<void>(
-                              context,
-                              MaterialPageRoute<void>(
-                                builder: (BuildContext context) =>
-                                    CollectingOrderPage(
-                                        // widget.imageUrl,
-                                        widget.order),
-                              ),
-                            );
-                          });
+                          getProduct(widget.order, context);
                         },
                         child: const Text(
                           'Начать сборку',

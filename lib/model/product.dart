@@ -43,10 +43,10 @@ class Product {
 
   ShortProduct get toShortProduct {
     return ShortProduct(
-      productId: product_id,
-      status: status,
-      formedQuantity: collected_quantity,
-    );
+        productId: product_id,
+        status: status,
+        farmer_order_id: farmer_order_id,
+        orderedQuantity: ordered_quantity);
   }
 
   factory Product.fromJson(Map<String, dynamic> json) =>
@@ -181,29 +181,39 @@ class ShortProduct {
   int? productId;
   String? status;
   double? formedQuantity;
+  double? orderedQuantity;
+  int? farmer_order_id;
   ShortProduct({
     this.productId,
     this.status,
     this.formedQuantity,
+    this.orderedQuantity,
+    this.farmer_order_id,
   });
 
   ShortProduct copyWith({
     int? productId,
     String? status,
     double? formedQuantity,
+    double? orderedQuantity,
+    int? farmer_order_id,
   }) {
     return ShortProduct(
       productId: productId ?? this.productId,
       status: status ?? this.status,
       formedQuantity: formedQuantity ?? this.formedQuantity,
+      orderedQuantity: orderedQuantity ?? this.orderedQuantity,
+      farmer_order_id: farmer_order_id ?? this.farmer_order_id,
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
-      'product_id': productId,
+      'productId': productId,
       'status': status,
       'formedQuantity': formedQuantity,
+      'orderedQuantity': orderedQuantity,
+      'farmer_order_id': farmer_order_id,
     };
   }
 
@@ -212,6 +222,8 @@ class ShortProduct {
       productId: map['productId']?.toInt(),
       status: map['status'],
       formedQuantity: map['formedQuantity']?.toDouble(),
+      orderedQuantity: map['orderedQuantity']?.toDouble(),
+      farmer_order_id: map['farmer_order_id']?.toInt(),
     );
   }
 
@@ -221,8 +233,9 @@ class ShortProduct {
       ShortProduct.fromMap(json.decode(source));
 
   @override
-  String toString() =>
-      'ShortProduct(productId: $productId, status: $status, formedQuantity: $formedQuantity)';
+  String toString() {
+    return 'ShortProduct(productId: $productId, status: $status, formedQuantity: $formedQuantity, orderedQuantity: $orderedQuantity, farmer_order_id: $farmer_order_id)';
+  }
 
   @override
   bool operator ==(Object other) {
@@ -231,10 +244,17 @@ class ShortProduct {
     return other is ShortProduct &&
         other.productId == productId &&
         other.status == status &&
-        other.formedQuantity == formedQuantity;
+        other.formedQuantity == formedQuantity &&
+        other.orderedQuantity == orderedQuantity &&
+        other.farmer_order_id == farmer_order_id;
   }
 
   @override
-  int get hashCode =>
-      productId.hashCode ^ status.hashCode ^ formedQuantity.hashCode;
+  int get hashCode {
+    return productId.hashCode ^
+        status.hashCode ^
+        formedQuantity.hashCode ^
+        orderedQuantity.hashCode ^
+        farmer_order_id.hashCode;
+  }
 }
