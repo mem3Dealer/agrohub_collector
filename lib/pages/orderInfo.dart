@@ -28,7 +28,7 @@ class OrderInfoPage extends StatelessWidget {
         List<Product> _list = ordersBloc.state.listOfProducts!;
         Order order = ordersBloc.state.currentOrder!;
         DateFormat format = DateFormat('HH:MM');
-        String _time = format.format(order.delivery_time!);
+        String _time = format.format(order.deliveryTime!);
         double totalWeight = 0.0;
         // double totalPrice = 0.0;
         for (Product e in _list) {
@@ -38,7 +38,7 @@ class OrderInfoPage extends StatelessWidget {
         double width = MediaQuery.of(context).size.width;
         double height = MediaQuery.of(context).size.height;
         return MyScaffold(true, false,
-            title: "Заказ №${order.agregator_order_id}",
+            title: "Заказ №${order.agregatorOrderId}",
             body: Padding(
               padding: EdgeInsets.fromLTRB(13.0, 24, 13, 0),
               child: SizedBox(
@@ -131,7 +131,7 @@ class OrderInfoPage extends StatelessWidget {
                                 ),
                                 Flexible(
                                   child: Text(
-                                    '${order.total_price.toString()} руб.',
+                                    '${order.totalPrice.toString()} руб.',
                                     overflow: TextOverflow.fade,
                                     style: style.copyWith(
                                         fontWeight: FontWeight.w500),

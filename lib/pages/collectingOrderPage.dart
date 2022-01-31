@@ -35,7 +35,7 @@ class _CollectingOrderPageState extends State<CollectingOrderPage>
   // final String _pageStatus = 'to_collect';
   @override
   void initState() {
-    ordersBloc.checkStatus(context, widget.order);
+    // ordersBloc.checkStatus(context, widget.order);
 
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
@@ -58,8 +58,9 @@ class _CollectingOrderPageState extends State<CollectingOrderPage>
   Widget build(BuildContext context) {
     // ordRep.getThisOrder(widget.order.id!);
     // _order =  await ordRep.getThisOrder(widget.order.id!);
+    // print(widget.order);
     DateFormat format = DateFormat('HH:MM');
-    String _time = format.format(widget.order.delivery_time!);
+    String _time = format.format(widget.order.deliveryTime!);
     // print(orderNumber);
     return WillPopScope(
       onWillPop: () async => false,
@@ -68,17 +69,18 @@ class _CollectingOrderPageState extends State<CollectingOrderPage>
         child: MyScaffold(
           false,
           true,
-          title: "Заказ №${widget.order.agregator_order_id}",
+          title: "Заказ №${widget.order.agregatorOrderId}",
           deliveryTime: _time,
           body: BlocBuilder<OrdersBloc, OrdersState>(
               bloc: ordersBloc,
               builder: (context, state) {
+                // print('THIS IS STATE`S FIRST: ${state.listOfProducts!.first}');
                 int totalCollected = 0;
                 int totalToCollect = 0;
                 if (state.listOfProducts != null &&
                     state.listOfProducts != []) {
                   for (Product p in state.listOfProducts!) {
-                    if (p.status == 'to_collect') {
+                    if (p.status == 'collecting') {
                       totalToCollect++;
                     } else if (p.status == 'collected') {
                       totalCollected++;
@@ -116,7 +118,7 @@ class _CollectingOrderPageState extends State<CollectingOrderPage>
                                   Container(
                                     child: _TabToCollect(
                                       state: state,
-                                      pageStatus: 'to_collect',
+                                      pageStatus: 'collecting',
                                     ),
                                   ),
                                   Container(
@@ -156,7 +158,6 @@ class _CollectingOrderPageState extends State<CollectingOrderPage>
             bloc: ordersBloc,
             builder: (context, state) {
               ordersBloc.state.listOfProducts?.any((prod) {
-                _isCollected;
                 prod.collected_quantity == 0.0
                     ? {_isCollected = false}
                     : {_isCollected = true};
@@ -170,20 +171,16 @@ class _CollectingOrderPageState extends State<CollectingOrderPage>
                     backgroundColor: const Color(0xff7FB069),
                     onPressed: _isCollected
                         ? () {
-                            ordersBloc
-                                .checkStatus(context, widget.order)
-                                .then((value) {
-                              print(_isCollected);
-                              Navigator.push<void>(
-                                context,
-                                MaterialPageRoute<void>(
-                                  builder: (BuildContext context) =>
-                                      CompletedCollectionPage(
-                                    order: widget.order,
-                                  ),
+                            // print(_isCollected);
+                            Navigator.push<void>(
+                              context,
+                              MaterialPageRoute<void>(
+                                builder: (BuildContext context) =>
+                                    CompletedCollectionPage(
+                                  order: widget.order,
                                 ),
-                              );
-                            });
+                              ),
+                            );
                           }
                         : null),
               );
@@ -225,6 +222,7 @@ class _TabToCollectState extends State<_TabToCollect>
         itemBuilder: (context, int index) {
           Product product = widget.state.listOfProducts![index];
           // print(product.status);
+
           // double height = MediaQuery.of(context).size.height / 4;
           if (product.status == widget._pageStatus) {
             return Column(

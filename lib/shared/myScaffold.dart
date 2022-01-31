@@ -110,7 +110,7 @@ class Header extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 45, 16, 10),
       child: Row(
-        mainAxisSize: MainAxisSize.min,
+        // mainAxisSize: MainAxisSize.values[254],
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           if (isItInfo == true)
@@ -120,18 +120,26 @@ class Header extends StatelessWidget {
                   Navigator.pop(context);
                 },
                 icon: Icon(Icons.arrow_back_ios_new_outlined)),
-          Text(
-            title,
-            textAlign: TextAlign.left,
-            softWrap: true,
-            overflow: TextOverflow.clip,
-            style: const TextStyle(
-                fontFamily: 'Roboto',
-                fontWeight: FontWeight.w700,
-                fontSize: 30),
+          BlocBuilder<OrdersBloc, OrdersState>(
+            builder: (context, state) {
+              return Container(
+                width: 280,
+                child: Text(
+                  title,
+                  maxLines: 1,
+                  overflow: TextOverflow.fade,
+                  softWrap: false,
+                  textAlign: TextAlign.left,
+                  style: const TextStyle(
+                      fontFamily: 'Roboto',
+                      fontWeight: FontWeight.w700,
+                      fontSize: 32),
+                ),
+              );
+            },
           ),
-          Spacer(
-            flex: 2,
+          SizedBox(
+            width: 10,
           ),
           deliveryTime == null
               ? Container()

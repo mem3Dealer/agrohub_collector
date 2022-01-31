@@ -19,11 +19,10 @@ class OrdersRepository {
 
   Future<List<Order>> getAllOrders() async {
     Response<dynamic> response =
-        await http.get("/orders/get_all_orders/?per_page=7");
+        await http.get("/orders/get_all_orders/?per_page=10");
     List list = response.data['results'];
     String _url = response.data['next'];
     url = _url.substring(62);
-
     List<Order> ord = list.map<Order>((e) => Order.fromMap(e)).toList();
     return ord;
   }
@@ -50,9 +49,13 @@ class OrdersRepository {
     Response<dynamic> response =
         await http.get("/orders/get_detailed_order/?order_id=$id");
     List list = response.data;
-
+    print(response);
     List<Product> listOfProducts =
         list.map<Product>((e) => Product.fromMap(e)).toList();
+    for (Product p in listOfProducts) {
+      p.status = 'collecting';
+      p.collected_quantity = 0.0;
+    }
     return listOfProducts;
   }
 
@@ -60,7 +63,7 @@ class OrdersRepository {
   Future<Order> getThisOrder(int id) async {
     Response<dynamic> response =
         await http.get('/orders/order_search/?order_id=$id');
-    // print(response);
+
     Order res = Order.fromMap(response.data['result']);
     return res;
   }
@@ -68,12 +71,12 @@ class OrdersRepository {
   //обновить статус заказа
   void updateOrderStatus({required Map<String, dynamic> data}) {
     http.post('/orders/change_status_order/', data);
-    // print('SENT:$data');
+    print('SENT:$data');
   }
 
   //отправить собранную корзину продуктов
   void postProducts({required Map<String, dynamic> data}) {
     http.post('/orders/collect_product/', data);
-    // print('SENT:$data');
+    print('SENT:$data');
   }
 }

@@ -38,7 +38,7 @@ class MyResponse {
     return {
       'order_id': orderId,
       // 'farmer_order_id': farmerOrderId,
-      'product': listShortProduct?.map((x) => x.toMap()).toList(),
+      'product': listShortProduct?.map((x) => x.toServerMap()).toList(),
     };
   }
 

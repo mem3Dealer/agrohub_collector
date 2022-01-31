@@ -8,6 +8,7 @@ import 'package:agrohub_collector_flutter/model/response.dart';
 import 'package:agrohub_collector_flutter/pages/allOrdersPage.dart';
 import 'package:agrohub_collector_flutter/pages/collectingOrderPage.dart';
 import 'package:agrohub_collector_flutter/repositories/orders_rep.dart';
+import 'package:agrohub_collector_flutter/shared/myWidgets.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -26,6 +27,7 @@ class OrdersBloc extends Bloc<OrdersEvents, OrdersState> {
     // on<CollectProduct>(_eventCollectProduct);
     on<LoadNewOrders>(_eventLoadNewOrders);
   }
+  List<String> _listStats = ['ACCEPTED_BY_RESTAURANT', 'READY', 'CANCELLED'];
 
   Future<void> _eventOrdersGetAllOrders(
     OrdersGetAllOrders event,
@@ -36,21 +38,14 @@ class OrdersBloc extends Bloc<OrdersEvents, OrdersState> {
         onError: event.onError,
         data: event.params,
       );
-      for (Order order in orders) {
-        // order.status = 'ACCEPTED';
-
-        // if (order.status != 'READY' && order.status != 'IN PROGRESS') {
-        //   print(order.agregator_order_id);
-        //   print(order.status);
-        //   order.status = 'ACCEPTED';
-        // }
-      }
-      List<Order> ordersNew = orders
-          .where((Order element) =>
-              element.status != 'READY' && element.status != 'IN PROGRESS')
-          .toList();
+      List<Order> ordersNew =
+          orders.where((Order element) => element.status == 'NEW').toList();
       sortingOrder(ordersNew);
 
+      // if (ordersNew.length < 6) {
+      //   LoadNewOrders();
+      //   // print('yup');
+      // }
       // List<Order> ordersInWork = orders
       //     .where((Order element) => element.status == 'collecting')
       //     .toList();
@@ -60,7 +55,7 @@ class OrdersBloc extends Bloc<OrdersEvents, OrdersState> {
       // .toList();
 
       ordersNew.sort((a, b) {
-        return a.delivery_time!.compareTo(b.delivery_time!);
+        return a.deliveryTime!.compareTo(b.deliveryTime!);
       });
       emitter(
         state.copyWith(
@@ -88,17 +83,15 @@ class OrdersBloc extends Bloc<OrdersEvents, OrdersState> {
     }
   }
 
-// Future<List<Order>>?
+// подгруз заказов
   Future<void> _eventLoadNewOrders(
     LoadNewOrders event,
     Emitter<OrdersState> emitter,
   ) async {
     List<Order> _list = await ord_rep.getMoreOrders();
 
-    List<Order> _newOrders = _list
-        .where((Order element) =>
-            element.status != 'READY' && element.status != 'IN PROGRESS')
-        .toList();
+    List<Order> _newOrders =
+        _list.where((Order element) => element.status == 'NEW').toList();
     // emitter(state.copyWith(loading: true));
     List<Order>? _aga = state.ordersNew;
     _aga!.addAll(_newOrders);
@@ -122,30 +115,43 @@ class OrdersBloc extends Bloc<OrdersEvents, OrdersState> {
 
   void sortingOrder(List<Order> orders) {
     orders.sort((Order a, Order b) {
-      DateTime adate = a.delivery_time!;
-      DateTime bdate = b.delivery_time!;
+      DateTime adate = a.deliveryTime!;
+      DateTime bdate = b.deliveryTime!;
       return adate.compareTo(bdate);
     });
   }
 
   Future<void> _eventInitCollectingOrder(
       InitCollectingOrder event, Emitter<OrdersState> emitter) async {
-    List<Order> orders = await _allOrders();
-    Order currentOrder =
-        orders.firstWhere((element) => element.id == event.collectingOrderId);
+    // List<Order> orders = await _allOrders();
+    // await storage.write(
+    //     key: 'currentOrderId', value: '${event.collectingOrderId}');
+    String? id = await storage.read(key: 'currentOrderId');
+    try {
+      if (id != null) {
+        Order? currentOrder;
+        currentOrder = await ord_rep.getThisOrder(int.parse(id));
 
-    await detailOrder(id: currentOrder.id!).then((value) {
-      emitter(state.copyWith(
-          currentOrder: currentOrder,
-          listOfProducts: value,
-          version: state.version + 1));
-      Navigator.pushReplacement<void, void>(
-          event.context,
-          MaterialPageRoute<void>(
-            builder: (BuildContext context) =>
-                CollectingOrderPage(currentOrder),
-          ));
-    });
+        await detailOrder(id: currentOrder.id!).then((value) {
+          emitter(state.copyWith(
+              currentOrder: currentOrder,
+              listOfProducts: value,
+              version: state.version + 1));
+          Navigator.pushReplacement<void, void>(
+              event.context,
+              MaterialPageRoute<void>(
+                builder: (BuildContext context) =>
+                    CollectingOrderPage(currentOrder!),
+              ));
+        });
+      } else {
+        print('there is no id, isnt it? $id');
+      }
+    } catch (e) {
+      inspect(e);
+      print(e);
+      event.onError;
+    }
   }
 
   Future<void> _eventOrdersGetDetailOrder(
@@ -154,9 +160,8 @@ class OrdersBloc extends Bloc<OrdersEvents, OrdersState> {
   ) async {
     try {
       Order _order = await ord_rep.getThisOrder(event.order.id!);
-      if (_order.status != 'IN PROGRESS' ||
-          _order.status != 'READY' ||
-          _order.status != 'CANCELLED') {
+      // print(_listStats.contains(_order.status) == false);
+      if (_listStats.contains(_order.status) == false) {
         List<Product>? _listOfProducts = await detailOrder(
           id: event.order.id!,
           onError: event.onError,
@@ -164,7 +169,7 @@ class OrdersBloc extends Bloc<OrdersEvents, OrdersState> {
 
         Map<String, dynamic> _postData = {
           'id': _order.id,
-          'status': 'IN PROGRESS'
+          'status': 'ACCEPTED_BY_RESTAURANT'
         };
         String? _currentOrder = await storage.read(key: 'currentOrderId');
         // print('THIS IS IT: $_currentOrder');
@@ -172,19 +177,23 @@ class OrdersBloc extends Bloc<OrdersEvents, OrdersState> {
           await storage.write(
               key: 'currentOrderId', value: "${event.order.id}");
         }
-        for (Product p in _listOfProducts!) {
-          p.status = 'to_collect';
-          p.collected_quantity = 0.0;
-        }
-        // ord_rep.updateOrderStatus(data: _postData); TODO раскоментить чтобы возобновить работу с беком
+        ord_rep.updateOrderStatus(
+            data:
+                _postData); // TODO раскоментить чтобы возобновить работу с беком
         emitter(state.copyWith(
             listOfProducts: _listOfProducts,
-            currentOrder: event.order.copyWith(status: 'IN PROGRESS')));
-
-        // ord_rep.setOrderStatus(id: 85, status: 'IN PROGRESS');
+            currentOrder:
+                event.order.copyWith(status: 'ACCEPTED_BY_RESTAURANT')));
         event.onSuccess!();
+      } else {
+        MyWidgets.buildSnackBar(
+            content: 'Заказ не доступен к собрке',
+            context: event.context,
+            button: true,
+            secs: 3);
       }
     } catch (e) {
+      // inspect(e);
       event.onError!(e);
     }
   }
@@ -192,9 +201,8 @@ class OrdersBloc extends Bloc<OrdersEvents, OrdersState> {
   Future<void> _eventFinishCollecting(
       FinishCollecting event, Emitter<OrdersState> emitter) async {
     await storage.write(key: 'currentOrderId', value: '0');
-    MyResponse _orderPost = MyResponse(
-        orderId: state.currentOrder?.id,
-        farmerOrderId: state.currentOrder?.farmer_order_id,
+    MyResponse _orderPost = MyResponse(orderId: state.currentOrder?.id,
+        // farmerOrderId: state.currentOrder?,
         listShortProduct: <ShortProduct>[]);
 
     for (Product product in state.listOfProducts!) {
@@ -207,9 +215,10 @@ class OrdersBloc extends Bloc<OrdersEvents, OrdersState> {
       'id': state.currentOrder?.id,
       'status': 'READY'
     };
-
-    // ord_rep.updateOrderStatus(data: _statusPost);
-    // ord_rep.postProducts(data: _orderPost.toServerMap()); TODO раскоментить чтобы возобновить работу с беком
+    // print('ORDER SENT: ${_orderPost.toServerMap()}');
+    ord_rep.updateOrderStatus(data: _statusPost);
+    ord_rep.postProducts(data: _orderPost.toServerMap());
+    //  TODO раскоментить чтобы возобновить работу с беком
 
     emitter(state.copyWith(listOfProducts: [], currentOrder: Order()));
     authBloc.emit(authBloc.state.copyWith(currentCollectingOrderId: 0));
@@ -244,64 +253,8 @@ class OrdersBloc extends Bloc<OrdersEvents, OrdersState> {
     // add(const OrdersLoading(loading: true));
     final List<Product>? listOfProducts =
         await ordersRepository.getDetailOrder(id);
+    // print(listOfProducts);
     // add(const OrdersLoading(loading: false));
     return listOfProducts;
-  }
-
-  Future<void> checkStatus(BuildContext context, Order _order) async {
-    Order _otherOrder = await ord_rep.getThisOrder(_order.id!);
-    // bool _isCancel = false;
-    bool isCancelled = false;
-    bool isAlreadycDone = false;
-    String _cancel = 'К сожалению, этот заказ был отменён';
-    String _done = 'К сожалению, этот заказ был уже собран';
-
-    SnackBar _snackBar = SnackBar(
-        onVisible: () {
-          Future.delayed(const Duration(seconds: 3), () {
-            Navigator.pop(context);
-          });
-        },
-        behavior: SnackBarBehavior.floating,
-        duration: const Duration(seconds: 3),
-        width: 360,
-        backgroundColor: const Color(0xffFAE2E1),
-        content: SizedBox(
-          height: 48,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Text(isCancelled ? _cancel : _done,
-                  style: const TextStyle(
-                      fontFamily: 'Roboto',
-                      fontWeight: FontWeight.w400,
-                      color: Color(0xff363B3F),
-                      fontSize: 16)),
-              TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: const Text('Ок :(',
-                      style: TextStyle(
-                          fontFamily: 'Roboto',
-                          fontWeight: FontWeight.w700,
-                          color: Color(0xff363B3F),
-                          fontSize: 18)))
-            ],
-          ),
-        ));
-
-    if (_otherOrder.status == 'CANCELLED') {
-      // setState(() {
-      isCancelled = true;
-      // });
-      ScaffoldMessenger.of(context).showSnackBar(_snackBar);
-    } else if (_otherOrder.status == 'READY') {
-      // setState(() {
-      isAlreadycDone = true;
-      // });
-      ScaffoldMessenger.of(context).showSnackBar(_snackBar);
-      // ScaffoldMessenger.of(context).showSnackBar(_snackBarOnDone);
-    }
   }
 }

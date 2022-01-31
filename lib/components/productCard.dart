@@ -248,7 +248,7 @@ class ProductCardState extends State<ProductCard> {
                                                 isItCollected
                                             ? const Color(0xff69A8BB)
                                             : null,
-                                    text: widget.product.status == 'to_collect'
+                                    text: widget.product.status == 'collecting'
                                         ? 'Собрать'
                                         : 'Вернуть в Собрать',
                                   ),

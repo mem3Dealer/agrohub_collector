@@ -34,7 +34,7 @@ class CompletedCollectionPage extends StatelessWidget {
                   padding:
                       const EdgeInsets.only(left: 38, right: 37, bottom: 40),
                   child: Text(
-                    'Отлично, заказ №${order.agregator_order_id} собран!',
+                    'Отлично, заказ №${order.agregatorOrderId} собран!',
                     textAlign: TextAlign.center,
                     style: const TextStyle(
                         fontFamily: 'Roboto',

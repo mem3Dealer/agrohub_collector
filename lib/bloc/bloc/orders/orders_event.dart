@@ -22,10 +22,11 @@ class OrdersGetAllOrders extends OrdersEvents {
 class OrdersGetDetailOrder extends OrdersEvents {
   OrdersGetDetailOrder({
     required this.order,
+    required this.context,
     this.onError,
     this.onSuccess,
   });
-
+  BuildContext context;
   final Order order;
   // final int id;
   final Function? onError;
@@ -44,7 +45,13 @@ class ChangeProductStatus extends OrdersEvents {
 }
 
 class InitCollectingOrder extends OrdersEvents {
-  InitCollectingOrder({required this.collectingOrderId, required this.context});
+  Function? onError;
+  Function? onSuccess;
+  InitCollectingOrder(
+      {required this.collectingOrderId,
+      required this.context,
+      this.onError,
+      this.onSuccess});
   int? collectingOrderId;
   BuildContext context;
 }

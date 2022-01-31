@@ -50,8 +50,9 @@ class _OrderTileState extends State<OrderTile> {
   // double _height = 116;
   // bool isVisiible = true;
 
-  Future getProduct(Order order) async {
+  Future getProduct(Order order, BuildContext context) async {
     ordersBloc.add(OrdersGetDetailOrder(
+        context: context,
         order: order,
         onError: (e) {
           inspect(e);
@@ -63,10 +64,11 @@ class _OrderTileState extends State<OrderTile> {
   Widget build(
     BuildContext context,
   ) {
+    // print(widget.order.agregatorOrderId);
     // DateTime? _time =
     //     DateFormat('EEE, dd MMM yyyy HH:MM').parse(order.delivery_time!);
     DateFormat format = DateFormat('HH:MM');
-    String _time = format.format(widget.order.delivery_time!);
+    String _time = format.format(widget.order.deliveryTime!);
     // print('$_exContrl, $_key');
     return Padding(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
@@ -86,7 +88,7 @@ class _OrderTileState extends State<OrderTile> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Text(
-                          "Заказ №${widget.order.agregator_order_id}",
+                          "Заказ №${widget.order.agregatorOrderId}",
                           textAlign: TextAlign.left,
                           style: const TextStyle(
                               fontFamily: 'Roboto',
@@ -120,7 +122,7 @@ class _OrderTileState extends State<OrderTile> {
               ],
             ),
             collapsed: Container(
-                // child: Text(widget.order.status.toString()),
+                // child: Text(widget.controller.value.toString()),
                 ),
             expanded: Center(
               child: SizedBox(
@@ -138,7 +140,7 @@ class _OrderTileState extends State<OrderTile> {
                           const Color(0xff69A8BB),
                         )),
                         onPressed: () {
-                          getProduct(widget.order).then((value) {
+                          getProduct(widget.order, context).then((value) {
                             Navigator.push<void>(
                               context,
                               MaterialPageRoute<void>(
