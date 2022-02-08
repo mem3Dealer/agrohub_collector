@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:developer';
-
+import 'package:expansion_tile_card/expansion_tile_card.dart';
 import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_bloc.dart';
 import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_event.dart';
 import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_state.dart';
@@ -10,23 +10,17 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 
-class ProductCard extends StatefulWidget {
+class AnotherProductCard extends StatefulWidget {
   // String imageUrl, name, totalPrice, orderedWeight;
   Product product;
 
-  ProductCard(
-      {required this.product,
-      // required this.name,
-      // required this.orderedWeight,
-      // required this.totalPrice,
-      Key? key})
-      : super(key: key);
+  AnotherProductCard({required this.product, Key? key}) : super(key: key);
 
   @override
-  ProductCardState createState() => ProductCardState();
+  AnotherProductCardState createState() => AnotherProductCardState();
 }
 
-class ProductCardState extends State<ProductCard> {
+class AnotherProductCardState extends State<AnotherProductCard> {
   bool _isCollapsed = true;
   bool isActive = false;
   bool isOnDelete = false;
@@ -131,136 +125,123 @@ class ProductCardState extends State<ProductCard> {
     bool isItCollected = widget.product.status == 'collected';
     return BlocBuilder<OrdersBloc, OrdersState>(
       builder: (context, state) {
-        return InkWell(
-          onTap: isOnDelete
-              ? null
-              : () {
-                  _expandCard();
-                },
-          child: Container(
-              width: 382,
-              height: _isCollapsed ? 164 : 400,
-              foregroundDecoration: isOnDelete
-                  ? BoxDecoration(
-                      color: Colors.grey.shade400.withOpacity(0.7),
-                      // backgroundBlendMode: BlendMode.color,
-                    )
-                  : null,
-              decoration: BoxDecoration(
-                  color: Colors.white, borderRadius: BorderRadius.circular(4)),
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 16, 8, 16),
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        //картинка
-                        ImagePlacer(
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 16.0),
+          child: AbsorbPointer(
+            absorbing: isOnDelete,
+            child: Container(
+                foregroundDecoration: isOnDelete
+                    ? BoxDecoration(
+                        color: Colors.grey.shade400.withOpacity(0.7),
+                        // backgroundBlendMode: BlendMode.color,
+                      )
+                    : null,
+                decoration:
+                    BoxDecoration(borderRadius: BorderRadius.circular(4)),
+                child: ExpansionTileCard(
+                  finalPadding: EdgeInsets.zero,
+                  borderRadius: const BorderRadius.all(Radius.circular(4.0)),
+                  title: Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(top: 6.0, bottom: 6),
+                        child: ImagePlacer(
                           url: widget.product.image!,
                         ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            //имя продукта
-                            ProductName(widget: widget, style: _style),
-                            //общий вес
-                            OrderedWeight()
-                          ],
-                        ), //имя и вес
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            IconButton(
-                                alignment: Alignment.topRight,
-                                onPressed: () {},
-                                icon: _isCollapsed
-                                    ? const Icon(Icons.arrow_forward_ios_sharp)
-                                    : const RotatedBox(
-                                        quarterTurns: 1,
-                                        child:
-                                            Icon(Icons.arrow_forward_ios_sharp),
-                                      )),
-                          ],
-                        )
-                      ],
-                    ),
-                    if (_isCollapsed == false)
+                      ),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Divider(
+                          ProductName(widget: widget, style: _style),
+                          OrderedWeight(),
+                        ],
+                      ),
+                    ],
+                  ),
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(right: 16.0, left: 16),
+                          child: const Divider(
                             // height: 2,
                             thickness: 1.5,
                             color: Color(0xff69A8BB),
                           ),
-                          // ЦЕНА ------ ЦЕНА
-                          PriceRow(style: _style, widget: widget),
-                          const SizedBox(
-                            height: 32,
-                          ),
-                          Text(
+                        ),
+                        // ЦЕНА ------ ЦЕНА
+                        Padding(
+                          padding: const EdgeInsets.only(right: 16.0, left: 16),
+                          child: PriceRow(style: _style, widget: widget),
+                        ),
+                        const SizedBox(
+                          height: 32,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 16.0),
+                          child: Text(
                             'Товара собрано',
                             style: _style.copyWith(fontSize: 16),
                           ),
-                          const SizedBox(
-                            height: 4,
+                        ),
+                        const SizedBox(
+                          height: 4,
+                        ),
+                        //ПОЛЕ ВВОДА
+                        Padding(
+                          padding: const EdgeInsets.only(
+                              right: 16.0, left: 16, bottom: 16),
+                          child: _TextField(),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(
+                              right: 16.0, left: 16, bottom: 16),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Expanded(
+                                child: MyButton(
+                                  //  / isActive: isActive,
+                                  product: widget.product,
+                                  onDelete: setDeleteState,
+                                  style: _style.copyWith(color: Colors.white),
+                                  color: const Color(0xffE14D43),
+                                  text: 'Удалить',
+                                ),
+                              ),
+                              const SizedBox(
+                                width: 16,
+                              ),
+                              SizedBox(
+                                width: 170,
+                                height: 56,
+                                child: MyButton(
+                                  controller: _controller,
+                                  collectedQuantity:
+                                      double.tryParse(_controller.text),
+                                  isActive: isItCollected ? true : isActive,
+                                  product: widget.product,
+                                  style: _style.copyWith(
+                                      color: isActive
+                                          ? Colors.white
+                                          : Color(0xffA9C7D0)),
+                                  color: isActive || isItCollected
+                                      ? const Color(0xff69A8BB)
+                                      : const Color(0xffE1EBEE),
+                                  text: widget.product.status == 'collecting'
+                                      ? 'Собрать'
+                                      : 'Вернуть в Собрать',
+                                ),
+                              ),
+                            ],
                           ),
-                          //ПОЛЕ ВВОДА
-                          _TextField(),
-                          const SizedBox(
-                            height: 25,
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(right: 8.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                //
-                                //'удалить'
-                                Expanded(
-                                  child: MyButton(
-                                    product: widget.product,
-                                    onDelete: setDeleteState,
-                                    style: _style,
-                                    color: const Color(0xffE14D43),
-                                    text: 'Удалить',
-                                  ),
-                                ),
-                                const SizedBox(
-                                  width: 16,
-                                ),
-                                Expanded(
-                                  child: MyButton(
-                                    controller: _controller,
-                                    collectedQuantity:
-                                        double.tryParse(_controller.text),
-                                    isActive: isItCollected ? true : isActive,
-                                    product: widget.product,
-                                    style: _style,
-                                    // &&
-                                    //             double.tryParse(
-                                    //                     _controller.text) ==
-                                    //                 0.0
-                                    color:
-                                        isActive || //TODO не работает ничерта! я про невидимость кнопки когда введен ноль
-                                                isItCollected
-                                            ? const Color(0xff69A8BB)
-                                            : null,
-                                    text: widget.product.status == 'collecting'
-                                        ? 'Собрать'
-                                        : 'Вернуть в Собрать',
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )
-                        ],
-                      )
+                        )
+                      ],
+                    )
                   ],
-                ),
-              )),
+                )),
+          ),
         );
       },
     );
@@ -276,58 +257,55 @@ class ProductCardState extends State<ProductCard> {
             border: Border.all(
               color: const Color(0xffCACED0),
             )),
-        child: Padding(
-          padding: const EdgeInsets.only(left: 8.0, right: 8),
-          child: TextFormField(
-            inputFormatters: <TextInputFormatter>[
-              FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d*')),
-            ],
-            key: formKey,
-            // initialValue:
-            // textAlignVertical:
-            //     TextAlignVertical.top,
-            onEditingComplete: _isCollected ? () => _expandCard() : null,
-            onChanged: _isCollected
-                ? (text) {
-                    double? _cQ = double.tryParse(text);
-                    if (text.isNotEmpty && _cQ != 0.0) {
-                      widget.product.collected_quantity = _cQ;
-                    }
+        child: TextFormField(
+          inputFormatters: <TextInputFormatter>[
+            FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d*')),
+          ],
+          key: formKey,
+          // initialValue:
+          // textAlignVertical:
+          //     TextAlignVertical.top,
+          onEditingComplete: _isCollected ? () => _expandCard() : null,
+          onChanged: _isCollected
+              ? (text) {
+                  double? _cQ = double.tryParse(text);
+                  if (text.isNotEmpty && _cQ != 0.0) {
+                    widget.product.collected_quantity = _cQ;
                   }
-                : null,
-            style: _isCollected
-                ? _style.copyWith(
-                    fontWeight: FontWeight.w900, color: Colors.green)
-                : _style,
-            autofocus: true,
-            maxLines: 1,
-            maxLength: 6,
-            controller: _controller,
-            keyboardType: TextInputType.number,
-            // cursorHeight: 30,
+                }
+              : null,
+          style: _isCollected
+              ? _style.copyWith(
+                  fontWeight: FontWeight.w900, color: Colors.green)
+              : _style,
+          autofocus: true,
+          maxLines: 1,
+          maxLength: 6,
+          controller: _controller,
+          keyboardType: TextInputType.number,
+          // cursorHeight: 30,
 
-            decoration: InputDecoration(
-                counter: const SizedBox.shrink(),
-                // errorText: 'Поле не может быть пустым',
-                suffixIconConstraints: BoxConstraints.tightForFinite(),
-                // suffixIcon: _controller.text.isNotEmpty
-                //     ? IconButton(
-                //         iconSize: 10,
-                //         padding: EdgeInsets.zero,
-                //         icon: const Icon(
-                //           Icons.clear_sharp,
-                //           color: Color(0xffE14D43),
-                //         ),
-                //         onPressed: () => _controller.clear(),
-                //       )
-                //     : null,
-                suffixText:
-                    widget.product.product_type == 'per_kilo' ? 'кг.' : 'шт',
-                contentPadding: const EdgeInsets.only(left: 12, top: 10),
-                hintStyle: _style.copyWith(color: Color(0xff999999)),
-                hintText: 'Введите',
-                border: InputBorder.none),
-          ),
+          decoration: InputDecoration(
+              counter: const SizedBox.shrink(),
+              // errorText: 'Поле не может быть пустым',
+              // suffixIconConstraints: BoxConstraints.tightForFinite(),
+              // suffixIcon: _controller.text.isNotEmpty
+              //     ? IconButton(
+              //         iconSize: 10,
+              //         padding: EdgeInsets.zero,
+              //         icon: const Icon(
+              //           Icons.clear_sharp,
+              //           color: Color(0xffE14D43),
+              //         ),
+              //         onPressed: () => _controller.clear(),
+              //       )
+              //     : null,
+              suffixText:
+                  widget.product.product_type == 'per_kilo' ? 'кг' : 'шт',
+              contentPadding: const EdgeInsets.fromLTRB(16, 10, 16, 9),
+              hintStyle: _style.copyWith(color: Color(0xff999999)),
+              hintText: 'Введите',
+              border: InputBorder.none),
         ));
   }
 
@@ -350,7 +328,7 @@ class ProductCardState extends State<ProductCard> {
     ]));
 
     return Container(
-      padding: const EdgeInsets.fromLTRB(8, 8, 16, 0),
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
       child: _isCollected
           ? _richText
           : Text(
@@ -414,7 +392,7 @@ class _ButtonState extends State<MyButton> {
                   // changeStatus(widget.product, 'deleted');
                   widget.onDelete!();
                 } else if (widget.text == 'Вернуть в Собрать') {
-                  changeStatus(widget.product, 'to_collect');
+                  changeStatus(widget.product, 'collecting');
                 } else if (widget.text == 'Собрать') {
                   changeStatus(widget.product, 'collected');
                   widget.controller!.clear();
@@ -427,11 +405,8 @@ class _ButtonState extends State<MyButton> {
         height: 56,
         decoration: BoxDecoration(borderRadius: BorderRadius.circular(4)),
         child: Center(
-          child: Text(
-            widget.text,
-            textAlign: TextAlign.center,
-            style: widget.style.copyWith(color: Colors.white),
-          ),
+          child: Text(widget.text,
+              textAlign: TextAlign.center, style: widget.style),
         ),
       ),
       style:
@@ -449,7 +424,7 @@ class PriceRow extends StatelessWidget {
         super(key: key);
 
   final TextStyle _style;
-  final ProductCard widget;
+  final AnotherProductCard widget;
 
   @override
   Widget build(BuildContext context) {
@@ -458,7 +433,7 @@ class PriceRow extends StatelessWidget {
       children: [
         Text(
           'Цена:',
-          style: _style,
+          style: _style.copyWith(fontSize: 16),
         ),
         Text(
           widget.product.product_type == 'per_kilo'
@@ -479,19 +454,27 @@ class ProductName extends StatelessWidget {
   })  : _style = style,
         super(key: key);
 
-  final ProductCard widget;
+  final AnotherProductCard widget;
   final TextStyle _style;
 
   @override
   Widget build(BuildContext context) {
+    double _wdt = MediaQuery.of(context).size.width;
+    double _textW;
+    if (_wdt > 360) {
+      _textW = 150;
+    } else {
+      _textW = 110;
+    }
     return Container(
-      padding: const EdgeInsets.fromLTRB(8, 0, 16, 0),
+      padding: const EdgeInsets.only(left: 16, right: 16),
       height: 96,
-      width: 170,
+      width: _textW,
       child: Text(
         widget.product.name ?? 'noname',
+        softWrap: true,
         maxLines: 4,
-        overflow: TextOverflow.visible,
+        overflow: TextOverflow.fade,
         style: _style,
       ),
     );
@@ -512,6 +495,13 @@ class ImagePlacer extends StatefulWidget {
 class _ImagePlacerState extends State<ImagePlacer> {
   @override
   Widget build(BuildContext context) {
+    double _wdt = MediaQuery.of(context).size.width;
+    double _picW;
+    if (_wdt > 350) {
+      _picW = 132;
+    } else {
+      _picW = 100;
+    }
     //однажды я это решу :)
 // проблема была в том, что он выкидывал ошибку битой ссылки (badUrl) в моменты когда я нажимал на кнопку
 // чтобы перейти на экран инфы. В общем - так работает.
@@ -539,16 +529,6 @@ class _ImagePlacerState extends State<ImagePlacer> {
         return Image.asset('assets/images/placeholder.jpg');
       },
     );
-
-    // FadeInImage image = FadeInImage.assetNetwork(
-    //   placeholder: 'assets/images/placeholder.jpg',
-    //   image: widget.url,
-    //   imageErrorBuilder: (context, object, stackTrace) {
-    //     return Image.asset('assets/images/placeholder.jpg');
-    //   },
-
-    // );
-
-    return SizedBox(height: 132, width: 132, child: image);
+    return Container(width: _picW, height: _picW, child: image);
   }
 }

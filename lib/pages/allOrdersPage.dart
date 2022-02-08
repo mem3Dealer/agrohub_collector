@@ -6,6 +6,9 @@ import 'package:agrohub_collector_flutter/bloc/bloc/auth/auth_state.dart';
 import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_bloc.dart';
 import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_event.dart';
 import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_state.dart';
+import 'package:agrohub_collector_flutter/components/productCard.dart';
+import 'package:agrohub_collector_flutter/shared/globals.dart';
+import 'package:agrohub_collector_flutter/shared/myWidgets.dart';
 import 'package:expandable/expandable.dart';
 import 'package:intl/date_symbols.dart';
 import 'package:intl/intl.dart';
@@ -35,12 +38,12 @@ class AllOrdersPage extends StatefulWidget {
 class _AllOrdersPageState extends State<AllOrdersPage> {
   final authBloc = GetIt.I.get<AuthenticationBloc>();
   final ordersBloc = GetIt.I.get<OrdersBloc>();
-
+  MyGlobals myGlobals = MyGlobals();
+  bool isError = false;
   @override
   void initState() {
-    getOrders();
-
     super.initState();
+    getOrders();
 
     // authBloc.add(AuthenticationInit());
   }
@@ -55,12 +58,13 @@ class _AllOrdersPageState extends State<AllOrdersPage> {
     ordersBloc.add(OrdersGetAllOrders(
         onError: (e) {
           inspect(e);
+          isError = true;
         },
         onSuccess: () => print('Everything`s proceeding as I have forseen')));
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext cntx) {
     return BlocBuilder<OrdersBloc, OrdersState>(
       bloc: ordersBloc,
       builder: (context, state) {
@@ -111,163 +115,55 @@ class _AllOrdersPageState extends State<AllOrdersPage> {
           });
         }
 
-        if (ordersBloc.state.ordersNew != null) {
-          if (ordersBloc.state.ordersNew!.length < 7) {
-            ordersBloc.add(LoadNewOrders());
-          }
-        }
+        return MyScaffold(false, false, title: 'Список заказов', body: Center(
+          child: BlocBuilder<OrdersBloc, OrdersState>(
+            builder: (_context, state) {
+              return Padding(
+                  padding: const EdgeInsets.only(top: 16.0),
+                  child: ScrollConfiguration(
+                    behavior: ScrollBehavior(),
+                    child: GlowingOverscrollIndicator(
+                      axisDirection: AxisDirection.down,
+                      color: Colors.grey,
+                      child: isError == false
+                          ? state.loading == false
+                              ? ListView.builder(
+                                  shrinkWrap: true,
+                                  itemCount: state.ordersNew?.length,
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    Order order = Order();
+                                    if (state.ordersNew != null) {
+                                      order = state.ordersNew![index];
+                                    } else {
+                                      // print('sucks');
+                                      // ordersBloc.add(LoadNewOrders());
+                                    }
+                                    return OrderTile(
+                                        buildContext: cntx,
 
-        return MyScaffold(
-          false,
-          false,
-          title: 'Список заказов',
-          body: state.ordersNew != null
-              ? state.ordersNew!.isNotEmpty
-                  ? Center(
-                      child: BlocBuilder<OrdersBloc, OrdersState>(
-                        builder: (context, state) {
-                          return Container(
-                            width: 500,
-                            child: ListView.builder(
-                                shrinkWrap: true,
-                                itemCount: state.ordersNew?.length,
-                                itemBuilder: (BuildContext context, int index) {
-                                  Order order = state.ordersNew![index];
-                                  return OrderTile(
-                                      controller: _ctrlList[index],
-                                      index: index,
-                                      order: order);
-                                }),
-                          );
-                        },
-                      ),
-                    )
-                  : Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
-                          Text(
-                            'Кажется, у нас какие-то неполадки.\nСвяжитесь с администратором.',
-                            textAlign: TextAlign.center,
-                          )
-                        ],
-                      ),
-                    )
-              : const Center(
-                  child: CircularProgressIndicator(
-                  color: Color(0xffE14D43),
-                )),
-          // fab: FloatingActionButton(
-          //   onPressed: () async {},
-          // ),
-        );
+                                        // controller: _ctrlList[index],
+                                        index: index,
+                                        order: order);
+                                  })
+                              : CircularProgressIndicator(
+                                  color: Color(0xffE14D43),
+                                )
+                          : Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: const [
+                                Text(
+                                  'Кажется, у нас какие-то неполадки.\nСвяжитесь с администратором.',
+                                  textAlign: TextAlign.center,
+                                )
+                              ],
+                            ),
+                    ),
+                  ));
+            },
+          ),
+        ));
       },
     );
   }
 }
-
-// class AnotherOne extends StatelessWidget {
-//   const AnotherOne({
-//     Key? key,
-//   }) : super(key: key);
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return SingleChildScrollView(
-//        child: ExpansionPanelList.radio(
-//          children: widget.state.allOrders!
-//              .map<ExpansionPanelRadio>((Order order) {
-//            return ExpansionPanelRadio(
-//              value: order.id!,
-//              headerBuilder:
-//                  (BuildContext context, bool isExpanded) {
-//                return Card(
-//                  child: Column(
-//                    mainAxisAlignment: MainAxisAlignment.center,
-//                    children: [
-//                      Padding(
-//                          padding: const EdgeInsets.fromLTRB(
-//                              16, 12, 56, 12),
-//                          child: Row(
-//                            mainAxisAlignment:
-//                                MainAxisAlignment.start,
-//                            children: [
-//                              Text(
-//                                "Заказ №${order.agregator_order_id}",
-//                                textAlign: TextAlign.left,
-//                                style: const TextStyle(
-//                                    fontFamily: 'Roboto',
-//                                    fontSize: 24,
-//                                    fontWeight: FontWeight.w500),
-//                              ),
-//                            ],
-//                          )),
-//                      const Divider(
-//                        // height: 2,
-//                        thickness: 1.5,
-//                        color: Color(0xff69A8BB),
-//                      ),
-//                      Padding(
-//                        padding: const EdgeInsets.fromLTRB(
-//                            265, 12, 0, 10),
-//                        child: Row(
-//                          mainAxisSize: MainAxisSize.min,
-//                          mainAxisAlignment:
-//                              MainAxisAlignment.end,
-//                          children: [
-//                            Text(
-//                              '12:30',
-//                              textAlign: TextAlign.end,
-//                              style: const TextStyle(
-//                                  fontFamily: 'Roboto',
-//                                  fontSize: 16,
-//                                  fontWeight: FontWeight.w500),
-//                            ),
-//                          ],
-//                        ),
-//                      ),
-//                    ],
-//                  ),
-//                );
-//              },
-//              body: ListTile(
-//                title: Container(
-//                  decoration: BoxDecoration(
-//                      borderRadius: BorderRadius.circular(4)),
-//                  width: 350,
-//                  height: 56,
-//                  child: ElevatedButton(
-//                    style: ButtonStyle(
-//                        backgroundColor:
-//                            MaterialStateProperty.all(
-//                      const Color(0xff69A8BB),
-//                    )),
-//                    onPressed: () {
-//                      // getProduct(widget.order).then((value) {
-//                      //   Navigator.push<void>(
-//                      //     context,
-//                      //     MaterialPageRoute<void>(
-//                      //       builder: (BuildContext context) =>
-//                      //           CollectingOrderPage(
-//                      //               // widget.imageUrl,
-//                      //               widget.order),
-//                      //     ),
-//                      //   );
-//                      // });
-//                    },
-//                    child: const Text(
-//                      'Начать сборку',
-//                      style: TextStyle(
-//                          fontFamily: 'Roboto',
-//                          fontWeight: FontWeight.w400,
-//                          fontSize: 16),
-//                    ),
-//                  ),
-//                ),
-//              ),
-//            );
-//          }).toList(),
-//        ),
-//      );
-//   }
-// }

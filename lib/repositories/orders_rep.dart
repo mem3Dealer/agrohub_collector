@@ -1,7 +1,9 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:agrohub_collector_flutter/api/apiOrders.dart';
 import 'package:agrohub_collector_flutter/bloc/bloc/auth/auth_bloc.dart';
+import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_event.dart';
 import 'package:agrohub_collector_flutter/model/product.dart';
 import 'package:agrohub_collector_flutter/repositories/auth_rep.dart';
 import 'package:dio/dio.dart';
@@ -17,14 +19,18 @@ String? url = '';
 class OrdersRepository {
   //Получение всех заказов с рынка
 
-  Future<List<Order>> getAllOrders() async {
-    Response<dynamic> response =
-        await http.get("/orders/get_all_orders/?per_page=10");
-    List list = response.data['results'];
-    String _url = response.data['next'];
-    url = _url.substring(62);
-    List<Order> ord = list.map<Order>((e) => Order.fromMap(e)).toList();
-    return ord;
+  Future<List<Order>> getNewOrders() async {
+    try {
+      Response<dynamic> response =
+          await http.get("/orders/get_all_orders/?status=NEW");
+      List list = response.data['results'];
+
+      List<Order> ord = list.map<Order>((e) => Order.fromMap(e)).toList();
+      return ord;
+    } catch (e) {
+      inspect(e);
+      return null!;
+    }
   }
 
   //следующие заказы
@@ -49,12 +55,12 @@ class OrdersRepository {
     Response<dynamic> response =
         await http.get("/orders/get_detailed_order/?order_id=$id");
     List list = response.data;
-    print(response);
+
     List<Product> listOfProducts =
         list.map<Product>((e) => Product.fromMap(e)).toList();
     for (Product p in listOfProducts) {
-      p.status = 'collecting';
-      p.collected_quantity = 0.0;
+      p.status = 'collected';
+      p.collected_quantity = 5.0;
     }
     return listOfProducts;
   }

@@ -64,6 +64,7 @@ class AuthenticationBloc
         onSuccess: event.onSuccess,
       ));
       Map<String, dynamic> payload = Jwt.parseJwt(token);
+      print(payload);
       String role = '';
       int? farmerId = payload['farmer_id'];
       int? collectorId = payload['user_id'];

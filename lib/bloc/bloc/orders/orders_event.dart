@@ -1,6 +1,7 @@
+import 'package:flutter/cupertino.dart';
+
 import 'package:agrohub_collector_flutter/model/order.dart';
 import 'package:agrohub_collector_flutter/model/product.dart';
-import 'package:flutter/cupertino.dart';
 
 abstract class OrdersEvents {
   OrdersEvents();
@@ -65,6 +66,7 @@ class LoadNewOrders extends OrdersEvents {
   // BuildContext context;
   LoadNewOrders();
 }
+
 // class CollectProduct extends OrdersEvents {
 //   CollectProduct({
 //     required this.collectedQuantity,
@@ -73,3 +75,9 @@ class LoadNewOrders extends OrdersEvents {
 //   double collectedQuantity;
 //   Product product;
 // }
+class OrdersLoading extends OrdersEvents {
+  bool loading = false;
+  OrdersLoading({
+    required this.loading,
+  });
+}

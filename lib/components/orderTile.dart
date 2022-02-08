@@ -2,20 +2,29 @@ import 'dart:developer';
 
 import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_bloc.dart';
 import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_event.dart';
+import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_state.dart';
 import 'package:agrohub_collector_flutter/model/order.dart';
 import 'package:agrohub_collector_flutter/pages/collectingOrderPage.dart';
+import 'package:agrohub_collector_flutter/shared/globals.dart';
+import 'package:agrohub_collector_flutter/shared/myScaffold.dart';
+import 'package:agrohub_collector_flutter/shared/myWidgets.dart';
 import 'package:flutter/material.dart';
 import 'package:expandable/expandable.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:intl/intl.dart';
 
 class OrderTile extends StatefulWidget {
   Order order;
-  ExpandableController controller;
+  BuildContext buildContext;
+
+  // Future<void> onPressed;
+  // ExpandableController controller;
   int index;
   OrderTile({
     required this.order,
-    required this.controller,
+    required this.buildContext,
+    // required this.controller,
     required this.index,
     Key? key,
   }) : super(
@@ -28,17 +37,12 @@ class OrderTile extends StatefulWidget {
 
 class _OrderTileState extends State<OrderTile> {
   final ordersBloc = GetIt.I.get<OrdersBloc>();
-  // ExpandableController _exContrl = ExpandableController();
-  late UniqueKey _key;
-  // ExpandableController _lastOpened = ExpandableController();
+  bool _isLoading = false;
+  MyGlobals myGlobals = MyGlobals();
+
   @override
   void initState() {
     super.initState();
-    // _exContrl = ExpandableController()
-    //   ..addListener(() {
-    //     print(widget.index);
-    // });
-    _key = UniqueKey();
   }
 
   @override
@@ -47,181 +51,125 @@ class _OrderTileState extends State<OrderTile> {
     // widget.controller.dispose();
   }
 
-  // double _height = 116;
-  // bool isVisiible = true;
-
-  Future getProduct(Order order, BuildContext context) async {
+  Future<void> getProduct(Order order, BuildContext context) async {
+    // BuildContext _bCtx = myGlobals.scaffoldKey.currentContext!;
     ordersBloc.add(OrdersGetDetailOrder(
-        context: context,
-        order: order,
-        onError: (e) {
-          inspect(e);
-        },
-        onSuccess: () {}));
+      context: widget.buildContext,
+      order: order,
+    ));
   }
 
   @override
   Widget build(
     BuildContext context,
   ) {
-    // print(widget.order.agregatorOrderId);
-    // DateTime? _time =
-    //     DateFormat('EEE, dd MMM yyyy HH:MM').parse(order.delivery_time!);
     DateFormat format = DateFormat('HH:MM');
-    String _time = format.format(widget.order.deliveryTime!);
-    // print('$_exContrl, $_key');
+    String _time = format.format(widget.order.deliveryTime ?? DateTime.now());
     return Padding(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-        child: Card(
-          child: ExpandablePanel(
-            key: _key,
-            controller: widget.controller,
-            theme: const ExpandableThemeData(
-              hasIcon: false,
-            ),
-            header: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 12, 56, 12),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Text(
-                          "Заказ №${widget.order.agregatorOrderId}",
-                          textAlign: TextAlign.left,
-                          style: const TextStyle(
-                              fontFamily: 'Roboto',
-                              fontSize: 24,
-                              fontWeight: FontWeight.w500),
-                        ),
-                      ],
-                    )),
-                const Divider(
-                  // height: 2,
-                  thickness: 1.5,
-                  color: Color(0xff69A8BB),
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+        child: BlocBuilder<OrdersBloc, OrdersState>(
+          bloc: ordersBloc,
+          builder: (_context, state) {
+            return Card(
+              child: ExpandablePanel(
+                // controller: widget.controller,
+                theme: const ExpandableThemeData(
+                  tapHeaderToExpand: true,
+                  tapBodyToExpand: true,
+                  tapBodyToCollapse: true,
+                  iconPadding: EdgeInsets.zero,
+                  hasIcon: false,
                 ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(265, 12, 0, 10),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Text(
-                        _time,
-                        textAlign: TextAlign.end,
-                        style: const TextStyle(
-                            fontFamily: 'Roboto',
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            collapsed: Container(
-                // child: Text(widget.controller.value.toString()),
-                ),
-            expanded: Center(
-              child: SizedBox(
-                  height: 72,
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                    child: Container(
-                      decoration:
-                          BoxDecoration(borderRadius: BorderRadius.circular(4)),
-                      width: 350,
-                      height: 56,
-                      child: ElevatedButton(
-                        style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all(
-                          const Color(0xff69A8BB),
-                        )),
-                        onPressed: () {
-                          getProduct(widget.order, context).then((value) {
-                            Navigator.push<void>(
-                              context,
-                              MaterialPageRoute<void>(
-                                builder: (BuildContext context) =>
-                                    CollectingOrderPage(
-                                        // widget.imageUrl,
-                                        widget.order),
+                header: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 12, 0, 4),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Заказ №${widget.order.agregatorOrderId}",
+                              textAlign: TextAlign.left,
+                              style: const TextStyle(
+                                  color: Color(0xff363B3F),
+                                  fontFamily: 'Roboto',
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w700),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(right: 16.0),
+                              child: Container(
+                                width: 32,
+                                height: 32,
+                                decoration: BoxDecoration(
+                                    image: DecorationImage(
+                                        image: AssetImage(
+                                            'assets/images/expIcon.png'))),
                               ),
-                            );
-                          });
-                        },
-                        child: const Text(
-                          'Начать сборку',
-                          style: TextStyle(
-                              fontFamily: 'Roboto',
-                              fontWeight: FontWeight.w400,
-                              fontSize: 16),
-                        ),
+                            )
+                          ],
+                        )),
+                    const Divider(
+                      // height: 2,
+                      thickness: 1.5,
+                      color: Color(0xff69A8BB),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Text(
+                            _time,
+                            textAlign: TextAlign.end,
+                            style: const TextStyle(
+                                fontFamily: 'Roboto',
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500),
+                          ),
+                        ],
                       ),
                     ),
-                  )),
-            ),
-          ),
+                  ],
+                ),
+                collapsed: Container(
+                  child: Text('${widget.order.id}, ${widget.order.status}'),
+                ),
+                expanded: Center(
+                  child: SizedBox(
+                      height: 72,
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                        child: Container(
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(4)),
+                          width: 350,
+                          height: 56,
+                          child: ElevatedButton(
+                              style: ButtonStyle(
+                                  backgroundColor: MaterialStateProperty.all(
+                                const Color(0xff69A8BB),
+                              )),
+                              onPressed: () {
+                                getProduct(widget.order, context);
+                                setState(() {
+                                  _isLoading = true;
+                                });
+                              },
+                              child: Text(
+                                'Начать сборку',
+                                style: TextStyle(
+                                    fontFamily: 'Roboto',
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 18),
+                              )),
+                        ),
+                      )),
+                ),
+              ),
+            );
+          },
         ));
   }
 }
-
-// class Header extends StatelessWidget {
-//   const Header({
-//     Key? key,
-//     required this.widget,
-//     required String time,
-//   })  : _time = time,
-//         super(key: key);
-
-//   final OrderTile widget;
-//   final String _time;
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Column(
-//       mainAxisAlignment: MainAxisAlignment.center,
-//       children: [
-//         Padding(
-//             padding: const EdgeInsets.fromLTRB(16, 12, 56, 12),
-//             child: Row(
-//               mainAxisAlignment: MainAxisAlignment.start,
-//               children: [
-//                 Text(
-//                   "Заказ №${widget.order.agregator_order_id}",
-//                   textAlign: TextAlign.left,
-//                   style: const TextStyle(
-//                       fontFamily: 'Roboto',
-//                       fontSize: 24,
-//                       fontWeight: FontWeight.w500),
-//                 ),
-//               ],
-//             )),
-//         const Divider(
-//           // height: 2,
-//           thickness: 1.5,
-//           color: Color(0xff69A8BB),
-//         ),
-//         Padding(
-//           padding: const EdgeInsets.fromLTRB(265, 12, 0, 10),
-//           child: Row(
-//             mainAxisSize: MainAxisSize.min,
-//             mainAxisAlignment: MainAxisAlignment.end,
-//             children: [
-//               Text(
-//                 _time,
-//                 textAlign: TextAlign.end,
-//                 style: const TextStyle(
-//                     fontFamily: 'Roboto',
-//                     fontSize: 16,
-//                     fontWeight: FontWeight.w500),
-//               ),
-//             ],
-//           ),
-//         ),
-//       ],
-//     );
-//   }
-// }

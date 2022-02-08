@@ -35,129 +35,115 @@ class OrderInfoPage extends StatelessWidget {
           totalWeight += e.ordered_quantity ?? 0;
           // totalPrice += e.unit_price ?? 0;
         }
-        double width = MediaQuery.of(context).size.width;
-        double height = MediaQuery.of(context).size.height;
+        Widget _sB = SizedBox(
+          height: 12,
+        );
+        var _wdt = MediaQuery.of(context).size.width;
+        print(_wdt);
+
         return MyScaffold(true, false,
             title: "Заказ №${order.agregatorOrderId}",
-            body: Padding(
-              padding: EdgeInsets.fromLTRB(13.0, 24, 13, 0),
-              child: SizedBox(
-                height: 216,
-                width: 382,
-                child: Column(
-                  children: [
-                    Card(
-                      color: Colors.white,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(4)),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: const [
-                              Padding(
-                                padding: EdgeInsets.only(left: 16, top: 16),
-                                child: Text('Детали заказа',
-                                    style: TextStyle(
-                                        fontFamily: 'Roboto',
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 24)),
-                              ),
-                            ],
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(
-                                left: 18, right: 50, top: 10),
-                            child: Row(
-                              children: [
-                                Text('Время доставки:', style: style),
-                                const SizedBox(
-                                  width: 85,
-                                ),
-                                Text(
-                                  _time.toString(),
-                                  style: const TextStyle(
-                                      color: Color(0xffE14D43),
+            body: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 32, 16, 0),
+                  child: Card(
+                    color: Colors.white,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(4)),
+                    child: Column(
+                      // mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: const [
+                            Padding(
+                              padding: EdgeInsets.only(
+                                  left: 16, top: 16, bottom: 16),
+                              child: Text('Детали заказа',
+                                  style: TextStyle(
                                       fontFamily: 'Roboto',
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w700),
-                                )
-                              ],
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 24)),
                             ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(
-                                left: 18, right: 60, top: 10),
-                            child: Row(
-                              children: [
-                                Text('Количество товаров:', style: style),
-                                const SizedBox(
-                                  width: 55,
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(left: 16.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  leftSide('Время доставки:'),
+                                  _sB,
+                                  leftSide('Количество товаров:'),
+                                  _sB,
+                                  leftSide('Общий вес:'),
+                                  _sB,
+                                  leftSide('Сумма заказа:'),
+                                ],
+                              ),
+                            ),
+                            SizedBox(width: _wdt > 360 ? _wdt * 0.15 : 5),
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.only(right: 16.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    rightSide(_time, isTime: true),
+                                    _sB,
+                                    rightSide('${_list.length} шт.'),
+                                    _sB,
+                                    rightSide("$totalWeight кг"),
+                                    _sB,
+                                    rightSide('${order.totalPrice} руб.')
+                                  ],
                                 ),
-                                Text(
-                                  '${_list.length} шт.',
-                                  style: style.copyWith(
-                                      fontWeight: FontWeight.w500),
-                                )
-                              ],
+                              ),
                             ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(
-                                left: 18, right: 60, top: 10),
-                            child: Row(
-                              children: [
-                                Text('Общий вес:', style: style),
-                                const SizedBox(
-                                  width: 127,
-                                ),
-                                Text(
-                                  "$totalWeight кг",
-                                  style: style.copyWith(
-                                      fontWeight: FontWeight.w500),
-                                )
-                              ],
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(
-                                left: 18, right: 60, top: 10, bottom: 25),
-                            child: Row(
-                              children: [
-                                Text('Сумма заказа:', style: style),
-                                const SizedBox(
-                                  width: 103,
-                                ),
-                                Flexible(
-                                  child: Text(
-                                    '${order.totalPrice.toString()} руб.',
-                                    overflow: TextOverflow.fade,
-                                    style: style.copyWith(
-                                        fontWeight: FontWeight.w500),
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
-                          const Divider(
-                            indent: 16,
-                            endIndent: 16,
-                            // height: 2,
-                            thickness: 1.5,
-                            color: Color(0xff69A8BB),
-                          ),
-                          SizedBox(
-                            height: 16,
-                          )
-                        ],
-                      ),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 16,
+                        ),
+                        const Divider(
+                          indent: 16,
+                          endIndent: 16,
+                          // height: 2,
+                          thickness: 2,
+                          color: Color(0xff69A8BB),
+                        ),
+                        SizedBox(
+                          height: 16,
+                        )
+                      ],
                     ),
-                  ],
+                  ),
                 ),
-              ),
+              ],
             ));
       },
+    );
+  }
+
+  Widget leftSide(String text) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 24.0),
+      child: Text(text, style: style),
+    );
+  }
+
+  Widget rightSide(String text, {bool isTime = false}) {
+    return Container(
+      // width: 117,
+      child: Text(text,
+          overflow: TextOverflow.fade,
+          softWrap: false,
+          style: style.copyWith(
+              color: isTime ? Color(0xffE14D43) : Color(0xff363B3F),
+              fontWeight: isTime ? FontWeight.w700 : FontWeight.w500)),
     );
   }
 

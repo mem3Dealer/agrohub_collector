@@ -29,14 +29,12 @@ class _CollectingOrderPageState extends State<CollectingOrderPage>
   final ordersBloc = GetIt.I.get<OrdersBloc>();
   final ordRep = OrdersRepository();
   bool toCollect = true;
-  bool _isCollected = false;
+  bool isCollected = false;
   late TabController _tabController;
 
   // final String _pageStatus = 'to_collect';
   @override
   void initState() {
-    // ordersBloc.checkStatus(context, widget.order);
-
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
   }
@@ -77,79 +75,65 @@ class _CollectingOrderPageState extends State<CollectingOrderPage>
                 // print('THIS IS STATE`S FIRST: ${state.listOfProducts!.first}');
                 int totalCollected = 0;
                 int totalToCollect = 0;
-                if (state.listOfProducts != null &&
-                    state.listOfProducts != []) {
-                  for (Product p in state.listOfProducts!) {
-                    if (p.status == 'collecting') {
-                      totalToCollect++;
-                    } else if (p.status == 'collected') {
-                      totalCollected++;
+                if (state.loading == false) {
+                  if (state.listOfProducts != null) {
+                    for (Product p in state.listOfProducts ?? []) {
+                      if (p.status == 'collecting') {
+                        totalToCollect++;
+                      } else if (p.status == 'collected') {
+                        totalCollected++;
+                      }
+                      // print("${p.name}: ${p.collected_quantity}, ${p.status}");
                     }
-                    // print("${p.name}: ${p.collected_quantity}, ${p.status}");
+                  }
+                  if (totalToCollect == 0) {
+                    _tabController.animateTo(1);
+                  } else if (totalCollected == 0) {
+                    _tabController.animateTo(0);
                   }
 
-                  if (state.listOfProducts?.isNotEmpty == true) {
-                    if (totalToCollect == 0) {
-                      _tabController.animateTo(1);
-                    }
-                    return SizedBox(
-                      height: 1000,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          TabBar(
-                              controller: _tabController,
-                              labelColor: const Color(0xff363B3F),
-                              labelStyle:
-                                  _style.copyWith(fontWeight: FontWeight.w500),
-                              indicatorColor: const Color(0xffE14D43),
-                              tabs: [
-                                Tab(
-                                  text: 'Собрать $totalToCollect',
-                                ),
-                                Tab(
-                                  text: 'Собрано $totalCollected',
-                                )
-                              ]),
-                          Expanded(
-                            child: TabBarView(
-                                controller: _tabController,
-                                children: [
-                                  Container(
-                                    child: _TabToCollect(
-                                      state: state,
-                                      pageStatus: 'collecting',
-                                    ),
-                                  ),
-                                  Container(
-                                    child: _TabToCollect(
-                                      state: state,
-                                      pageStatus: 'collected',
-                                    ),
-                                  ),
-                                ]),
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TabBar(
+                          controller: _tabController,
+                          labelColor: const Color(0xff363B3F),
+                          labelStyle:
+                              _style.copyWith(fontWeight: FontWeight.w500),
+                          indicatorColor: const Color(0xffE14D43),
+                          indicatorPadding:
+                              EdgeInsets.only(left: 16, right: 16),
+                          tabs: [
+                            Tab(
+                              text: 'Собрать ($totalToCollect)',
+                            ),
+                            Tab(
+                              text: 'Собрано ($totalCollected)',
+                            )
+                          ]),
+                      Expanded(
+                        child:
+                            TabBarView(controller: _tabController, children: [
+                          Container(
+                            child: _TabToCollect(
+                              state: state,
+                              pageStatus: 'collecting',
+                            ),
                           ),
-                        ],
+                          Container(
+                            child: _TabToCollect(
+                              state: state,
+                              pageStatus: 'collected',
+                            ),
+                          ),
+                        ]),
                       ),
-                    );
-                  } else {
-                    return const Center(
-                      child: CircularProgressIndicator(
-                        color: Color(0xffE14D43),
-                      ),
-                    );
-                  }
+                    ],
+                  );
                 } else {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Кажется, у нас какие-то неполадки.\nСвяжитесь с администратором или попробуйте позже.',
-                          textAlign: TextAlign.center,
-                          style: _style,
-                        )
-                      ],
+                  return const Center(
+                    child: CircularProgressIndicator(
+                      color: Color(0xffE14D43),
                     ),
                   );
                 }
@@ -157,32 +141,49 @@ class _CollectingOrderPageState extends State<CollectingOrderPage>
           fab: BlocBuilder<OrdersBloc, OrdersState>(
             bloc: ordersBloc,
             builder: (context, state) {
+              final bool showFab =
+                  MediaQuery.of(context).viewInsets.bottom == 0.0;
               ordersBloc.state.listOfProducts?.any((prod) {
                 prod.collected_quantity == 0.0
-                    ? {_isCollected = false}
-                    : {_isCollected = true};
-                return !_isCollected;
+                    ? {isCollected = false}
+                    : {isCollected = true};
+                return !isCollected;
               });
               return Visibility(
-                visible: _isCollected,
-                child: FloatingActionButton(
-                    tooltip: 'Завершить заказ',
-                    child: const Icon(Icons.check),
-                    backgroundColor: const Color(0xff7FB069),
-                    onPressed: _isCollected
-                        ? () {
-                            // print(_isCollected);
-                            Navigator.push<void>(
-                              context,
-                              MaterialPageRoute<void>(
-                                builder: (BuildContext context) =>
-                                    CompletedCollectionPage(
-                                  order: widget.order,
+                visible: showFab,
+                child: SizedBox(
+                  height: 80,
+                  width: 80,
+                  child: FloatingActionButton(
+                      tooltip: 'Завершить заказ',
+                      child: isCollected
+                          ? Icon(
+                              Icons.check,
+                              size: 40,
+                              color: Colors.white,
+                            )
+                          : Icon(
+                              Icons.check,
+                              size: 40,
+                              color: Color(0xffAACB9C),
+                            ),
+                      backgroundColor:
+                          isCollected ? Color(0xff7FB069) : Color(0xffD6E5CF),
+                      onPressed: isCollected
+                          ? () {
+                              // print(isCollected);
+                              Navigator.push<void>(
+                                context,
+                                MaterialPageRoute<void>(
+                                  builder: (BuildContext context) =>
+                                      CompletedCollectionPage(
+                                    order: widget.order,
+                                  ),
                                 ),
-                              ),
-                            );
-                          }
-                        : null),
+                              );
+                            }
+                          : null),
+                ),
               );
             },
           ),
@@ -215,46 +216,39 @@ class _TabToCollectState extends State<_TabToCollect>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return ListView.builder(
-        padding: const EdgeInsets.only(top: 10),
-        shrinkWrap: true,
-        itemCount: widget.state.listOfProducts!.length,
-        itemBuilder: (context, int index) {
-          Product product = widget.state.listOfProducts![index];
-          // print(product.status);
-
-          // double height = MediaQuery.of(context).size.height / 4;
-          if (product.status == widget._pageStatus) {
-            return Column(
-              children: [
-                ProductCard(
-                  product: product,
-                ),
-                const SizedBox(
-                  height: 16,
-                )
-              ],
-            );
-          } else {
-            return
-                //       // index == 0
-                //       //     ? Padding(
-                //       //         padding: EdgeInsets.only(top: height, right: 50, left: 50),
-                //       //         child: const Text(
-                //       //           'Было бы замечательно если работа выполнялась сама собой.\nНо чтобы здесь что-то появилось, надо что-то собрать',
-                //       //           textAlign: TextAlign.center,
-                //       //           style: TextStyle(
-                //       //               fontFamily: 'Roboto',
-                //       //               fontWeight: FontWeight.w400,
-                //       //               color: Color(0xff363B3F),
-                //       //               fontSize: 15),
-                //       //         ),
-                //       //       )
-                //       //     :
-
-                Container();
-          }
-        });
+    return BlocBuilder<OrdersBloc, OrdersState>(
+      builder: (context, state) {
+        return state.loading == false
+            ? ScrollConfiguration(
+                behavior: ScrollBehavior(),
+                child: GlowingOverscrollIndicator(
+                    axisDirection: AxisDirection.down,
+                    color: Colors.grey,
+                    child: state.listOfProducts != null
+                        ? ListView.builder(
+                            padding: const EdgeInsets.all(16),
+                            shrinkWrap: true,
+                            itemCount: widget.state.listOfProducts!.length,
+                            itemBuilder: (context, int index) {
+                              Product product =
+                                  widget.state.listOfProducts![index];
+                              if (product.status == widget._pageStatus) {
+                                return AnotherProductCard(
+                                  product: product,
+                                );
+                              } else {
+                                return Container();
+                              }
+                            })
+                        : Center(
+                            child: CircularProgressIndicator(),
+                          )),
+              )
+            : Center(
+                child: CircularProgressIndicator(),
+              );
+      },
+    );
   }
 }
 
