@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 
 import 'package:agrohub_collector_flutter/model/order.dart';
@@ -37,9 +39,11 @@ class OrdersGetDetailOrder extends OrdersEvents {
 class ChangeProductStatus extends OrdersEvents {
   ChangeProductStatus(
     this.collectedQuantity, {
+    this.t,
     required this.product,
     required this.newStatus,
   });
+  Timer? t;
   double collectedQuantity = 0.0;
   final Product product;
   final String newStatus;

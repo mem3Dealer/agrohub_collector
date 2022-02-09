@@ -7,43 +7,31 @@ import 'package:agrohub_collector_flutter/model/product.dart';
 
 class OrdersState extends Equatable {
   bool? loading = false;
-  String? deliveryNumber = "";
+  bool? errorNullProducts = false;
+  bool? errorUnavailableOrder = false;
+  bool? isProdOnDelete = false;
   String? deliveryTime;
-  String? farmerName;
-  String? farmerStore;
+
   int? farmerId;
   int? orderId;
   // List<FirstOrder>? firstOrder = <FirstOrder>[];
-  List<Order>? allOrders = [];
+  List<Order>? orders = [];
   List<Product>? listOfProducts = [];
-  List<Order>? selectOrder = [];
-  List<Order>? ordersNew = [];
-  List<Order>? ordersInWork = [];
-  List<Order>? ordersCollected = [];
-  Map<String, dynamic>? initialParamsDetail;
-  int? idOrder;
-  int? farmerOrderId;
+
   String? status;
   String? deliveryId;
   int version = 0;
   Order? currentOrder;
   OrdersState({
     this.loading,
-    this.deliveryNumber,
+    this.errorNullProducts,
+    this.errorUnavailableOrder,
+    this.isProdOnDelete,
     this.deliveryTime,
-    this.farmerName,
-    this.farmerStore,
     this.farmerId,
     this.orderId,
-    this.allOrders,
+    this.orders,
     this.listOfProducts,
-    this.selectOrder,
-    this.ordersNew,
-    this.ordersInWork,
-    this.ordersCollected,
-    this.initialParamsDetail,
-    this.idOrder,
-    this.farmerOrderId,
     this.status,
     this.deliveryId,
     required this.version,
@@ -52,21 +40,14 @@ class OrdersState extends Equatable {
 
   OrdersState copyWith({
     bool? loading,
-    String? deliveryNumber,
+    bool? errorNullProducts,
+    bool? errorUnavailableOrder,
+    bool? isProdOnDelete,
     String? deliveryTime,
-    String? farmerName,
-    String? farmerStore,
     int? farmerId,
     int? orderId,
-    List<Order>? allOrders,
+    List<Order>? orders,
     List<Product>? listOfProducts,
-    List<Order>? selectOrder,
-    List<Order>? ordersNew,
-    List<Order>? ordersInWork,
-    List<Order>? ordersCollected,
-    Map<String, dynamic>? initialParamsDetail,
-    int? idOrder,
-    int? farmerOrderId,
     String? status,
     String? deliveryId,
     int? version,
@@ -74,21 +55,15 @@ class OrdersState extends Equatable {
   }) {
     return OrdersState(
       loading: loading ?? this.loading,
-      deliveryNumber: deliveryNumber ?? this.deliveryNumber,
+      errorNullProducts: errorNullProducts ?? this.errorNullProducts,
+      errorUnavailableOrder:
+          errorUnavailableOrder ?? this.errorUnavailableOrder,
+      isProdOnDelete: isProdOnDelete ?? this.isProdOnDelete,
       deliveryTime: deliveryTime ?? this.deliveryTime,
-      farmerName: farmerName ?? this.farmerName,
-      farmerStore: farmerStore ?? this.farmerStore,
       farmerId: farmerId ?? this.farmerId,
       orderId: orderId ?? this.orderId,
-      allOrders: allOrders ?? this.allOrders,
+      orders: orders ?? this.orders,
       listOfProducts: listOfProducts ?? this.listOfProducts,
-      selectOrder: selectOrder ?? this.selectOrder,
-      ordersNew: ordersNew ?? this.ordersNew,
-      ordersInWork: ordersInWork ?? this.ordersInWork,
-      ordersCollected: ordersCollected ?? this.ordersCollected,
-      initialParamsDetail: initialParamsDetail ?? this.initialParamsDetail,
-      idOrder: idOrder ?? this.idOrder,
-      farmerOrderId: farmerOrderId ?? this.farmerOrderId,
       status: status ?? this.status,
       deliveryId: deliveryId ?? this.deliveryId,
       version: version ?? this.version,
@@ -99,21 +74,14 @@ class OrdersState extends Equatable {
   Map<String, dynamic> toMap() {
     return {
       'loading': loading,
-      'deliveryNumber': deliveryNumber,
+      'errorNullProducts': errorNullProducts,
+      'errorUnavailableOrder': errorUnavailableOrder,
+      'isProdOnDelete': isProdOnDelete,
       'deliveryTime': deliveryTime,
-      'farmerName': farmerName,
-      'farmerStore': farmerStore,
       'farmerId': farmerId,
       'orderId': orderId,
-      'allOrders': allOrders?.map((x) => x.toMap()).toList(),
+      'orders': orders?.map((x) => x.toMap()).toList(),
       'listOfProducts': listOfProducts?.map((x) => x.toMap()).toList(),
-      'selectOrder': selectOrder?.map((x) => x.toMap()).toList(),
-      'ordersNew': ordersNew?.map((x) => x.toMap()).toList(),
-      'ordersInWork': ordersInWork?.map((x) => x.toMap()).toList(),
-      'ordersCollected': ordersCollected?.map((x) => x.toMap()).toList(),
-      'initialParamsDetail': initialParamsDetail,
-      'idOrder': idOrder,
-      'farmerOrderId': farmerOrderId,
       'status': status,
       'deliveryId': deliveryId,
       'version': version,
@@ -124,36 +92,19 @@ class OrdersState extends Equatable {
   factory OrdersState.fromMap(Map<String, dynamic> map) {
     return OrdersState(
       loading: map['loading'],
-      deliveryNumber: map['deliveryNumber'],
+      errorNullProducts: map['errorNullProducts'],
+      errorUnavailableOrder: map['errorUnavailableOrder'],
+      isProdOnDelete: map['isProdOnDelete'],
       deliveryTime: map['deliveryTime'],
-      farmerName: map['farmerName'],
-      farmerStore: map['farmerStore'],
       farmerId: map['farmerId']?.toInt(),
       orderId: map['orderId']?.toInt(),
-      allOrders: map['allOrders'] != null
-          ? List<Order>.from(map['allOrders']?.map((x) => Order.fromMap(x)))
+      orders: map['orders'] != null
+          ? List<Order>.from(map['orders']?.map((x) => Order.fromMap(x)))
           : null,
       listOfProducts: map['listOfProducts'] != null
           ? List<Product>.from(
               map['listOfProducts']?.map((x) => Product.fromMap(x)))
           : null,
-      selectOrder: map['selectOrder'] != null
-          ? List<Order>.from(map['selectOrder']?.map((x) => Order.fromMap(x)))
-          : null,
-      ordersNew: map['ordersNew'] != null
-          ? List<Order>.from(map['ordersNew']?.map((x) => Order.fromMap(x)))
-          : null,
-      ordersInWork: map['ordersInWork'] != null
-          ? List<Order>.from(map['ordersInWork']?.map((x) => Order.fromMap(x)))
-          : null,
-      ordersCollected: map['ordersCollected'] != null
-          ? List<Order>.from(
-              map['ordersCollected']?.map((x) => Order.fromMap(x)))
-          : null,
-      initialParamsDetail:
-          Map<String, dynamic>.from(map['initialParamsDetail']),
-      idOrder: map['idOrder']?.toInt(),
-      farmerOrderId: map['farmerOrderId']?.toInt(),
       status: map['status'],
       deliveryId: map['deliveryId'],
       version: map['version']?.toInt() ?? 0,
@@ -170,28 +121,21 @@ class OrdersState extends Equatable {
 
   @override
   String toString() {
-    return 'OrdersState(loading: $loading, deliveryNumber: $deliveryNumber, deliveryTime: $deliveryTime, farmerName: $farmerName, farmerStore: $farmerStore, farmerId: $farmerId, orderId: $orderId, allOrders: $allOrders, listOfProducts: $listOfProducts, selectOrder: $selectOrder, ordersNew: $ordersNew, ordersInWork: $ordersInWork, ordersCollected: $ordersCollected, initialParamsDetail: $initialParamsDetail, idOrder: $idOrder, farmerOrderId: $farmerOrderId, status: $status, deliveryId: $deliveryId, version: $version, currentOrder: $currentOrder)';
+    return 'OrdersState(loading: $loading, errorNullProducts: $errorNullProducts, errorUnavailableOrder: $errorUnavailableOrder, isProdOnDelete: $isProdOnDelete, deliveryTime: $deliveryTime, farmerId: $farmerId, orderId: $orderId, orders: $orders, listOfProducts: $listOfProducts, status: $status, deliveryId: $deliveryId, version: $version, currentOrder: $currentOrder)';
   }
 
   @override
   List<dynamic> get props {
     return [
       loading,
-      deliveryNumber,
+      errorNullProducts,
+      errorUnavailableOrder,
+      isProdOnDelete,
       deliveryTime,
-      farmerName,
-      farmerStore,
       farmerId,
       orderId,
-      allOrders,
+      orders,
       listOfProducts,
-      selectOrder,
-      ordersNew,
-      ordersInWork,
-      ordersCollected,
-      initialParamsDetail,
-      idOrder,
-      farmerOrderId,
       status,
       deliveryId,
       version,

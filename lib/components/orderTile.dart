@@ -52,7 +52,6 @@ class _OrderTileState extends State<OrderTile> {
   }
 
   Future<void> getProduct(Order order, BuildContext context) async {
-    // BuildContext _bCtx = myGlobals.scaffoldKey.currentContext!;
     ordersBloc.add(OrdersGetDetailOrder(
       context: widget.buildContext,
       order: order,

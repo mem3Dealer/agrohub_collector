@@ -6,7 +6,7 @@ import 'package:agrohub_collector_flutter/bloc/bloc/auth/auth_state.dart';
 import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_bloc.dart';
 import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_event.dart';
 import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_state.dart';
-import 'package:agrohub_collector_flutter/components/productCard.dart';
+import 'package:agrohub_collector_flutter/components/productCard/productCard.dart';
 import 'package:agrohub_collector_flutter/shared/globals.dart';
 import 'package:agrohub_collector_flutter/shared/myWidgets.dart';
 import 'package:expandable/expandable.dart';
@@ -50,7 +50,6 @@ class _AllOrdersPageState extends State<AllOrdersPage> {
 
   @override
   void dispose() {
-    // _controller.dispose();
     super.dispose();
   }
 
@@ -65,105 +64,68 @@ class _AllOrdersPageState extends State<AllOrdersPage> {
 
   @override
   Widget build(BuildContext cntx) {
-    return BlocBuilder<OrdersBloc, OrdersState>(
-      bloc: ordersBloc,
-      builder: (context, state) {
-        List _ctrlList = [];
-        // ExpandableController _lastCtrl = ExpandableController();
-        if (state.allOrders != null) {
-          _ctrlList = List<ExpandableController>.generate(
-              state.allOrders!.length, (index) {
-            final controller = ExpandableController();
-            controller.addListener(() {
-              // bool _isAny = false;
-              // // int? _index;
-              // for (var i = 0; i < state.allOrders!.length; i++) {
-              //   _ctrlList.any((element) {
-              //     // _index = element[index];
-              //     return _isAny = element.expanded;
-              //   });
-              //   if (i == index) {
-              //     // _index = i;
-              //     // _lastCtrl = _ctrlList[i];
-              //     print('yes');
-              //   } else if (i != index && _isAny == true) {
-              //     print('ee?');
-              //     // _isAny = false;
-              //     Future.delayed(Duration(milliseconds: 500), () {
-              //       _ctrlList[index].expanded = false;
-              //       // _ctrlList[i].expanded = false;
-              //       // _ctrlList[i].expanded = true;
-
-              //       // _ctrlList[i].toggle();
-              //       // print('ctrl collapsed $i');
-              //     });
-              //   }
-
-              //   // if (i != index) {
-
-              //   //   if()
-              //   //   _ctrlList[i].toggle();
-              //   // } else {
-              //   //   if (_ctrlList[i].expanded == false) {
-
-              //   //   }
-              //   // }
-              // }
-            });
-            // print(controller);
-            return controller;
-          });
-        }
-
-        return MyScaffold(false, false, title: 'Список заказов', body: Center(
-          child: BlocBuilder<OrdersBloc, OrdersState>(
-            builder: (_context, state) {
-              return Padding(
-                  padding: const EdgeInsets.only(top: 16.0),
-                  child: ScrollConfiguration(
-                    behavior: ScrollBehavior(),
-                    child: GlowingOverscrollIndicator(
+    return MyScaffold(false, false,
+        title: 'Список заказов',
+        body: Center(
+            child: Padding(
+                padding: const EdgeInsets.only(top: 16.0),
+                child: ScrollConfiguration(
+                  behavior: ScrollBehavior(),
+                  child: GlowingOverscrollIndicator(
                       axisDirection: AxisDirection.down,
                       color: Colors.grey,
-                      child: isError == false
-                          ? state.loading == false
-                              ? ListView.builder(
-                                  shrinkWrap: true,
-                                  itemCount: state.ordersNew?.length,
-                                  itemBuilder:
-                                      (BuildContext context, int index) {
-                                    Order order = Order();
-                                    if (state.ordersNew != null) {
-                                      order = state.ordersNew![index];
-                                    } else {
-                                      // print('sucks');
-                                      // ordersBloc.add(LoadNewOrders());
-                                    }
-                                    return OrderTile(
-                                        buildContext: cntx,
-
-                                        // controller: _ctrlList[index],
-                                        index: index,
-                                        order: order);
-                                  })
-                              : CircularProgressIndicator(
-                                  color: Color(0xffE14D43),
-                                )
-                          : Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: const [
-                                Text(
-                                  'Кажется, у нас какие-то неполадки.\nСвяжитесь с администратором.',
-                                  textAlign: TextAlign.center,
-                                )
-                              ],
-                            ),
-                    ),
-                  ));
-            },
-          ),
-        ));
-      },
-    );
+                      child: BlocConsumer<OrdersBloc, OrdersState>(
+                        listener: (context, state) {
+                          if (state.errorNullProducts == true) {
+                            MyWidgets.buildSnackBar(
+                                context: context,
+                                content:
+                                    "С этим заказом что-то не так.\nПопробуйте взять другой",
+                                secs: 2,
+                                button: true);
+                          } else if (state.errorUnavailableOrder == true) {
+                            MyWidgets.buildSnackBar(
+                                context: context,
+                                content: "Заказ больше не доступен",
+                                secs: 2,
+                                button: true);
+                          }
+                        },
+                        builder: (context, state) {
+                          return isError == false
+                              ? state.orders != null && state.loading == false
+                                  ? ListView.builder(
+                                      shrinkWrap: true,
+                                      itemCount: state.orders?.length,
+                                      itemBuilder:
+                                          (BuildContext context, int index) {
+                                        Order order = Order();
+                                        if (state.orders != null) {
+                                          order = state.orders![index];
+                                        }
+                                        return OrderTile(
+                                            buildContext: cntx,
+                                            index: index,
+                                            order: order);
+                                      })
+                                  : CircularProgressIndicator(
+                                      color: Color(0xffE14D43),
+                                    )
+                              : Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: const [
+                                    Text(
+                                      'Кажется, у нас какие-то неполадки.\nСвяжитесь с администратором.',
+                                      textAlign: TextAlign.center,
+                                    )
+                                  ],
+                                );
+                        },
+                      )),
+                ))));
   }
+}
+
+class OrdersDelivery {
+  OrdersDelivery();
 }

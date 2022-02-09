@@ -59,9 +59,10 @@ class OrdersRepository {
     List<Product> listOfProducts =
         list.map<Product>((e) => Product.fromMap(e)).toList();
     for (Product p in listOfProducts) {
-      p.status = 'collected';
-      p.collected_quantity = 5.0;
+      p.status = 'collecting';
+      p.collected_quantity = 0.0;
     }
+    // print(listOfProducts);
     return listOfProducts;
   }
 

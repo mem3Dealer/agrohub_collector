@@ -1,7 +1,7 @@
 import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_bloc.dart';
 import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_event.dart';
 import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_state.dart';
-import 'package:agrohub_collector_flutter/components/productCard.dart';
+import 'package:agrohub_collector_flutter/components/productCard/productCard.dart';
 import 'package:agrohub_collector_flutter/model/order.dart';
 import 'package:agrohub_collector_flutter/model/product.dart';
 import 'package:agrohub_collector_flutter/pages/allOrdersPage.dart';
@@ -54,12 +54,11 @@ class _CollectingOrderPageState extends State<CollectingOrderPage>
 
   @override
   Widget build(BuildContext context) {
-    // ordRep.getThisOrder(widget.order.id!);
-    // _order =  await ordRep.getThisOrder(widget.order.id!);
-    // print(widget.order);
+    bool showFab = true;
+    bool _isSnackOn = true;
     DateFormat format = DateFormat('HH:MM');
     String _time = format.format(widget.order.deliveryTime!);
-    // print(orderNumber);
+
     return WillPopScope(
       onWillPop: () async => false,
       child: DefaultTabController(
@@ -86,6 +85,7 @@ class _CollectingOrderPageState extends State<CollectingOrderPage>
                       // print("${p.name}: ${p.collected_quantity}, ${p.status}");
                     }
                   }
+
                   if (totalToCollect == 0) {
                     _tabController.animateTo(1);
                   } else if (totalCollected == 0) {
@@ -138,51 +138,55 @@ class _CollectingOrderPageState extends State<CollectingOrderPage>
                   );
                 }
               }),
-          fab: BlocBuilder<OrdersBloc, OrdersState>(
-            bloc: ordersBloc,
+          fab: BlocConsumer<OrdersBloc, OrdersState>(
+            listener: (context, state) {
+              _isSnackOn = state.isProdOnDelete == false;
+            },
             builder: (context, state) {
-              final bool showFab =
-                  MediaQuery.of(context).viewInsets.bottom == 0.0;
-              ordersBloc.state.listOfProducts?.any((prod) {
+              showFab = MediaQuery.of(context).viewInsets.bottom == 0.0;
+              state.listOfProducts?.any((prod) {
                 prod.collected_quantity == 0.0
                     ? {isCollected = false}
                     : {isCollected = true};
                 return !isCollected;
               });
               return Visibility(
-                visible: showFab,
-                child: SizedBox(
-                  height: 80,
-                  width: 80,
-                  child: FloatingActionButton(
-                      tooltip: 'Завершить заказ',
-                      child: isCollected
-                          ? Icon(
-                              Icons.check,
-                              size: 40,
-                              color: Colors.white,
-                            )
-                          : Icon(
-                              Icons.check,
-                              size: 40,
-                              color: Color(0xffAACB9C),
-                            ),
-                      backgroundColor:
-                          isCollected ? Color(0xff7FB069) : Color(0xffD6E5CF),
-                      onPressed: isCollected
-                          ? () {
-                              // print(isCollected);
-                              Navigator.push<void>(
-                                context,
-                                MaterialPageRoute<void>(
-                                  builder: (BuildContext context) =>
-                                      CompletedCollectionPage(
-                                    order: widget.order,
+                visible: _isSnackOn,
+                child: Visibility(
+                  visible: showFab,
+                  child: SizedBox(
+                    height: 80,
+                    width: 80,
+                    child: FloatingActionButton(
+                        tooltip: 'Завершить заказ',
+                        child: isCollected
+                            ? Icon(
+                                Icons.check,
+                                size: 40,
+                                color: Colors.white,
+                              )
+                            : Icon(
+                                Icons.check,
+                                size: 40,
+                                color: Color(0xffAACB9C),
+                              ),
+                        backgroundColor:
+                            isCollected ? Color(0xff7FB069) : Color(0xffD6E5CF),
+                        onPressed: isCollected
+                            ? () {
+                                // print(isCollected);
+                                Navigator.push<void>(
+                                  context,
+                                  MaterialPageRoute<void>(
+                                    builder: (BuildContext context) =>
+                                        CompletedCollectionPage(
+                                      order: widget.order,
+                                    ),
                                   ),
-                                ),
-                              );
-                            }
-                          : null),
+                                );
+                              }
+                            : null),
+                  ),
                 ),
               );
             },
@@ -218,35 +222,25 @@ class _TabToCollectState extends State<_TabToCollect>
     super.build(context);
     return BlocBuilder<OrdersBloc, OrdersState>(
       builder: (context, state) {
-        return state.loading == false
-            ? ScrollConfiguration(
-                behavior: ScrollBehavior(),
-                child: GlowingOverscrollIndicator(
-                    axisDirection: AxisDirection.down,
-                    color: Colors.grey,
-                    child: state.listOfProducts != null
-                        ? ListView.builder(
-                            padding: const EdgeInsets.all(16),
-                            shrinkWrap: true,
-                            itemCount: widget.state.listOfProducts!.length,
-                            itemBuilder: (context, int index) {
-                              Product product =
-                                  widget.state.listOfProducts![index];
-                              if (product.status == widget._pageStatus) {
-                                return AnotherProductCard(
-                                  product: product,
-                                );
-                              } else {
-                                return Container();
-                              }
-                            })
-                        : Center(
-                            child: CircularProgressIndicator(),
-                          )),
-              )
-            : Center(
-                child: CircularProgressIndicator(),
-              );
+        return ScrollConfiguration(
+            behavior: ScrollBehavior(),
+            child: GlowingOverscrollIndicator(
+                axisDirection: AxisDirection.down,
+                color: Colors.grey,
+                child: ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    shrinkWrap: true,
+                    itemCount: widget.state.listOfProducts!.length,
+                    itemBuilder: (context, int index) {
+                      Product product = widget.state.listOfProducts![index];
+                      if (product.status == widget._pageStatus) {
+                        return AnotherProductCard(
+                          product: product,
+                        );
+                      } else {
+                        return Container();
+                      }
+                    })));
       },
     );
   }

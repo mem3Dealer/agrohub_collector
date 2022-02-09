@@ -30,6 +30,9 @@ class OrdersBloc extends Bloc<OrdersEvents, OrdersState> {
   }
   List<String> _listStats = ['ACCEPTED_BY_RESTAURANT', 'READY', 'CANCELLED'];
 
+  // Stream<List<Order>> getOrders() =>
+  //     Stream.periodic(Duration(seconds: 1)).asyncMap((_) => _allOrders());
+
   Future<void> _eventOrdersGetAllOrders(
     OrdersGetAllOrders event,
     Emitter<OrdersState> emitter,
@@ -43,23 +46,18 @@ class OrdersBloc extends Bloc<OrdersEvents, OrdersState> {
       sortingOrder(orders);
       emitter(
         state.copyWith(
-          ordersNew: orders,
+          orders: orders,
           loading: false,
         ),
       );
-      // add(OrdersLoading(loading: false));
       event.onSuccess!();
     } catch (e) {
       emitter(
         state.copyWith(
           loading: false,
-          allOrders: [],
-          ordersNew: [],
-          ordersInWork: [],
-          ordersCollected: [],
+          orders: [],
         ),
       );
-      // print('we drop here?  ${state.allOrders}');
       inspect(e);
       event.onError!(e);
     }
@@ -136,15 +134,13 @@ class OrdersBloc extends Bloc<OrdersEvents, OrdersState> {
         List<Product>? _listOfProducts = await detailOrder(
           id: event.order.id!,
           onError: () {
-            MyWidgets.buildSnackBar(
-                context: event.context,
-                content: "content",
-                secs: 1,
-                button: false);
-            // Navigator.popAndPushNamed(event.context, '/allOrders');
             Navigator.canPop(event.context);
             emitter(state.copyWith(
-                listOfProducts: [], loading: false, currentOrder: Order()));
+                listOfProducts: [],
+                loading: false,
+                errorNullProducts: true,
+                currentOrder: Order()));
+            emitter(state.copyWith(errorNullProducts: false));
           },
         );
         if (_listOfProducts != null) {
@@ -167,9 +163,14 @@ class OrdersBloc extends Bloc<OrdersEvents, OrdersState> {
               loading: false,
               currentOrder:
                   event.order.copyWith(status: 'ACCEPTED_BY_RESTAURANT')));
-          // ord_rep.updateOrderStatus(data:_postData); // TODO раскоментить чтобы возобновить работу с беком
+          // ord_rep.updateOrderStatus(
+          //     data:
+          //         _postData); // TODO раскоментить чтобы возобновить работу с беком
 
         }
+      } else {
+        emitter(state.copyWith(errorUnavailableOrder: true));
+        emitter(state.copyWith(errorUnavailableOrder: false));
       }
     } catch (e) {
       emitter(state
@@ -236,9 +237,10 @@ class OrdersBloc extends Bloc<OrdersEvents, OrdersState> {
       add(OrdersLoading(loading: true));
       final List<Product>? listOfProducts =
           await ordersRepository.getDetailOrder(id);
-
+      // add(OrdersLoading(loading: false));
       return listOfProducts;
     } catch (e) {
+      add(OrdersLoading(loading: false));
       onError!();
     }
   }
