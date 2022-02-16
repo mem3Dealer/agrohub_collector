@@ -14,9 +14,7 @@ import 'package:get_it/get_it.dart';
 import 'package:intl/intl.dart';
 
 class CollectingOrderPage extends StatefulWidget {
-  // Product order; TODO это нужно сделать через блок с полем Product collecting;
   Order order;
-
   static const String routeName = '/collectingOrder';
   CollectingOrderPage(this.order, {Key? key}) : super(key: key);
 
@@ -144,49 +142,49 @@ class _CollectingOrderPageState extends State<CollectingOrderPage>
             },
             builder: (context, state) {
               showFab = MediaQuery.of(context).viewInsets.bottom == 0.0;
+
               state.listOfProducts?.any((prod) {
                 prod.collected_quantity == 0.0
                     ? {isCollected = false}
                     : {isCollected = true};
                 return !isCollected;
               });
+
+              // print('this is snack: $_isSnackOn, this is showfab: $showFab');
               return Visibility(
-                visible: _isSnackOn,
-                child: Visibility(
-                  visible: showFab,
-                  child: SizedBox(
-                    height: 80,
-                    width: 80,
-                    child: FloatingActionButton(
-                        tooltip: 'Завершить заказ',
-                        child: isCollected
-                            ? Icon(
-                                Icons.check,
-                                size: 40,
-                                color: Colors.white,
-                              )
-                            : Icon(
-                                Icons.check,
-                                size: 40,
-                                color: Color(0xffAACB9C),
-                              ),
-                        backgroundColor:
-                            isCollected ? Color(0xff7FB069) : Color(0xffD6E5CF),
-                        onPressed: isCollected
-                            ? () {
-                                // print(isCollected);
-                                Navigator.push<void>(
-                                  context,
-                                  MaterialPageRoute<void>(
-                                    builder: (BuildContext context) =>
-                                        CompletedCollectionPage(
-                                      order: widget.order,
-                                    ),
+                visible: showFab,
+                child: SizedBox(
+                  height: 80,
+                  width: 80,
+                  child: FloatingActionButton(
+                      tooltip: 'Завершить заказ',
+                      child: isCollected
+                          ? Icon(
+                              Icons.check,
+                              size: 40,
+                              color: Colors.white,
+                            )
+                          : Icon(
+                              Icons.check,
+                              size: 40,
+                              color: Color(0xffAACB9C),
+                            ),
+                      backgroundColor:
+                          isCollected ? Color(0xff7FB069) : Color(0xffD6E5CF),
+                      onPressed: isCollected
+                          ? () {
+                              // print(isCollected);
+                              Navigator.push<void>(
+                                context,
+                                MaterialPageRoute<void>(
+                                  builder: (BuildContext context) =>
+                                      CompletedCollectionPage(
+                                    order: widget.order,
                                   ),
-                                );
-                              }
-                            : null),
-                  ),
+                                ),
+                              );
+                            }
+                          : null),
                 ),
               );
             },

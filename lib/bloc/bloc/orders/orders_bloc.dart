@@ -163,9 +163,9 @@ class OrdersBloc extends Bloc<OrdersEvents, OrdersState> {
               loading: false,
               currentOrder:
                   event.order.copyWith(status: 'ACCEPTED_BY_RESTAURANT')));
-          // ord_rep.updateOrderStatus(
-          //     data:
-          //         _postData); // TODO раскоментить чтобы возобновить работу с беком
+          ord_rep.updateOrderStatus(
+              data:
+                  _postData); // TODO раскоментить чтобы возобновить работу с беком
 
         }
       } else {
@@ -175,7 +175,6 @@ class OrdersBloc extends Bloc<OrdersEvents, OrdersState> {
     } catch (e) {
       emitter(state
           .copyWith(listOfProducts: [], loading: false, currentOrder: Order()));
-      print('ERROR HAPPENED IN ORDERS BLOC, GETDETAILORDER');
       inspect(e);
       // event.onError!();
     }
@@ -198,9 +197,9 @@ class OrdersBloc extends Bloc<OrdersEvents, OrdersState> {
       'id': state.currentOrder?.id,
       'status': 'READY'
     };
-    // print('ORDER SENT: ${_orderPost.toServerMap()}');
-    // ord_rep.updateOrderStatus(data: _statusPost);
-    // ord_rep.postProducts(data: _orderPost.toServerMap());
+    print('ORDER SENT: ${_orderPost.toServerMap()}');
+    ord_rep.updateOrderStatus(data: _statusPost);
+    ord_rep.postProducts(data: _orderPost.toServerMap());
     //  TODO раскоментить чтобы возобновить работу с беком
 
     emitter(state.copyWith(listOfProducts: [], currentOrder: Order()));

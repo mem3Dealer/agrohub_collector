@@ -11,7 +11,8 @@ class HtttpSerivceOrders {
   final authBloc = GetIt.I.get<AuthenticationBloc>();
   Dio dio = Dio();
 
-  final String baseUrl = "https://dev-orders-api.agrohub.io";
+  // final String baseUrl = "https://dev-orders-api.agrohub.io"; //смотрит на тест
+  final String baseUrl = "https://orders-api.agrohub.io"; //смотрит на прод
 
   HttpServiceOrders() {
     dio = Dio(

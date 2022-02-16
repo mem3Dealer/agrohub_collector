@@ -25,8 +25,8 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _password = TextEditingController();
   @override
   void initState() {
-    super.initState();
     loadFirstPage();
+    super.initState();
     _login.addListener(() {
       if (_login.text.isNotEmpty) {
         isItCompleted();

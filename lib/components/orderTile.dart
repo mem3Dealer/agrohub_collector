@@ -133,8 +133,8 @@ class _OrderTileState extends State<OrderTile> {
                   ],
                 ),
                 collapsed: Container(
-                  child: Text('${widget.order.id}, ${widget.order.status}'),
-                ),
+                    // child: Text('${widget.order.id}, ${widget.order.status}'),
+                    ),
                 expanded: Center(
                   child: SizedBox(
                       height: 72,
