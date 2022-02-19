@@ -55,7 +55,7 @@ class OrdersRepository {
     Response<dynamic> response =
         await http.get("/orders/get_detailed_order/?order_id=$id");
     List list = response.data;
-
+    print(list);
     List<Product> listOfProducts =
         list.map<Product>((e) => Product.fromMap(e)).toList();
     for (Product p in listOfProducts) {

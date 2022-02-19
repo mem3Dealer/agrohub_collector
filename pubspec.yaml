@@ -41,7 +41,9 @@ dependencies:
   overlay_support: ^1.2.1
   flutter_svg: ^1.0.3
   expansion_tile_card: ^2.0.0
+  awesome_notifications: ^0.6.21
   community_material_icon: ^5.9.55
+  firebase_core: ^1.12.0
   flutter:
     sdk: flutter
 

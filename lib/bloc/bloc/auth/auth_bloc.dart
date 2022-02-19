@@ -43,10 +43,13 @@ class AuthenticationBloc
   ) async {
     await storage.write(key: 'token', value: '');
     await storage.write(key: 'user', value: '');
+    await storage.write(key: 'collectorId', value: '');
+    await storage.write(key: 'storeId', value: '');
     emitter(
       state.copyWith(
         JWT: '',
         role: '',
+        collectorId: 0,
       ),
     );
     event.onSuccess!();
@@ -64,7 +67,7 @@ class AuthenticationBloc
         onSuccess: event.onSuccess,
       ));
       Map<String, dynamic> payload = Jwt.parseJwt(token);
-      print(payload);
+      // print(payload);
       String role = '';
       int? farmerId = payload['farmer_id'];
       int? collectorId = payload['user_id'];

@@ -1,3 +1,5 @@
+import 'package:agrohub_collector_flutter/bloc/bloc/auth/auth_bloc.dart';
+import 'package:agrohub_collector_flutter/bloc/bloc/auth/auth_events.dart';
 import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_bloc.dart';
 import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_state.dart';
 import 'package:agrohub_collector_flutter/pages/orderInfo.dart';
@@ -24,6 +26,7 @@ class MyScaffold extends StatelessWidget {
   final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
       GlobalKey<ScaffoldMessengerState>();
   final ordersBloc = GetIt.I.get<OrdersBloc>();
+  final authBloc = GetIt.I.get<AuthenticationBloc>();
   MyGlobals myGlobals = MyGlobals();
   @override
   Widget build(BuildContext context) {
@@ -38,6 +41,15 @@ class MyScaffold extends StatelessWidget {
           resizeToAvoidBottomInset: true,
           appBar: AppBar(
             actions: <Widget>[
+              IconButton(
+                  iconSize: 30,
+                  color: Colors.red,
+                  onPressed: () {
+                    authBloc.add(AuthenticationLogout(
+                        onSuccess: () =>
+                            Navigator.pushNamed(context, '/loginPage')));
+                  },
+                  icon: Icon(Icons.logout)),
               isCollecting
                   ? BlocBuilder<OrdersBloc, OrdersState>(
                       bloc: ordersBloc,
@@ -136,126 +148,3 @@ class MyScaffold extends StatelessWidget {
     );
   }
 }
-
-// class HeadColumn extends StatelessWidget {
-//   const HeadColumn({
-//     Key? key,
-//     required this.deliveryTime,
-//     required this.isItInfo,
-//     required this.isCollecting,
-//     required this.title,
-//   }) : super(key: key);
-
-//   final String? deliveryTime;
-//   final bool isItInfo;
-//   final bool isCollecting;
-//   final String title;
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Column(
-//       children: [
-//         Header(deliveryTime: deliveryTime, isItInfo: isItInfo, title: title),
-//         if (deliveryTime != null)
-//           Row(
-//             mainAxisAlignment: MainAxisAlignment.start,
-//             children: [
-//               Padding(
-//                 padding: const EdgeInsets.only(left: 16),
-//                 child: Text(
-//                   deliveryTime!,
-//                   style: const TextStyle(
-//                       fontFamily: 'Roboto',
-//                       fontWeight: FontWeight.w500,
-//                       fontSize: 21,
-//                       color: Color(0xffE14D43)),
-//                 ),
-//               ),
-//             ],
-//           ),
-//         // isCollecting == true ?  ButtonsPanel() : const SizedBox.shrink(),
-//       ],
-//     );
-//   }
-// }
-
-// class Header extends StatelessWidget {
-//   const Header({
-//     Key? key,
-//     required this.deliveryTime,
-//     required this.isItInfo,
-//     required this.title,
-//   }) : super(key: key);
-
-//   final String? deliveryTime;
-//   final bool isItInfo;
-//   final String title;
-
-//   @override
-//   Widget build(BuildContext context) {
-//     final ordersBloc = GetIt.I.get<OrdersBloc>();
-//     return Padding(
-//       padding: const EdgeInsets.fromLTRB(16, 45, 16, 10),
-//       child: Row(
-//         // mainAxisSize: MainAxisSize.values[254],
-//         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//         children: [
-//           if (isItInfo == true)
-//             IconButton(
-//                 padding: EdgeInsets.zero,
-//                 onPressed: () {
-//                   Navigator.pop(context);
-//                 },
-//                 icon: Icon(Icons.arrow_back_ios_new_outlined)),
-//           BlocBuilder<OrdersBloc, OrdersState>(
-//             builder: (context, state) {
-//               return Container(
-//                 width: 280,
-//                 child: Text(
-//                   title,
-//                   maxLines: 1,
-//                   overflow: TextOverflow.fade,
-//                   softWrap: false,
-//                   textAlign: TextAlign.left,
-//                   style: const TextStyle(
-//                       fontFamily: 'Roboto',
-//                       fontWeight: FontWeight.w700,
-//                       fontSize: 32),
-//                 ),
-//               );
-//             },
-//           ),
-//           SizedBox(
-//             width: 10,
-//           ),
-//           deliveryTime == null
-//               ? Container()
-//               : BlocBuilder<OrdersBloc, OrdersState>(
-//                   bloc: ordersBloc,
-//                   builder: (context, state) {
-//                     return Visibility(
-//                       visible: state.listOfProducts != null
-//                           ? state.listOfProducts!.isNotEmpty
-//                               ? true
-//                               : false
-//                           : false,
-//                       child: IconButton(
-//                           iconSize: 35,
-//                           onPressed: () {
-//                             Navigator.push<void>(
-//                               context,
-//                               MaterialPageRoute<void>(
-//                                 builder: (BuildContext context) =>
-//                                     OrderInfoPage(),
-//                               ),
-//                             );
-//                           },
-//                           icon: const Icon(Icons.info_outline)),
-//                     );
-//                   },
-//                 )
-//         ],
-//       ),
-//     );
-//   }
-// }

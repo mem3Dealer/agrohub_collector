@@ -10,6 +10,7 @@ import 'package:agrohub_collector_flutter/components/productCard/productCard.dar
 import 'package:agrohub_collector_flutter/shared/globals.dart';
 import 'package:agrohub_collector_flutter/shared/myWidgets.dart';
 import 'package:expandable/expandable.dart';
+import 'package:flutter/foundation.dart';
 import 'package:intl/date_symbols.dart';
 import 'package:intl/intl.dart';
 import 'package:agrohub_collector_flutter/components/orderTile.dart';
@@ -55,10 +56,7 @@ class _AllOrdersPageState extends State<AllOrdersPage> {
 
   Future<void> getOrders() async {
     ordersBloc.add(OrdersGetAllOrders(
-        onError: (e) {
-          inspect(e);
-          isError = true;
-        },
+        onError: (e) {},
         onSuccess: () => print('Everything`s proceeding as I have forseen')));
   }
 
@@ -92,40 +90,46 @@ class _AllOrdersPageState extends State<AllOrdersPage> {
                           }
                         },
                         builder: (context, state) {
-                          return isError == false
-                              ? state.orders != null && state.loading == false
-                                  ? ListView.builder(
-                                      shrinkWrap: true,
-                                      itemCount: state.orders?.length,
-                                      itemBuilder:
-                                          (BuildContext context, int index) {
-                                        Order order = Order();
-                                        if (state.orders != null) {
-                                          order = state.orders![index];
-                                        }
-                                        return OrderTile(
-                                            buildContext: cntx,
-                                            index: index,
-                                            order: order);
-                                      })
-                                  : CircularProgressIndicator(
-                                      color: Color(0xffE14D43),
-                                    )
-                              : Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: const [
-                                    Text(
-                                      'Кажется, у нас какие-то неполадки.\nСвяжитесь с администратором.',
-                                      textAlign: TextAlign.center,
-                                    )
-                                  ],
-                                );
+                          if (state.loading == true) {
+                            return CircularProgressIndicator(
+                              color: Color(0xffE14D43),
+                            );
+                          }
+                          if (state.orders == null) {
+                            return Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: const [
+                                Text(
+                                  'Кажется, у нас какие-то неполадки.\nСвяжитесь с администратором.',
+                                  textAlign: TextAlign.center,
+                                )
+                              ],
+                            );
+                          }
+                          if (state.orders!.isEmpty == true) {
+                            return Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: const [
+                                Text(
+                                  "Новых заказов в сборку пока нет :(",
+                                  textAlign: TextAlign.center,
+                                )
+                              ],
+                            );
+                          }
+                          return ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: state.orders?.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                Order order = Order();
+                                order = state.orders![index];
+                                return OrderTile(
+                                    buildContext: cntx,
+                                    index: index,
+                                    order: order);
+                              });
                         },
                       )),
                 ))));
   }
-}
-
-class OrdersDelivery {
-  OrdersDelivery();
 }

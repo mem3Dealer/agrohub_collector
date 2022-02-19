@@ -43,6 +43,7 @@ class AnotherProductCardState extends State<AnotherProductCard> {
     _controller.addListener(() {
       double? input = double.tryParse(_controller.text);
       final _isActive = _controller.text.isNotEmpty;
+
       setState(() {
         if (input != 0.0) {
           this.isActive = _isActive;
@@ -50,6 +51,15 @@ class AnotherProductCardState extends State<AnotherProductCard> {
           this.isActive = false;
         }
       });
+      if (_controller.text.startsWith(RegExp(r'[.,]'))) {
+        _controller.text = '0.';
+        _controller.selection = TextSelection.collapsed(offset: 2);
+      }
+      if (_controller.text.contains(',')) {
+        _controller.text = _controller.text.replaceAll(RegExp('[,]'), '.');
+        _controller.selection =
+            TextSelection.collapsed(offset: _controller.text.length);
+      }
     });
   }
 
@@ -137,7 +147,8 @@ class AnotherProductCardState extends State<AnotherProductCard> {
                   ),
                   children: [
                     Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                      // crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Padding(
                           padding: const EdgeInsets.only(right: 16.0, left: 16),
@@ -155,11 +166,14 @@ class AnotherProductCardState extends State<AnotherProductCard> {
                         const SizedBox(
                           height: 32,
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 16.0),
-                          child: Text(
-                            'Товара собрано',
-                            style: _style.copyWith(fontSize: 16),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 16.0),
+                            child: Text(
+                              'Товара собрано',
+                              style: _style.copyWith(fontSize: 16),
+                            ),
                           ),
                         ),
                         const SizedBox(
@@ -167,8 +181,7 @@ class AnotherProductCardState extends State<AnotherProductCard> {
                         ),
                         //ПОЛЕ ВВОДА
                         Padding(
-                          padding: const EdgeInsets.only(
-                              right: 16.0, left: 16, bottom: 16),
+                          padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
                           child: _TextField(),
                         ),
                         Padding(
@@ -219,10 +232,12 @@ class AnotherProductCardState extends State<AnotherProductCard> {
                                       double.tryParse(_controller.text),
                                   isActive: isItCollected ? true : isActive,
                                   product: widget.product,
-                                  style: _style.copyWith(
-                                      color: isActive
-                                          ? Colors.white
-                                          : Color(0xffA9C7D0)),
+                                  style: !isItCollected
+                                      ? _style.copyWith(
+                                          color: isActive
+                                              ? Colors.white
+                                              : Color(0xffA9C7D0))
+                                      : _style.copyWith(color: Colors.white),
                                   color: isActive || isItCollected
                                       ? const Color(0xff69A8BB)
                                       : const Color(0xffE1EBEE),
@@ -247,7 +262,7 @@ class AnotherProductCardState extends State<AnotherProductCard> {
   Container _TextField() {
     bool _isCollected = widget.product.status == 'collected';
     return Container(
-        width: 350,
+        // width: 350,
         height: 56,
         decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(4),
@@ -256,12 +271,9 @@ class AnotherProductCardState extends State<AnotherProductCard> {
             )),
         child: TextFormField(
           inputFormatters: <TextInputFormatter>[
-            FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d*')),
+            FilteringTextInputFormatter.allow(RegExp(r'^\d*[.,]?\d*')),
           ],
           key: formKey,
-          // initialValue:
-          // textAlignVertical:
-          //     TextAlignVertical.top,
           onEditingComplete: _isCollected ? () => _expandCard() : null,
           onChanged: _isCollected
               ? (text) {

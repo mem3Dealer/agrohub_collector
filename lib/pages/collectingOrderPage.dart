@@ -58,7 +58,7 @@ class _CollectingOrderPageState extends State<CollectingOrderPage>
     String _time = format.format(widget.order.deliveryTime!);
 
     return WillPopScope(
-      onWillPop: () async => false,
+      onWillPop: () async => true,
       child: DefaultTabController(
         length: 2,
         child: MyScaffold(

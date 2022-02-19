@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:agrohub_collector_flutter/api/errorHandler.dart';
 import 'package:agrohub_collector_flutter/bloc/bloc/auth/auth_bloc.dart';
+import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_bloc.dart';
 
 import 'package:agrohub_collector_flutter/repositories/auth_rep.dart';
 import 'package:dio/dio.dart';
@@ -10,9 +11,9 @@ import 'package:get_it/get_it.dart';
 class HtttpSerivceOrders {
   final authBloc = GetIt.I.get<AuthenticationBloc>();
   Dio dio = Dio();
-
-  // final String baseUrl = "https://dev-orders-api.agrohub.io"; //смотрит на тест
-  final String baseUrl = "https://orders-api.agrohub.io"; //смотрит на прод
+  final ordersBloc = GetIt.I.get<OrdersBloc>();
+  final String baseUrl = "https://dev-orders-api.agrohub.io"; //смотрит на тест
+  // final String baseUrl = "https://orders-api.agrohub.io"; //смотрит на прод
 
   HttpServiceOrders() {
     dio = Dio(
@@ -80,6 +81,7 @@ class HtttpSerivceOrders {
       final String errorMessage =
           DioExceptions.fromDioError(exception as DioError).toString();
       print(errorMessage);
+
       throw Exception(errorMessage);
     }
   }

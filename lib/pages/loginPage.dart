@@ -14,6 +14,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
 
 class LoginPage extends StatefulWidget {
+  static const String routeName = '/loginPage';
   const LoginPage({Key? key}) : super(key: key);
 
   @override
