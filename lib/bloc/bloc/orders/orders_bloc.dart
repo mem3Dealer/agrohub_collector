@@ -1,6 +1,4 @@
 import 'dart:developer';
-import 'dart:io';
-
 import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_event.dart';
 import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_state.dart';
 import 'package:agrohub_collector_flutter/model/product.dart';
@@ -9,9 +7,6 @@ import 'package:agrohub_collector_flutter/model/response.dart';
 import 'package:agrohub_collector_flutter/pages/allOrdersPage.dart';
 import 'package:agrohub_collector_flutter/pages/collectingOrderPage.dart';
 import 'package:agrohub_collector_flutter/repositories/orders_rep.dart';
-import 'package:agrohub_collector_flutter/shared/myWidgets.dart';
-import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -28,12 +23,14 @@ class OrdersBloc extends Bloc<OrdersEvents, OrdersState> {
     on<FinishCollecting>(_eventFinishCollecting);
     // on<LoadNewOrders>(_eventLoadNewOrders);
     on<OrdersLoading>(_eventOrdersLoading);
+    on<QuitCollecting>(_eventQuitCollecting);
   }
   List<String> _listStats = ['ACCEPTED_BY_RESTAURANT', 'READY', 'CANCELLED'];
 
   // Stream<List<Order>> getOrders() =>
   //     Stream.periodic(Duration(seconds: 1)).asyncMap((_) => _allOrders());
 
+  //получаем все заказы
   Future<void> _eventOrdersGetAllOrders(
     OrdersGetAllOrders event,
     Emitter<OrdersState> emitter,
@@ -70,6 +67,7 @@ class OrdersBloc extends Bloc<OrdersEvents, OrdersState> {
   }) async {
     add(OrdersLoading(loading: true));
     final List<Order> orders = await ordersRepository.getNewOrders();
+
     if (orders.isNotEmpty) {
       add(OrdersLoading(loading: false));
       return orders;
@@ -85,11 +83,9 @@ class OrdersBloc extends Bloc<OrdersEvents, OrdersState> {
     });
   }
 
+  //проверка может уже был начата сборка заказа
   Future<void> _eventInitCollectingOrder(
       InitCollectingOrder event, Emitter<OrdersState> emitter) async {
-    // List<Order> orders = await _allOrders();
-    // await storage.write(
-    //     key: 'currentOrderId', value: '${event.collectingOrderId}');
     String? id = await storage.read(key: 'currentOrderId');
     try {
       if (id != null) {
@@ -98,7 +94,6 @@ class OrdersBloc extends Bloc<OrdersEvents, OrdersState> {
         currentOrder = await ord_rep.getThisOrder(int.parse(id));
 
         await detailOrder(id: currentOrder.id!).then((value) {
-          print(value);
           emitter(state.copyWith(
               currentOrder: currentOrder,
               listOfProducts: value,
@@ -119,6 +114,21 @@ class OrdersBloc extends Bloc<OrdersEvents, OrdersState> {
       print(e);
       event.onError;
     }
+  }
+
+//прекращение сборки
+  Future<void> _eventQuitCollecting(
+    QuitCollecting event,
+    Emitter<OrdersState> emitter,
+  ) async {
+    Map<String, dynamic> _postData = {
+      'id': state.currentOrder?.id,
+      'status': 'NEW'
+    };
+    ord_rep.updateOrderStatus(data: _postData);
+    await storage.write(key: 'currentOrderId', value: '0');
+    emitter(state.copyWith(listOfProducts: [], currentOrder: Order()));
+    Navigator.popAndPushNamed(event.context, '/allOrders');
   }
 
   Future<void> _eventOrdersGetDetailOrder(
@@ -152,7 +162,7 @@ class OrdersBloc extends Bloc<OrdersEvents, OrdersState> {
                 key: 'currentOrderId', value: "${event.order.id}");
           }
 
-          Navigator.push<void>(
+          Navigator.pushReplacement(
             event.context,
             MaterialPageRoute<void>(
               builder: (BuildContext _context) =>
@@ -166,9 +176,9 @@ class OrdersBloc extends Bloc<OrdersEvents, OrdersState> {
               currentOrder:
                   event.order.copyWith(status: 'ACCEPTED_BY_RESTAURANT')));
 
-          if (!kDebugMode) {
-            ord_rep.updateOrderStatus(data: _postData);
-          } // TODO раскоментить чтобы возобновить работу с беком
+          // if (!kDebugMode) {
+          ord_rep.updateOrderStatus(data: _postData);
+          // } // TODO раскоментить чтобы возобновить работу с беком
 
         }
       } else {
@@ -200,11 +210,11 @@ class OrdersBloc extends Bloc<OrdersEvents, OrdersState> {
       'id': state.currentOrder?.id,
       'status': 'READY'
     };
-    if (!kDebugMode) {
-      print('ORDER SENT: ${_orderPost.toServerMap()}');
-      ord_rep.updateOrderStatus(data: _statusPost);
-      ord_rep.postProducts(data: _orderPost.toServerMap());
-    }
+    // if (!kDebugMode) {
+    print('ORDER SENT: ${_orderPost.toServerMap()}');
+    ord_rep.updateOrderStatus(data: _statusPost);
+    ord_rep.postProducts(data: _orderPost.toServerMap());
+    // // }
     //  TODO раскоментить чтобы возобновить работу с беком
 
     emitter(state.copyWith(listOfProducts: [], currentOrder: Order()));

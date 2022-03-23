@@ -17,7 +17,7 @@ class MyWidgets {
         onVisible: () => onVisible,
         behavior: SnackBarBehavior.floating,
         duration: Duration(seconds: secs),
-        width: 360,
+        width: MediaQuery.of(context).size.width - 30,
         backgroundColor: const Color(0xffFAE2E1),
         content: SizedBox(
           height: 50,
@@ -27,6 +27,7 @@ class MyWidgets {
             children: [
               Text(content,
                   softWrap: true,
+                  textAlign: TextAlign.left,
                   style: const TextStyle(
                       fontFamily: 'Roboto',
                       fontWeight: FontWeight.w400,
@@ -37,7 +38,7 @@ class MyWidgets {
                       onPressed: () {
                         // Navigator.popAndPushNamed(context, '/allOrders');
                       },
-                      child: const Text('¯\_(ツ)_/¯',
+                      child: const Text('¯\\_(ツ)_/¯',
                           style: TextStyle(
                               fontFamily: 'Roboto',
                               fontWeight: FontWeight.w700,

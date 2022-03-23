@@ -1,10 +1,9 @@
 import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_bloc.dart';
-import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_event.dart';
 import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_state.dart';
 import 'package:agrohub_collector_flutter/components/productCard/productCard.dart';
 import 'package:agrohub_collector_flutter/model/order.dart';
 import 'package:agrohub_collector_flutter/model/product.dart';
-import 'package:agrohub_collector_flutter/pages/allOrdersPage.dart';
+
 import 'package:agrohub_collector_flutter/pages/completedCollectionPage.dart';
 import 'package:agrohub_collector_flutter/repositories/orders_rep.dart';
 import 'package:agrohub_collector_flutter/shared/myScaffold.dart';
@@ -54,7 +53,7 @@ class _CollectingOrderPageState extends State<CollectingOrderPage>
   Widget build(BuildContext context) {
     bool showFab = true;
     bool _isSnackOn = true;
-    DateFormat format = DateFormat('HH:MM');
+    DateFormat format = DateFormat('HH:mm');
     String _time = format.format(widget.order.deliveryTime!);
 
     return WillPopScope(
@@ -69,7 +68,6 @@ class _CollectingOrderPageState extends State<CollectingOrderPage>
           body: BlocBuilder<OrdersBloc, OrdersState>(
               bloc: ordersBloc,
               builder: (context, state) {
-                // print('THIS IS STATE`S FIRST: ${state.listOfProducts!.first}');
                 int totalCollected = 0;
                 int totalToCollect = 0;
                 if (state.loading == false) {
@@ -80,7 +78,6 @@ class _CollectingOrderPageState extends State<CollectingOrderPage>
                       } else if (p.status == 'collected') {
                         totalCollected++;
                       }
-                      // print("${p.name}: ${p.collected_quantity}, ${p.status}");
                     }
                   }
 
@@ -149,8 +146,6 @@ class _CollectingOrderPageState extends State<CollectingOrderPage>
                     : {isCollected = true};
                 return !isCollected;
               });
-
-              // print('this is snack: $_isSnackOn, this is showfab: $showFab');
               return Visibility(
                 visible: showFab,
                 child: SizedBox(
@@ -173,7 +168,6 @@ class _CollectingOrderPageState extends State<CollectingOrderPage>
                           isCollected ? Color(0xff7FB069) : Color(0xffD6E5CF),
                       onPressed: isCollected
                           ? () {
-                              // print(isCollected);
                               Navigator.push<void>(
                                 context,
                                 MaterialPageRoute<void>(

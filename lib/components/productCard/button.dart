@@ -45,10 +45,8 @@ class _ButtonState extends State<MyButton> {
     return ElevatedButton(
       onPressed: widget.isActive ?? true
           ? () {
-              // print('WT: ${widget.text}, incoming: ${widget.product.status}');
               setState(() {
                 if (widget.text == 'Удалить') {
-                  // changeStatus(widget.product, 'deleted');
                   widget.onDelete!();
                 } else if (widget.text == 'Вернуть в Собрать') {
                   changeStatus(widget.product, 'collecting');

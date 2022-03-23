@@ -1,17 +1,15 @@
 import 'dart:developer';
-
 import 'package:agrohub_collector_flutter/bloc/bloc/auth/auth_bloc.dart';
 import 'package:agrohub_collector_flutter/bloc/bloc/auth/auth_events.dart';
 import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_bloc.dart';
 import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_event.dart';
-import 'package:agrohub_collector_flutter/model/order.dart';
 import 'package:agrohub_collector_flutter/pages/allOrdersPage.dart';
-import 'package:agrohub_collector_flutter/pages/collectingOrderPage.dart';
-import 'package:agrohub_collector_flutter/repositories/auth_rep.dart';
+import 'package:agrohub_collector_flutter/shared/myWidgets.dart';
 import 'package:community_material_icon/community_material_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
+import 'package:tap_debouncer/tap_debouncer.dart';
 
 class LoginPage extends StatefulWidget {
   static const String routeName = '/loginPage';
@@ -75,7 +73,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void hideErrorText() {
-    Future.delayed(Duration(seconds: 2)).then((value) {
+    Future.delayed(Duration(seconds: 1)).then((value) {
       setState(() {
         isError = false;
       });
@@ -107,7 +105,7 @@ class _LoginPageState extends State<LoginPage> {
                   collectingOrderId: currentCollectingOrderId,
                   context: context));
             } else {
-              Navigator.pushReplacement<void, void>(
+              Navigator.pushReplacement(
                   context,
                   MaterialPageRoute<void>(
                     builder: (BuildContext context) => const AllOrdersPage(),
@@ -121,33 +119,34 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  loginFarmer() {
+  Future<void> loginFarmer() async {
     setState(() {
       isLoading = true;
     });
-    Future.delayed(Duration(seconds: 2)).then((value) {
-      authBloc.add(
-        AuthenticationLogIn(
-          login: _login.text,
-          password: _password.text,
-          onError: (dynamic e) {
-            inspect(e);
-            // errorToast(
-            //   message: e.message,
-            //   context: context,
-            // );
-            setState(() {
-              isLoading = false;
-              isError = true;
-            });
-            hideErrorText();
-          },
-          onSuccess: () {
-            loadFirstPage();
-          },
-        ),
-      );
-    });
+    authBloc.add(
+      await AuthenticationLogIn(
+        login: _login.text,
+        password: _password.text,
+        onError: (dynamic e) {
+          inspect(e);
+
+          // errorToast(
+          //   message: e.message,
+          //   context: context,
+          // );
+          setState(() {
+            isLoading = false;
+            isError = true;
+            ScaffoldMessenger.of(context)
+                .showSnackBar(SnackBar(content: Text(e.toString())));
+          });
+          hideErrorText();
+        },
+        onSuccess: () {
+          loadFirstPage();
+        },
+      ),
+    );
   }
 
   @override
@@ -180,78 +179,107 @@ class _LoginPageState extends State<LoginPage> {
 
     return Scaffold(
       backgroundColor: const Color(0xffF1F1F1),
-      body: ListView(
-        shrinkWrap: true,
-        padding: const EdgeInsets.only(
-          left: 16,
-          bottom: 40,
-          right: 16,
-          // top: 32,
-        ),
-        children: <Widget>[
-          const Padding(
-            padding: EdgeInsets.only(bottom: 24.0, top: 40),
-            child: SizedBox(
-              height: 48,
-              child: Text(
-                'Форма входа',
-                // textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontWeight: FontWeight.w700,
-                  color: Color(0xff363B3F),
-                  fontSize: 32,
+      body: Center(
+        child: ListView(
+          shrinkWrap: true,
+          padding: const EdgeInsets.only(
+            left: 16,
+            bottom: 40,
+            right: 16,
+            // top: 32,
+          ),
+          children: <Widget>[
+            const Padding(
+              padding: EdgeInsets.only(bottom: 24.0, top: 40),
+              child: SizedBox(
+                height: 48,
+                child: Text(
+                  'Форма входа',
+                  // textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xff363B3F),
+                    fontSize: 32,
+                  ),
                 ),
               ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 16.0),
-            child: loginField(_style, inDec),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 16),
-            child: passwordField(_style, inDec),
-          ),
-          isError
-              ? Container(
-                  padding: EdgeInsets.only(bottom: 5),
-                  child: Text(
-                    'Введите правильный логин и пароль',
-                    style: _style.copyWith(color: Colors.red),
-                  ))
-              : SizedBox.shrink(),
-          enterButton(isItCompleted(), isLoading),
-        ],
+            Padding(
+              padding: const EdgeInsets.only(bottom: 16.0),
+              child: loginField(_style, inDec),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: passwordField(_style, inDec),
+            ),
+            isError
+                ? Container(
+                    padding: EdgeInsets.only(bottom: 5),
+                    child: Text(
+                      'Введите правильный логин и пароль',
+                      style: _style.copyWith(color: Colors.red),
+                    ))
+                : SizedBox.shrink(),
+            enterButton(isItCompleted()),
+          ],
+        ),
       ),
     );
   }
 
-  SizedBox enterButton(bool isItComplete, bool isLoading) {
+  SizedBox enterButton(bool isItComplete) {
     return SizedBox(
       height: 56,
       width: 382,
-      child: isLoading
-          ? Center(
-              child: CircularProgressIndicator(
-              color: Color(0xffE14D43),
-            ))
-          : ElevatedButton(
-              style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all<Color>(isItComplete
-                    ? const Color(0xff69A8BB)
-                    : const Color(0xffE1EBEE)),
-              ),
-              onPressed: isItComplete ? loginFarmer : null,
-              child: Text(
-                'Войти',
-                style: TextStyle(
-                  color: isItComplete ? Colors.white : Color(0xffA9C7D0),
-                  fontFamily: "Roboto",
-                  fontWeight: FontWeight.w400,
-                  fontSize: 18,
-                ),
-              ),
-            ),
+      // child: TapDebouncer(
+      //   cooldown: const Duration(milliseconds: 1000),
+      //   onTap: isItComplete ? loginFarmer : null,
+      //   waitBuilder: (BuildContext context, Widget child) {
+      //     return Center(
+      //         child: CircularProgressIndicator(
+      //       color: Color(0xffE14D43),
+      //     ));
+      //   },
+      //   builder: (context, _onTap) {
+      //     return ElevatedButton(
+      //       style: ButtonStyle(
+      //         backgroundColor: MaterialStateProperty.all<Color>(isItComplete
+      //             ? const Color(0xff69A8BB)
+      //             : const Color(0xffE1EBEE)),
+      //       ),
+      //       onPressed: _onTap,
+      //       child: Text(
+      //         'Войти',
+      //         style: TextStyle(
+      //           color: isItComplete ? Colors.white : Color(0xffA9C7D0),
+      //           fontFamily: "Roboto",
+      //           fontWeight: FontWeight.w400,
+      //           fontSize: 18,
+      //         ),
+      //       ),
+      //     );
+      //   },
+      // )
+      // ? Center(
+      //     child: CircularProgressIndicator(
+      //     color: Color(0xffE14D43),
+      //   ))
+      child: ElevatedButton(
+        style: ButtonStyle(
+          backgroundColor: MaterialStateProperty.all<Color>(
+              isItComplete ? const Color(0xff69A8BB) : const Color(0xffE1EBEE)),
+        ),
+        onPressed: isItComplete ? loginFarmer : null,
+        child: Text(
+          'Войдите',
+          style: TextStyle(
+            color: isItComplete ? Colors.white : Color(0xffA9C7D0),
+            fontFamily: "Roboto",
+            fontWeight: FontWeight.w400,
+            fontSize: 18,
+          ),
+        ),
+      ),
     );
   }
 

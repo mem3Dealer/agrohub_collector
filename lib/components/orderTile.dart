@@ -1,13 +1,8 @@
-import 'dart:developer';
-
 import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_bloc.dart';
 import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_event.dart';
 import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_state.dart';
 import 'package:agrohub_collector_flutter/model/order.dart';
-import 'package:agrohub_collector_flutter/pages/collectingOrderPage.dart';
-import 'package:agrohub_collector_flutter/shared/globals.dart';
-import 'package:agrohub_collector_flutter/shared/myScaffold.dart';
-import 'package:agrohub_collector_flutter/shared/myWidgets.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -37,8 +32,6 @@ class OrderTile extends StatefulWidget {
 
 class _OrderTileState extends State<OrderTile> {
   final ordersBloc = GetIt.I.get<OrdersBloc>();
-  bool _isLoading = false;
-  MyGlobals myGlobals = MyGlobals();
 
   @override
   void initState() {
@@ -48,7 +41,6 @@ class _OrderTileState extends State<OrderTile> {
   @override
   void dispose() {
     super.dispose();
-    // widget.controller.dispose();
   }
 
   Future<void> getProduct(Order order, BuildContext context) async {
@@ -62,8 +54,12 @@ class _OrderTileState extends State<OrderTile> {
   Widget build(
     BuildContext context,
   ) {
-    DateFormat format = DateFormat('HH:MM');
+    DateFormat format = DateFormat('HH:mm');
+    DateFormat _dayFormat = DateFormat('dd.MM.yy');
+    String _day =
+        _dayFormat.format(widget.order.deliveryTime ?? DateTime.now());
     String _time = format.format(widget.order.deliveryTime ?? DateTime.now());
+
     return Padding(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
         child: BlocBuilder<OrdersBloc, OrdersState>(
@@ -83,28 +79,34 @@ class _OrderTileState extends State<OrderTile> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 12, 0, 4),
+                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
-                              "Заказ №${widget.order.agregatorOrderId}",
-                              textAlign: TextAlign.left,
-                              style: const TextStyle(
-                                  color: Color(0xff363B3F),
-                                  fontFamily: 'Roboto',
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w700),
+                            Flexible(
+                              child: Text(
+                                "Заказ №${widget.order.agregatorOrderId}",
+                                maxLines: 1,
+                                overflow: TextOverflow.fade,
+                                softWrap: false,
+                                textAlign: TextAlign.left,
+                                style: const TextStyle(
+                                    color: Color(0xff363B3F),
+                                    fontFamily: 'Roboto',
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w700),
+                              ),
                             ),
                             Padding(
-                              padding: const EdgeInsets.only(right: 16.0),
-                              child: Container(
-                                width: 32,
-                                height: 32,
-                                decoration: BoxDecoration(
-                                    image: DecorationImage(
-                                        image: AssetImage(
-                                            'assets/images/expIcon.png'))),
+                              padding: const EdgeInsets.only(left: 8.0),
+                              child: Text(
+                                _day,
+                                style: TextStyle(
+                                  color: Color(0xff999999),
+                                  fontWeight: FontWeight.w500,
+                                  fontFamily: 'Roboto',
+                                  fontSize: 16,
+                                ),
                               ),
                             )
                           ],
@@ -115,9 +117,9 @@ class _OrderTileState extends State<OrderTile> {
                       color: Color(0xff69A8BB),
                     ),
                     Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+                      padding: const EdgeInsets.fromLTRB(16, 16, 28, 16),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
                             _time,
@@ -127,13 +129,23 @@ class _OrderTileState extends State<OrderTile> {
                                 fontSize: 16,
                                 fontWeight: FontWeight.w500),
                           ),
+                          Container(
+                            width: 32,
+                            height: 32,
+                            decoration: BoxDecoration(
+                                image: DecorationImage(
+                                    image: AssetImage(
+                                        'assets/images/expIcon.png'))),
+                          )
                         ],
                       ),
                     ),
                   ],
                 ),
                 collapsed: Container(
-                  child: Text('${widget.order.id}, ${widget.order.status}'),
+                  child: kDebugMode
+                      ? Text('${widget.order.id}, ${widget.order.status}')
+                      : null,
                 ),
                 expanded: Center(
                   child: SizedBox(
@@ -152,9 +164,6 @@ class _OrderTileState extends State<OrderTile> {
                               )),
                               onPressed: () {
                                 getProduct(widget.order, context);
-                                setState(() {
-                                  _isLoading = true;
-                                });
                               },
                               child: Text(
                                 'Начать сборку',

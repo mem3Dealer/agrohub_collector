@@ -1,11 +1,9 @@
 import 'dart:async';
-import 'package:agrohub_collector_flutter/main.dart';
 import 'package:agrohub_collector_flutter/repositories/auth_rep.dart';
 import 'package:bloc/bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:jwt_decode/jwt_decode.dart';
-
+import '../../../notifications/notification_service.dart';
 import 'auth_events.dart';
 import 'auth_state.dart';
 
@@ -14,7 +12,9 @@ List<int> storeToEditable = <int>[114, 101, 122];
 class AuthenticationBloc
     extends Bloc<AuthenticationEvent, AuthenticationState> {
   final AuthenticationRepository _authenticationRepository;
+  // late final ordersBloc = GetIt.I.get<OrdersBloc>();
   final FlutterSecureStorage storage = const FlutterSecureStorage();
+  final notes = Notifications();
 
   AuthenticationBloc({
     required AuthenticationRepository authenticationRepository,
@@ -22,21 +22,10 @@ class AuthenticationBloc
         super(AuthenticationState()) {
     on<AuthenticationLogIn>(_onEventAuthenticationLogIn);
     on<AuthenticationInit>(_onEventAuthenticationInit);
-    on<AuthenticationLoading>(_onEventAuthenticationLoading);
     on<AuthenticationLogout>(_onEventAuthenticationLogout);
   }
 
-  Future<void> _onEventAuthenticationLoading(
-    AuthenticationLoading event,
-    Emitter<AuthenticationState> emitter,
-  ) async {
-    emitter(
-      state.copyWith(
-        loading: event.loading,
-      ),
-    );
-  }
-
+  //логаут
   Future<void> _onEventAuthenticationLogout(
     AuthenticationLogout event,
     Emitter<AuthenticationState> emitter,
@@ -55,6 +44,7 @@ class AuthenticationBloc
     event.onSuccess!();
   }
 
+  //логин
   void _onEventAuthenticationLogIn(
     AuthenticationLogIn event,
     Emitter<AuthenticationState> emitter,
@@ -80,6 +70,7 @@ class AuthenticationBloc
         role = 'collector';
       }
       isChangePrice = storeToEditable.contains(payload['store_id']);
+      notes.subcscribeForNotesOfNewOrders();
 
       // if (farmerId != null) {
       //   // await FirebaseMessaging.instance.subscribeToTopic('farmer');
@@ -92,6 +83,7 @@ class AuthenticationBloc
       // await FirebaseMessaging.instance
       //     .getToken()
       //     .then((String? value) => print('token firebase $value'));
+      //TODO я не очень помню зачем это всё нужно
       await storage.write(key: 'role', value: role);
       await storage.write(key: 'storeId', value: storeId.toString());
       await storage.write(key: 'farmerId', value: farmerId.toString());
@@ -113,10 +105,12 @@ class AuthenticationBloc
     }
   }
 
+  //Проверка может юзер уже был залогинен
   Future<void> _onEventAuthenticationInit(
     AuthenticationInit event,
     Emitter<AuthenticationState> emitter,
   ) async {
+    notes.subcscribeForNotesOfNewOrders(); //Нужно ли это здесь?
     Map<String, dynamic>? userInfo = await _initUser(onError: event.onError);
     if (userInfo != null) {
       emitter(
@@ -128,10 +122,7 @@ class AuthenticationBloc
             collectorId: userInfo['collectorId'],
             currentCollectingOrderId: userInfo['currentCollectingOrderId']),
       );
-      // print('HERE currentCollectingOrderId: ${state.currentCollectingOrderId}');
       event.onSuccess(userInfo['role'], userInfo['currentCollectingOrderId']);
-      // event.onSuccess(userInfo['currentCollectingOrderId']) ??
-      //     event.onSuccess(0);
     } else {
       event.onError();
     }
@@ -158,7 +149,6 @@ class AuthenticationBloc
 
     if (token != '' && token != null) {
       String? _source = await storage.read(key: 'currentOrderId');
-      // print('THAS: $_source');
       int? _id = int.tryParse(_source ?? '0');
       String? storeId = await storage.read(key: 'storeId');
       String? collectorId = await storage.read(key: 'collectorId');

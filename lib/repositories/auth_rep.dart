@@ -12,7 +12,6 @@ class AuthenticationRepository {
       'username': login,
       'password': password,
     });
-    print(JWTResponse.data['access']);
     return JWTResponse.data['access'];
   }
 }

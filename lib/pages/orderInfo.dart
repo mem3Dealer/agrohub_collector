@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_bloc.dart';
 import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_state.dart';
 import 'package:agrohub_collector_flutter/model/order.dart';
@@ -12,23 +10,20 @@ import 'package:intl/intl.dart';
 
 class OrderInfoPage extends StatelessWidget {
   final ordersBloc = GetIt.I.get<OrdersBloc>();
-  // String orderNumber;
-  // String deliveryTime;
   static const String routeName = '/infoOrder';
-  OrderInfoPage(
-      // this.deliveryTime, this.orderNumber,
-      {Key? key})
-      : super(key: key);
+  OrderInfoPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<OrdersBloc, OrdersState>(
       bloc: ordersBloc,
       builder: (context, state) {
+        DateFormat _dayFormat = DateFormat('dd.MM.yy');
         List<Product> _list = ordersBloc.state.listOfProducts!;
         Order order = ordersBloc.state.currentOrder!;
-        DateFormat format = DateFormat('HH:MM');
+        DateFormat format = DateFormat('HH:mm');
         String _time = format.format(order.deliveryTime!);
+        String date = _dayFormat.format(order.deliveryTime!);
         double totalWeight = 0.0;
         // double totalPrice = 0.0;
         for (Product e in _list) {
@@ -39,7 +34,6 @@ class OrderInfoPage extends StatelessWidget {
           height: 12,
         );
         var _wdt = MediaQuery.of(context).size.width;
-        print(_wdt);
 
         return MyScaffold(true, false,
             title: "Заказ №${order.agregatorOrderId}",
@@ -60,7 +54,7 @@ class OrderInfoPage extends StatelessWidget {
                             Padding(
                               padding: EdgeInsets.only(
                                   left: 16, top: 16, bottom: 16),
-                              child: Text('Детали заказа',
+                              child: Text('Детали заказа:',
                                   style: TextStyle(
                                       fontFamily: 'Roboto',
                                       fontWeight: FontWeight.w500,
@@ -75,6 +69,8 @@ class OrderInfoPage extends StatelessWidget {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
+                                  leftSide('Дата заказа:'),
+                                  _sB,
                                   leftSide('Время доставки:'),
                                   _sB,
                                   leftSide('Количество товаров:'),
@@ -92,6 +88,8 @@ class OrderInfoPage extends StatelessWidget {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
+                                    rightSide(date),
+                                    _sB,
                                     rightSide(_time, isTime: true),
                                     _sB,
                                     rightSide('${_list.length} шт.'),

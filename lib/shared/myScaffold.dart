@@ -1,9 +1,10 @@
 import 'package:agrohub_collector_flutter/bloc/bloc/auth/auth_bloc.dart';
 import 'package:agrohub_collector_flutter/bloc/bloc/auth/auth_events.dart';
 import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_bloc.dart';
+import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_event.dart';
 import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_state.dart';
+import 'package:agrohub_collector_flutter/pages/loginPage.dart';
 import 'package:agrohub_collector_flutter/pages/orderInfo.dart';
-import 'package:agrohub_collector_flutter/shared/globals.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
@@ -27,7 +28,7 @@ class MyScaffold extends StatelessWidget {
       GlobalKey<ScaffoldMessengerState>();
   final ordersBloc = GetIt.I.get<OrdersBloc>();
   final authBloc = GetIt.I.get<AuthenticationBloc>();
-  MyGlobals myGlobals = MyGlobals();
+
   @override
   Widget build(BuildContext context) {
     // deliveryTime = '12:00-15:00';
@@ -35,44 +36,63 @@ class MyScaffold extends StatelessWidget {
     return ScaffoldMessenger(
       key: scaffoldMessengerKey,
       child: Scaffold(
-          key: myGlobals.scaffoldKey,
           floatingActionButton: fab,
           backgroundColor: const Color(0xffF1F1F1),
           resizeToAvoidBottomInset: true,
           appBar: AppBar(
             actions: <Widget>[
-              IconButton(
-                  iconSize: 30,
-                  color: Colors.red,
-                  onPressed: () {
-                    authBloc.add(AuthenticationLogout(
-                        onSuccess: () =>
-                            Navigator.pushNamed(context, '/loginPage')));
-                  },
-                  icon: Icon(Icons.logout)),
+              !isCollecting && !isItInfo
+                  ? IconButton(
+                      iconSize: 30,
+                      color: Colors.red,
+                      onPressed: () {
+                        authBloc.add(AuthenticationLogout(
+                            onSuccess: () => Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute<void>(
+                                    builder: (BuildContext context) =>
+                                        const LoginPage(),
+                                  ),
+                                )));
+                      },
+                      icon: Icon(Icons.logout))
+                  : SizedBox.shrink(),
               isCollecting
                   ? BlocBuilder<OrdersBloc, OrdersState>(
                       bloc: ordersBloc,
                       builder: (context, state) {
-                        return Visibility(
-                          visible: state.listOfProducts != null
-                              ? state.listOfProducts!.isNotEmpty
-                                  ? true
-                                  : false
-                              : false,
-                          child: IconButton(
-                              color: Color(0xff363B3F),
-                              iconSize: 35,
-                              onPressed: () {
-                                Navigator.push<void>(
-                                  context,
-                                  MaterialPageRoute<void>(
-                                    builder: (BuildContext context) =>
-                                        OrderInfoPage(),
-                                  ),
-                                );
-                              },
-                              icon: const Icon(Icons.info_outline)),
+                        return Row(
+                          children: [
+                            IconButton(
+                                onPressed: () {
+                                  ordersBloc
+                                      .add(QuitCollecting(context: context));
+                                },
+                                icon: Icon(
+                                  Icons.arrow_back,
+                                  color: Colors.black,
+                                )),
+                            Visibility(
+                              visible: state.listOfProducts != null
+                                  ? state.listOfProducts!.isNotEmpty
+                                      ? true
+                                      : false
+                                  : false,
+                              child: IconButton(
+                                  color: Color(0xff363B3F),
+                                  iconSize: 35,
+                                  onPressed: () {
+                                    Navigator.push<void>(
+                                      context,
+                                      MaterialPageRoute<void>(
+                                        builder: (BuildContext context) =>
+                                            OrderInfoPage(),
+                                      ),
+                                    );
+                                  },
+                                  icon: const Icon(Icons.info_outline)),
+                            ),
+                          ],
                         );
                       },
                     )

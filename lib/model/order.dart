@@ -60,11 +60,11 @@ class Order {
       agregatorExternalOrderId: map['agregator_external_order_id']?.toInt(),
       agregatorOrderId: map['agregator_order_id'],
       agregatorOrderTime: map['agregator_order_time'] != null
-          ? DateFormat('EEE, dd MMM yyyy HH:MM')
+          ? DateFormat('E, d MMM yyyy HH:mm:ss')
               .parse(map['agregator_order_time'] as String)
           : null,
       agrohubOrderTime: map['agrohub_order_time'] != null
-          ? DateFormat('EEE, dd MMM yyyy HH:MM')
+          ? DateFormat('E, d MMM yyyy HH:mm:ss')
               .parse(map['agrohub_order_time'] as String)
           : null,
       clientName: map['client_name'],
@@ -72,7 +72,7 @@ class Order {
       comment: map['comment'],
       // deliveryId: map['delivery_id'],
       deliveryTime: map['delivery_time'] != null
-          ? DateFormat('EEE, dd MMM yyyy HH:MM')
+          ? DateFormat('E, d MMM yyyy HH:mm:ss')
               .parse(map['delivery_time'] as String)
           : null,
       discriminator: map['discriminator'],
@@ -86,7 +86,7 @@ class Order {
       totalPrice: map['total_price']?.toDouble(),
       unitsPrice: map['units_price']?.toDouble(),
       updatedAt: map['updated_at'] != null
-          ? DateFormat('EEE, dd MMM yyyy HH:MM')
+          ? DateFormat('E, d MMM yyyy HH:mm:ss')
               .parse(map['updated_at'] as String)
           : null,
     );

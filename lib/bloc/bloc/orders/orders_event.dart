@@ -66,10 +66,10 @@ class FinishCollecting extends OrdersEvents {
   FinishCollecting({required this.context});
 }
 
-class LoadNewOrders extends OrdersEvents {
-  // BuildContext context;
-  LoadNewOrders();
-}
+// class LoadNewOrders extends OrdersEvents {
+//   // BuildContext context;
+//   LoadNewOrders();
+// }
 
 // class CollectProduct extends OrdersEvents {
 //   CollectProduct({
@@ -84,4 +84,9 @@ class OrdersLoading extends OrdersEvents {
   OrdersLoading({
     required this.loading,
   });
+}
+
+class QuitCollecting extends OrdersEvents {
+  BuildContext context;
+  QuitCollecting({required this.context});
 }

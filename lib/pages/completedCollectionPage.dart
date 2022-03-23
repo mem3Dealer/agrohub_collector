@@ -2,9 +2,7 @@ import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_bloc.dart';
 import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_event.dart';
 import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_state.dart';
 import 'package:agrohub_collector_flutter/model/order.dart';
-import 'package:agrohub_collector_flutter/pages/allOrdersPage.dart';
 import 'package:agrohub_collector_flutter/repositories/orders_rep.dart';
-import 'package:agrohub_collector_flutter/shared/myScaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
@@ -28,7 +26,6 @@ class CompletedCollectionPage extends StatelessWidget {
       bloc: ordersBloc,
       builder: (context, state) {
         ordRep.getThisOrder(order.id!);
-        // print('{ORDER FROM FINISH: ${state.currentOrder}}');
         return Scaffold(
           body: Container(
             child: Column(
@@ -71,7 +68,6 @@ class CompletedCollectionPage extends StatelessWidget {
                             backgroundColor: MaterialStateProperty.all(
                                 const Color(0xff69A8BB))),
                         onPressed: () async {
-                          // print(state.currentOrder);
                           _finishCollecting(context);
                         },
                         child: const Text(

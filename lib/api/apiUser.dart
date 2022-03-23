@@ -11,8 +11,8 @@ class HttpService {
       AuthenticationBloc(authenticationRepository: authRep);
   late Dio _dio;
 
-  final String baseUrl = "https://dev-base-api.agrohub.io"; //смотрит на тест
-  // final String baseUrl = "https://base-api.agrohub.io"; //смотрит на прод
+  // final String baseUrl = "https://dev-base-api.agrohub.io"; //смотрит на тест
+  final String baseUrl = "https://base-api.agrohub.io"; //смотрит на прод
 
   HttpService() {
     _dio = Dio(

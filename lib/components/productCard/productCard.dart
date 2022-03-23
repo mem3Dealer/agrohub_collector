@@ -159,10 +159,10 @@ class AnotherProductCardState extends State<AnotherProductCard> {
                           ),
                         ),
                         // ЦЕНА ------ ЦЕНА
-                        Padding(
-                          padding: const EdgeInsets.only(right: 16.0, left: 16),
-                          child: PriceRow(style: _style, widget: widget),
-                        ),
+                        // Padding(
+                        //   padding: const EdgeInsets.only(right: 16.0, left: 16),
+                        //   child: PriceRow(style: _style, widget: widget),
+                        // ),
                         const SizedBox(
                           height: 32,
                         ),
@@ -223,9 +223,7 @@ class AnotherProductCardState extends State<AnotherProductCard> {
                               const SizedBox(
                                 width: 16,
                               ),
-                              SizedBox(
-                                width: 170,
-                                height: 56,
+                              Expanded(
                                 child: MyButton(
                                   controller: _controller,
                                   collectedQuantity:
@@ -330,7 +328,7 @@ class AnotherProductCardState extends State<AnotherProductCard> {
           : Text(
               widget.product.product_type == 'per_kilo'
                   ? '$_orderedQuantity кг'
-                  : '$_orderedQuantity шт',
+                  : '${_orderedQuantity.toInt()} шт',
               // : '$_orderedQuantity шт',
               // state
               //   .listOfProducts!.first.ordered_quantity

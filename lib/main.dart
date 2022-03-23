@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:agrohub_collector_flutter/api/apiOrders.dart';
 import 'package:agrohub_collector_flutter/bloc/bloc/network/network_bloc.dart';
 import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_bloc.dart';
@@ -20,19 +22,29 @@ import 'package:overlay_support/overlay_support.dart';
 final AuthenticationRepository _authenticationRepository =
     AuthenticationRepository();
 final OrdersRepository _ordersRepository = OrdersRepository();
-
+final ordersBloc = GetIt.I.get<OrdersBloc>();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  // FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
   AwesomeNotifications().initialize(null, [
     NotificationChannel(
+        playSound: true,
+        enableLights: true,
         enableVibration: true,
-        importance: NotificationImportance.High,
+        importance: NotificationImportance.Max,
         channelKey: 'new_order',
         channelName: 'New Order',
-        channelDescription: 'Канал для пушей о новых заказах')
+        channelDescription: 'Канал для пушей о новых заказах'),
+    NotificationChannel(
+        enableVibration: true,
+        playSound: true,
+        enableLights: true,
+        importance: NotificationImportance.Max,
+        channelKey: 'local_reminder',
+        channelName: 'Local Reminder',
+        channelDescription: 'Отложенные локальные уведомления')
   ]);
 
   GetIt.instance
@@ -46,21 +58,25 @@ void main() async {
   runApp(MyApp());
 }
 
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  // If you're going to use other Firebase services in the background, such as Firestore,
-  // make sure you call `initializeApp` before using other Firebase services.
-  // await Firebase.initializeApp();
-
-  print("Handling a background message: ${message.data}");
-
-  // Use this method to automatically convert the push data, in case you gonna use our data standard
-  AwesomeNotifications().createNotificationFromJsonData(message.data);
-}
+// Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+//   print("Handling a background message: ${message.data}");
+//   // AwesomeNotifications().createNotificationFromJsonData(message.data);
+//   AwesomeNotifications().createNotification(
+//       content: NotificationContent(
+//           wakeUpScreen: true,
+//           fullScreenIntent: true,
+//           category: NotificationCategory.Message,
+//           title: 'Новый заказ №${message.data}' + Emojis.transport_air_rocket,
+//           body: 'Срочно возьми в сборку' + Emojis.time_hourglass_not_done,
+//           id: DateTime.now().millisecondsSinceEpoch.remainder(100000),
+//           channelKey: 'new_order'));
+// }
 
 class MyApp extends StatelessWidget {
   final ordersBloc = GetIt.I.get<OrdersBloc>();
   final networkBloc = GetIt.I.get<NetworkBloc>();
   MyApp({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(

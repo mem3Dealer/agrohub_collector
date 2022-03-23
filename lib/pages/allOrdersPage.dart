@@ -1,21 +1,11 @@
-import 'dart:developer';
-
+import 'dart:async';
 import 'package:agrohub_collector_flutter/bloc/bloc/auth/auth_bloc.dart';
-import 'package:agrohub_collector_flutter/bloc/bloc/auth/auth_events.dart';
-import 'package:agrohub_collector_flutter/bloc/bloc/auth/auth_state.dart';
 import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_bloc.dart';
 import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_event.dart';
 import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_state.dart';
-import 'package:agrohub_collector_flutter/components/productCard/productCard.dart';
-import 'package:agrohub_collector_flutter/shared/globals.dart';
 import 'package:agrohub_collector_flutter/shared/myWidgets.dart';
-import 'package:expandable/expandable.dart';
-import 'package:flutter/foundation.dart';
-import 'package:intl/date_symbols.dart';
-import 'package:intl/intl.dart';
 import 'package:agrohub_collector_flutter/components/orderTile.dart';
 import 'package:agrohub_collector_flutter/model/order.dart';
-import 'package:agrohub_collector_flutter/repositories/auth_rep.dart';
 import 'package:agrohub_collector_flutter/repositories/orders_rep.dart';
 import 'package:agrohub_collector_flutter/shared/myScaffold.dart';
 import 'package:flutter/material.dart';
@@ -39,18 +29,25 @@ class AllOrdersPage extends StatefulWidget {
 class _AllOrdersPageState extends State<AllOrdersPage> {
   final authBloc = GetIt.I.get<AuthenticationBloc>();
   final ordersBloc = GetIt.I.get<OrdersBloc>();
-  MyGlobals myGlobals = MyGlobals();
+
   bool isError = false;
+  late Timer refresher;
   @override
   void initState() {
     super.initState();
+
     getOrders();
 
-    // authBloc.add(AuthenticationInit());
+    const halfMin = Duration(seconds: 30);
+    refresher = Timer.periodic(halfMin, (timer) {
+      getOrders();
+    });
   }
 
   @override
   void dispose() {
+    // _t.cancel();
+    refresher.cancel();
     super.dispose();
   }
 
@@ -78,15 +75,15 @@ class _AllOrdersPageState extends State<AllOrdersPage> {
                             MyWidgets.buildSnackBar(
                                 context: context,
                                 content:
-                                    "С этим заказом что-то не так.\nПопробуйте взять другой",
+                                    "С этим заказом что-то не так.\nПопробуйте взять другой.",
                                 secs: 2,
-                                button: true);
+                                button: false);
                           } else if (state.errorUnavailableOrder == true) {
                             MyWidgets.buildSnackBar(
                                 context: context,
                                 content: "Заказ больше не доступен",
                                 secs: 2,
-                                button: true);
+                                button: false);
                           }
                         },
                         builder: (context, state) {
@@ -117,17 +114,24 @@ class _AllOrdersPageState extends State<AllOrdersPage> {
                               ],
                             );
                           }
-                          return ListView.builder(
-                              shrinkWrap: true,
-                              itemCount: state.orders?.length,
-                              itemBuilder: (BuildContext context, int index) {
-                                Order order = Order();
-                                order = state.orders![index];
-                                return OrderTile(
-                                    buildContext: cntx,
-                                    index: index,
-                                    order: order);
-                              });
+                          return Column(
+                            // mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: ListView.builder(
+                                    shrinkWrap: true,
+                                    itemCount: state.orders?.length,
+                                    itemBuilder:
+                                        (BuildContext context, int index) {
+                                      Order order = state.orders![index];
+                                      return OrderTile(
+                                          buildContext: cntx,
+                                          index: index,
+                                          order: order);
+                                    }),
+                              ),
+                            ],
+                          );
                         },
                       )),
                 ))));
