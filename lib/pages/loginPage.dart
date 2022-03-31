@@ -217,7 +217,7 @@ class _LoginPageState extends State<LoginPage> {
               style: ButtonStyle(
                 overlayColor: MaterialStateProperty.all(Color(0xff4a7683)),
                 backgroundColor: MaterialStateProperty.all<Color>(isItComplete
-                    ? _cs.primary
+                    ? _cs.tertiary
                     : Theme.of(context).disabledColor),
               ),
               onPressed: _onTap,

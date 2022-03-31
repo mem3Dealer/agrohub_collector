@@ -57,7 +57,7 @@ class _OrderTileState extends State<OrderTile> {
         _dayFormat.format(widget.order.deliveryTime ?? DateTime.now());
     String _time = format.format(widget.order.deliveryTime ?? DateTime.now());
     final _theme = Theme.of(context);
-
+    final _cs = Theme.of(context).colorScheme;
     return Padding(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
         child: BlocBuilder<OrdersBloc, OrdersState>(
@@ -137,10 +137,10 @@ class _OrderTileState extends State<OrderTile> {
                           height: 56,
                           child: ElevatedButton(
                               style: ButtonStyle(
+                                  backgroundColor:
+                                      MaterialStateProperty.all(_cs.tertiary),
                                   overlayColor: MaterialStateProperty.all(
-                                      Color(0xff4a7683))
-                                  //TODO нужно стрясти этот цвет
-                                  ),
+                                      Color(0xff4a7683))),
                               onPressed: () {
                                 getProduct(widget.order, context);
                               },
