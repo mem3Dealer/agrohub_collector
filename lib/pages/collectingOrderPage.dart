@@ -27,6 +27,8 @@ class _CollectingOrderPageState extends State<CollectingOrderPage>
   final ordRep = OrdersRepository();
   bool toCollect = true;
   bool isCollected = false;
+  bool showFab = true;
+  bool _isSnackOn = true;
   late TabController _tabController;
 
   // final String _pageStatus = 'to_collect';
@@ -35,12 +37,6 @@ class _CollectingOrderPageState extends State<CollectingOrderPage>
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
   }
-
-  final TextStyle _style = const TextStyle(
-      fontFamily: 'Roboto',
-      fontWeight: FontWeight.w400,
-      color: Color(0xff363B3F),
-      fontSize: 18);
 
   @override
   void dispose() {
@@ -51,8 +47,7 @@ class _CollectingOrderPageState extends State<CollectingOrderPage>
 
   @override
   Widget build(BuildContext context) {
-    bool showFab = true;
-    bool _isSnackOn = true;
+    final _th = Theme.of(context);
     DateFormat format = DateFormat('HH:mm');
     String _time = format.format(widget.order.deliveryTime!);
 
@@ -93,9 +88,9 @@ class _CollectingOrderPageState extends State<CollectingOrderPage>
                       TabBar(
                           controller: _tabController,
                           labelColor: const Color(0xff363B3F),
-                          labelStyle:
-                              _style.copyWith(fontWeight: FontWeight.w500),
-                          indicatorColor: const Color(0xffE14D43),
+                          labelStyle: _th.textTheme.headline2!
+                              .copyWith(fontWeight: FontWeight.w500),
+                          indicatorColor: _th.colorScheme.secondary,
                           indicatorPadding:
                               EdgeInsets.only(left: 16, right: 16),
                           tabs: [
@@ -153,17 +148,11 @@ class _CollectingOrderPageState extends State<CollectingOrderPage>
                   width: 80,
                   child: FloatingActionButton(
                       tooltip: 'Завершить заказ',
-                      child: isCollected
-                          ? Icon(
-                              Icons.check,
-                              size: 40,
-                              color: Colors.white,
-                            )
-                          : Icon(
-                              Icons.check,
-                              size: 40,
-                              color: Color(0xffAACB9C),
-                            ),
+                      child: Icon(
+                        Icons.check,
+                        size: 40,
+                        color: isCollected ? Colors.white : Color(0xffAACB9C),
+                      ),
                       backgroundColor:
                           isCollected ? Color(0xff7FB069) : Color(0xffD6E5CF),
                       onPressed: isCollected
@@ -234,47 +223,6 @@ class _TabToCollectState extends State<_TabToCollect>
                       }
                     })));
       },
-    );
-  }
-}
-
-class Button extends StatelessWidget {
-  const Button({
-    Key? key,
-    required VoidCallback onTap,
-    required String text,
-  })  : _onTap = onTap,
-        _text = text,
-        super(key: key);
-
-  final double _buttonHeight = 54.6;
-  final double _buttonWidth = 122;
-  final VoidCallback _onTap;
-  final String _text;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: _onTap,
-      child: Container(
-        height: _buttonHeight,
-        width: _buttonWidth,
-        child: Center(
-          child: Text(
-            _text,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-                fontFamily: "Roboto",
-                fontWeight: FontWeight.w400,
-                fontSize: 16),
-          ),
-        ),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(4),
-          border: Border.all(color: const Color(0xff69A8BB), width: 1),
-          color: const Color(0xffE7F1F4),
-        ),
-      ),
     );
   }
 }

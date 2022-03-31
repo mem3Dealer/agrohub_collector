@@ -70,4 +70,5 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation group: 'com.google.android.material', name: 'material', version: '1.6.0-alpha03'
+    implementation 'com.google.firebase:firebase-messaging:20.2.40'
 }

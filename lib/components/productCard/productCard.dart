@@ -11,7 +11,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'imagePlacer.dart';
 import 'productName.dart';
-import 'priceRow.dart';
 import 'button.dart';
 
 class AnotherProductCard extends StatefulWidget {
@@ -78,12 +77,6 @@ class AnotherProductCardState extends State<AnotherProductCard> {
   @override
   bool get mounted => super.mounted;
 
-  final TextStyle _style = const TextStyle(
-      fontFamily: 'Roboto',
-      fontWeight: FontWeight.w400,
-      color: Color(0xff363B3F),
-      fontSize: 18);
-
   void setDeleteState() async {
     setState(() {
       isOnDelete = true;
@@ -109,6 +102,7 @@ class AnotherProductCardState extends State<AnotherProductCard> {
 
   @override
   Widget build(BuildContext context) {
+    final _thT = Theme.of(context).textTheme;
     bool isItCollected = widget.product.status == 'collected';
     return BlocBuilder<OrdersBloc, OrdersState>(
       builder: (context, state) {
@@ -139,7 +133,7 @@ class AnotherProductCardState extends State<AnotherProductCard> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          ProductName(widget: widget, style: _style),
+                          ProductName(widget: widget, style: _thT.headline2!),
                           OrderedWeight(),
                         ],
                       ),
@@ -152,16 +146,12 @@ class AnotherProductCardState extends State<AnotherProductCard> {
                       children: [
                         Padding(
                           padding: const EdgeInsets.only(right: 16.0, left: 16),
-                          child: const Divider(
-                            // height: 2,
-                            thickness: 1.5,
-                            color: Color(0xff69A8BB),
-                          ),
+                          child: const Divider(),
                         ),
                         // ЦЕНА ------ ЦЕНА
                         // Padding(
                         //   padding: const EdgeInsets.only(right: 16.0, left: 16),
-                        //   child: PriceRow(style: _style, widget: widget),
+                        //   child: PriceRow(style: _thT.headline2!, widget: widget),
                         // ),
                         const SizedBox(
                           height: 32,
@@ -172,7 +162,7 @@ class AnotherProductCardState extends State<AnotherProductCard> {
                             padding: const EdgeInsets.only(left: 16.0),
                             child: Text(
                               'Товара собрано',
-                              style: _style.copyWith(fontSize: 16),
+                              style: _thT.headline2!.copyWith(fontSize: 16),
                             ),
                           ),
                         ),
@@ -200,7 +190,7 @@ class AnotherProductCardState extends State<AnotherProductCard> {
                                         stream: kindaTimer(),
                                         context: context,
                                         current: _start,
-                                        style: _style,
+                                        style: _thT.headline2!,
                                         func: () {
                                           ordersBloc.emit(ordersBloc.state
                                               .copyWith(isProdOnDelete: false));
@@ -215,7 +205,8 @@ class AnotherProductCardState extends State<AnotherProductCard> {
                                               .hideCurrentSnackBar();
                                         });
                                   },
-                                  style: _style.copyWith(color: Colors.white),
+                                  style: _thT.headline2!
+                                      .copyWith(color: Colors.white),
                                   color: const Color(0xffE14D43),
                                   text: 'Удалить',
                                 ),
@@ -231,11 +222,12 @@ class AnotherProductCardState extends State<AnotherProductCard> {
                                   isActive: isItCollected ? true : isActive,
                                   product: widget.product,
                                   style: !isItCollected
-                                      ? _style.copyWith(
+                                      ? _thT.headline2!.copyWith(
                                           color: isActive
                                               ? Colors.white
                                               : Color(0xffA9C7D0))
-                                      : _style.copyWith(color: Colors.white),
+                                      : _thT.headline2!
+                                          .copyWith(color: Colors.white),
                                   color: isActive || isItCollected
                                       ? const Color(0xff69A8BB)
                                       : const Color(0xffE1EBEE),
@@ -258,15 +250,10 @@ class AnotherProductCardState extends State<AnotherProductCard> {
   }
 
   Container _TextField() {
+    final _thT = Theme.of(context).textTheme;
     bool _isCollected = widget.product.status == 'collected';
     return Container(
-        // width: 350,
         height: 56,
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(4),
-            border: Border.all(
-              color: const Color(0xffCACED0),
-            )),
         child: TextFormField(
           inputFormatters: <TextInputFormatter>[
             FilteringTextInputFormatter.allow(RegExp(r'^\d*[.,]?\d*')),
@@ -282,9 +269,9 @@ class AnotherProductCardState extends State<AnotherProductCard> {
                 }
               : null,
           style: _isCollected
-              ? _style.copyWith(
-                  fontWeight: FontWeight.w900, color: Colors.green)
-              : _style,
+              ? _thT.headline2!
+                  .copyWith(fontWeight: FontWeight.w900, color: Colors.green)
+              : _thT.headline2!,
           autofocus: true,
           maxLines: 1,
           maxLength: 6,
@@ -293,32 +280,32 @@ class AnotherProductCardState extends State<AnotherProductCard> {
           // cursorHeight: 30,
 
           decoration: InputDecoration(
-              counter: const SizedBox.shrink(),
-              suffixText:
-                  widget.product.product_type == 'per_kilo' ? 'кг' : 'шт',
-              contentPadding: const EdgeInsets.fromLTRB(16, 10, 16, 9),
-              hintStyle: _style.copyWith(color: Color(0xff999999)),
-              hintText: 'Введите',
-              border: InputBorder.none),
+            counter: const SizedBox.shrink(),
+            suffixText: widget.product.product_type == 'per_kilo' ? 'кг' : 'шт',
+            contentPadding: const EdgeInsets.fromLTRB(16, 10, 16, 9),
+            hintStyle: _thT.headline2!.copyWith(color: Color(0xff999999)),
+            hintText: 'Введите',
+            // border: InputBorder.none
+          ),
         ));
   }
 
-  Container OrderedWeight() {
+  Widget OrderedWeight() {
     bool _isCollected = widget.product.status == 'collected';
     double _collectedQuantity = widget.product.collected_quantity ?? 0.0;
     double _orderedQuantity = widget.product.ordered_quantity!;
-
+    final _thT = Theme.of(context).textTheme;
     RichText _richText = RichText(
         text: TextSpan(children: [
       TextSpan(
           text: '$_collectedQuantity ',
-          style: _style.copyWith(
-              fontWeight: FontWeight.w900, color: Colors.green)),
+          style: _thT.headline2!
+              .copyWith(fontWeight: FontWeight.w900, color: Colors.green)),
       TextSpan(
           text: widget.product.product_type == 'per_kilo'
               ? '/ $_orderedQuantity кг'
               : '/ $_orderedQuantity шт',
-          style: _style.copyWith(fontWeight: FontWeight.w900))
+          style: _thT.headline2!.copyWith(fontWeight: FontWeight.w900))
     ]));
 
     return Container(
@@ -329,11 +316,9 @@ class AnotherProductCardState extends State<AnotherProductCard> {
               widget.product.product_type == 'per_kilo'
                   ? '$_orderedQuantity кг'
                   : '${_orderedQuantity.toInt()} шт',
-              // : '$_orderedQuantity шт',
-              // state
-              //   .listOfProducts!.first.ordered_quantity
-              //   .toString(),
-              style: _style.copyWith(fontWeight: FontWeight.w900),
+              style: _thT.headline2!.copyWith(fontWeight: FontWeight.w900),
+              maxLines: 1,
+              overflow: TextOverflow.fade,
             ),
     );
   }

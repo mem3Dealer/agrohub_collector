@@ -7,6 +7,7 @@ import 'package:agrohub_collector_flutter/model/response.dart';
 import 'package:agrohub_collector_flutter/pages/allOrdersPage.dart';
 import 'package:agrohub_collector_flutter/pages/collectingOrderPage.dart';
 import 'package:agrohub_collector_flutter/repositories/orders_rep.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -176,9 +177,9 @@ class OrdersBloc extends Bloc<OrdersEvents, OrdersState> {
               currentOrder:
                   event.order.copyWith(status: 'ACCEPTED_BY_RESTAURANT')));
 
-          // if (!kDebugMode) {
-          ord_rep.updateOrderStatus(data: _postData);
-          // } // TODO раскоментить чтобы возобновить работу с беком
+          if (!kDebugMode) {
+            ord_rep.updateOrderStatus(data: _postData);
+          } // TODO раскоментить чтобы возобновить работу с беком
 
         }
       } else {
@@ -210,11 +211,11 @@ class OrdersBloc extends Bloc<OrdersEvents, OrdersState> {
       'id': state.currentOrder?.id,
       'status': 'READY'
     };
-    // if (!kDebugMode) {
-    print('ORDER SENT: ${_orderPost.toServerMap()}');
-    ord_rep.updateOrderStatus(data: _statusPost);
-    ord_rep.postProducts(data: _orderPost.toServerMap());
-    // // }
+    if (!kDebugMode) {
+      print('ORDER SENT: ${_orderPost.toServerMap()}');
+      ord_rep.updateOrderStatus(data: _statusPost);
+      ord_rep.postProducts(data: _orderPost.toServerMap());
+    }
     //  TODO раскоментить чтобы возобновить работу с беком
 
     emitter(state.copyWith(listOfProducts: [], currentOrder: Order()));

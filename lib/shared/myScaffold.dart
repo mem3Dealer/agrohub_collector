@@ -32,12 +32,12 @@ class MyScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // deliveryTime = '12:00-15:00';
-
+    final _theme = Theme.of(context);
     return ScaffoldMessenger(
       key: scaffoldMessengerKey,
       child: Scaffold(
           floatingActionButton: fab,
-          backgroundColor: const Color(0xffF1F1F1),
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           resizeToAvoidBottomInset: true,
           appBar: AppBar(
             actions: <Widget>[
@@ -100,15 +100,6 @@ class MyScaffold extends StatelessWidget {
             ],
             leadingWidth: isItInfo ? 30 : 0,
             titleSpacing: 0,
-            leading: isItInfo
-                ? IconButton(
-                    color: Color(0xff363B3F),
-                    padding: EdgeInsets.only(left: 16),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    icon: Icon(Icons.arrow_back_ios_new_outlined))
-                : SizedBox.shrink(),
             toolbarHeight: 64,
             elevation: 0.0,
             backgroundColor: Colors.white,
@@ -120,11 +111,7 @@ class MyScaffold extends StatelessWidget {
                 overflow: TextOverflow.fade,
                 softWrap: false,
                 textAlign: TextAlign.left,
-                style: const TextStyle(
-                    color: Color(0xff363B3F),
-                    fontFamily: 'Roboto',
-                    fontWeight: FontWeight.w700,
-                    fontSize: 32),
+                style: _theme.textTheme.headlineLarge,
               ),
             ),
             bottom: isCollecting

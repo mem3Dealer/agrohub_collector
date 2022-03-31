@@ -4,8 +4,8 @@ import 'package:agrohub_collector_flutter/bloc/bloc/auth/auth_events.dart';
 import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_bloc.dart';
 import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_event.dart';
 import 'package:agrohub_collector_flutter/pages/allOrdersPage.dart';
-import 'package:agrohub_collector_flutter/shared/myWidgets.dart';
 import 'package:community_material_icon/community_material_icon.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
@@ -26,6 +26,10 @@ class _LoginPageState extends State<LoginPage> {
   void initState() {
     loadFirstPage();
     super.initState();
+    if (kDebugMode) {
+      _login.text = 'test_collector_1';
+      _password.text = 'testcollector1';
+    }
     _login.addListener(() {
       if (_login.text.isNotEmpty) {
         isItCompleted();
@@ -90,7 +94,6 @@ class _LoginPageState extends State<LoginPage> {
     setState(() {
       isLoading = true;
     });
-
     authBloc.add(
       AuthenticationInit(
         onError: () {
@@ -99,6 +102,7 @@ class _LoginPageState extends State<LoginPage> {
           });
         },
         onSuccess: (String role, int currentCollectingOrderId) {
+          ;
           if (role == 'collector') {
             if (currentCollectingOrderId != 0) {
               ordersBloc.add(InitCollectingOrder(
@@ -113,6 +117,8 @@ class _LoginPageState extends State<LoginPage> {
             }
           } else {
             print('he was a farmer');
+            ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Это что, сообщение об ошибке?')));
           }
         },
       ),
@@ -129,11 +135,6 @@ class _LoginPageState extends State<LoginPage> {
         password: _password.text,
         onError: (dynamic e) {
           inspect(e);
-
-          // errorToast(
-          //   message: e.message,
-          //   context: context,
-          // );
           setState(() {
             isLoading = false;
             isError = true;
@@ -153,34 +154,13 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(
     BuildContext context,
   ) {
-    TextStyle _style = const TextStyle(
-        fontFamily: 'Roboto',
-        fontWeight: FontWeight.w400,
-        color: Color(0xff363B3F),
-        fontSize: 16);
-    InputDecoration inDec = const InputDecoration(
-      contentPadding: EdgeInsets.fromLTRB(16, 16, 0, 16),
-      focusedBorder: OutlineInputBorder(
-        borderSide: BorderSide(color: Color(0xff69A8BB)),
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderSide: BorderSide(color: Color(0xffCACED0)),
-      ),
-      border: OutlineInputBorder(
-        borderSide: BorderSide(
-          color: Color(0xff69A8BB),
-        ),
-      ),
-      labelStyle: TextStyle(color: Color(0xffCACED0)),
-      fillColor: Colors.white,
-      filled: true,
-      hintText: 'Логин',
-    );
+    final _theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: const Color(0xffF1F1F1),
+      backgroundColor: _theme.scaffoldBackgroundColor,
       body: Center(
         child: ListView(
+          primary: false,
           shrinkWrap: true,
           padding: const EdgeInsets.only(
             left: 16,
@@ -189,36 +169,29 @@ class _LoginPageState extends State<LoginPage> {
             // top: 32,
           ),
           children: <Widget>[
-            const Padding(
+            Padding(
               padding: EdgeInsets.only(bottom: 24.0, top: 40),
               child: SizedBox(
                 height: 48,
                 child: Text(
                   'Форма входа',
-                  // textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xff363B3F),
-                    fontSize: 32,
-                  ),
+                  style: _theme.textTheme.headlineLarge,
                 ),
               ),
             ),
             Padding(
               padding: const EdgeInsets.only(bottom: 16.0),
-              child: loginField(_style, inDec),
+              child: loginField(),
             ),
             Padding(
               padding: const EdgeInsets.only(bottom: 16),
-              child: passwordField(_style, inDec),
+              child: passwordField(),
             ),
             isError
                 ? Container(
                     padding: EdgeInsets.only(bottom: 5),
-                    child: Text(
-                      'Введите правильный логин и пароль',
-                      style: _style.copyWith(color: Colors.red),
-                    ))
+                    child: Text('Введите правильный логин и пароль',
+                        style: _theme.textTheme.caption))
                 : SizedBox.shrink(),
             enterButton(isItCompleted()),
           ],
@@ -228,68 +201,41 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   SizedBox enterButton(bool isItComplete) {
+    final _cs = Theme.of(context).colorScheme;
     return SizedBox(
-      height: 56,
-      width: 382,
-      // child: TapDebouncer(
-      //   cooldown: const Duration(milliseconds: 1000),
-      //   onTap: isItComplete ? loginFarmer : null,
-      //   waitBuilder: (BuildContext context, Widget child) {
-      //     return Center(
-      //         child: CircularProgressIndicator(
-      //       color: Color(0xffE14D43),
-      //     ));
-      //   },
-      //   builder: (context, _onTap) {
-      //     return ElevatedButton(
-      //       style: ButtonStyle(
-      //         backgroundColor: MaterialStateProperty.all<Color>(isItComplete
-      //             ? const Color(0xff69A8BB)
-      //             : const Color(0xffE1EBEE)),
-      //       ),
-      //       onPressed: _onTap,
-      //       child: Text(
-      //         'Войти',
-      //         style: TextStyle(
-      //           color: isItComplete ? Colors.white : Color(0xffA9C7D0),
-      //           fontFamily: "Roboto",
-      //           fontWeight: FontWeight.w400,
-      //           fontSize: 18,
-      //         ),
-      //       ),
-      //     );
-      //   },
-      // )
-      // ? Center(
-      //     child: CircularProgressIndicator(
-      //     color: Color(0xffE14D43),
-      //   ))
-      child: ElevatedButton(
-        style: ButtonStyle(
-          backgroundColor: MaterialStateProperty.all<Color>(
-              isItComplete ? const Color(0xff69A8BB) : const Color(0xffE1EBEE)),
-        ),
-        onPressed: isItComplete ? loginFarmer : null,
-        child: Text(
-          'Войдите',
-          style: TextStyle(
-            color: isItComplete ? Colors.white : Color(0xffA9C7D0),
-            fontFamily: "Roboto",
-            fontWeight: FontWeight.w400,
-            fontSize: 18,
-          ),
-        ),
-      ),
-    );
+        height: 56,
+        width: 382,
+        child: TapDebouncer(
+          cooldown: const Duration(milliseconds: 1000),
+          onTap: isItComplete ? loginFarmer : null,
+          waitBuilder: (BuildContext context, Widget child) {
+            return Center(
+                child: CircularProgressIndicator(color: _cs.secondary));
+          },
+          builder: (context, _onTap) {
+            return ElevatedButton(
+              style: ButtonStyle(
+                overlayColor: MaterialStateProperty.all(Color(0xff4a7683)),
+                backgroundColor: MaterialStateProperty.all<Color>(isItComplete
+                    ? _cs.primary
+                    : Theme.of(context).disabledColor),
+              ),
+              onPressed: _onTap,
+              child: Text('Войти',
+                  style: Theme.of(context).textTheme.headline2!.copyWith(
+                      color: !isItComplete ? Color(0xffA9C7D0) : Colors.white)),
+            );
+          },
+        ));
   }
 
-  Widget passwordField(TextStyle style, InputDecoration dec) {
+  Widget passwordField() {
     return TextField(
       controller: _password,
-      // onChanged: checkFormFields,
+      style: Theme.of(context).textTheme.headline2,
       obscureText: visible,
       obscuringCharacter: '*',
-      decoration: dec.copyWith(
+      decoration: InputDecoration(
           hintText: 'Пароль',
           suffixIcon: IconButton(
             splashColor: null,
@@ -298,16 +244,15 @@ class _LoginPageState extends State<LoginPage> {
             color: Color(0xff363B3F),
             onPressed: visibleIcon,
           )),
-      style: style.copyWith(),
     );
   }
 
-  TextField loginField(TextStyle style, InputDecoration dec) {
+  TextField loginField() {
     return TextField(
-      controller: _login,
-      obscureText: false,
-      decoration: dec,
-      style: style,
-    );
+        cursorColor: Theme.of(context).colorScheme.primary,
+        controller: _login,
+        obscureText: false,
+        style: Theme.of(context).textTheme.headline2,
+        decoration: InputDecoration(hintText: 'Логин'));
   }
 }

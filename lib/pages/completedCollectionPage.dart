@@ -20,6 +20,7 @@ class CompletedCollectionPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final _tTh = Theme.of(context).textTheme;
     final String assetName = 'assets/images/done.svg';
     final Widget svg = SvgPicture.asset(assetName, semanticsLabel: 'Done!');
     return BlocBuilder<OrdersBloc, OrdersState>(
@@ -37,14 +38,9 @@ class CompletedCollectionPage extends StatelessWidget {
                   padding: const EdgeInsets.only(left: 38, right: 37),
                   child: Container(
                     child: Text(
-                      'Отлично, заказ №${order.agregatorOrderId} собран!',
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                          color: Color(0xff363B3F),
-                          fontFamily: 'Roboto',
-                          fontWeight: FontWeight.w700,
-                          fontSize: 32),
-                    ),
+                        'Отлично, заказ №${order.agregatorOrderId} собран!',
+                        textAlign: TextAlign.center,
+                        style: _tTh.headlineLarge),
                   ),
                 ),
                 SizedBox(
@@ -70,13 +66,10 @@ class CompletedCollectionPage extends StatelessWidget {
                         onPressed: () async {
                           _finishCollecting(context);
                         },
-                        child: const Text(
+                        child: Text(
                           'Собрать следующий заказ',
                           textAlign: TextAlign.center,
-                          style: TextStyle(
-                              fontFamily: 'Roboto',
-                              fontSize: 16,
-                              fontWeight: FontWeight.w400),
+                          style: _tTh.headline1,
                         )),
                   ),
                 )

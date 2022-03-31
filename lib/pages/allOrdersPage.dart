@@ -59,81 +59,88 @@ class _AllOrdersPageState extends State<AllOrdersPage> {
 
   @override
   Widget build(BuildContext cntx) {
+    final _theme = Theme.of(context);
+    final _cs = _theme.colorScheme;
     return MyScaffold(false, false,
         title: 'Список заказов',
         body: Center(
-            child: Padding(
-                padding: const EdgeInsets.only(top: 16.0),
-                child: ScrollConfiguration(
-                  behavior: ScrollBehavior(),
-                  child: GlowingOverscrollIndicator(
-                      axisDirection: AxisDirection.down,
-                      color: Colors.grey,
-                      child: BlocConsumer<OrdersBloc, OrdersState>(
-                        listener: (context, state) {
-                          if (state.errorNullProducts == true) {
-                            MyWidgets.buildSnackBar(
-                                context: context,
-                                content:
-                                    "С этим заказом что-то не так.\nПопробуйте взять другой.",
-                                secs: 2,
-                                button: false);
-                          } else if (state.errorUnavailableOrder == true) {
-                            MyWidgets.buildSnackBar(
-                                context: context,
-                                content: "Заказ больше не доступен",
-                                secs: 2,
-                                button: false);
-                          }
-                        },
-                        builder: (context, state) {
-                          if (state.loading == true) {
-                            return CircularProgressIndicator(
-                              color: Color(0xffE14D43),
-                            );
-                          }
-                          if (state.orders == null) {
-                            return Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: const [
-                                Text(
-                                  'Кажется, у нас какие-то неполадки.\nСвяжитесь с администратором.',
-                                  textAlign: TextAlign.center,
-                                )
-                              ],
-                            );
-                          }
-                          if (state.orders!.isEmpty == true) {
-                            return Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: const [
-                                Text(
-                                  "Новых заказов в сборку пока нет :(",
-                                  textAlign: TextAlign.center,
-                                )
-                              ],
-                            );
-                          }
-                          return Column(
-                            // mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Expanded(
-                                child: ListView.builder(
-                                    shrinkWrap: true,
-                                    itemCount: state.orders?.length,
-                                    itemBuilder:
-                                        (BuildContext context, int index) {
-                                      Order order = state.orders![index];
-                                      return OrderTile(
-                                          buildContext: cntx,
-                                          index: index,
-                                          order: order);
-                                    }),
-                              ),
-                            ],
-                          );
-                        },
-                      )),
-                ))));
+            child: ScrollConfiguration(
+          behavior: ScrollBehavior(),
+          child: GlowingOverscrollIndicator(
+              axisDirection: AxisDirection.down,
+              color: Colors.grey,
+              child: BlocConsumer<OrdersBloc, OrdersState>(
+                listener: (context, state) {
+                  if (state.errorNullProducts == true) {
+                    MyWidgets.buildSnackBar(
+                        context: context,
+                        content:
+                            "С этим заказом что-то не так.\nПопробуйте взять другой.",
+                        secs: 2,
+                        button: false);
+                  } else if (state.errorUnavailableOrder == true) {
+                    MyWidgets.buildSnackBar(
+                        context: context,
+                        content: "Заказ больше не доступен",
+                        secs: 2,
+                        button: false);
+                  }
+                },
+                builder: (context, state) {
+                  if (state.loading == true) {
+                    return CircularProgressIndicator(
+                        color: _theme.colorScheme.secondary);
+                  }
+                  if (state.orders == null) {
+                    return Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        Text(
+                          'Кажется, у нас какие-то неполадки.\nСвяжитесь с администратором.',
+                          textAlign: TextAlign.center,
+                        )
+                      ],
+                    );
+                  }
+                  return Column(
+                    // mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: RefreshIndicator(
+                          // backgroundColor: ,
+                          color: _cs.secondary,
+                          onRefresh: () async {
+                            await Future.delayed(Duration(seconds: 2));
+                            getOrders();
+                          },
+                          child: state.orders!.isEmpty
+                              ? ListView(children: [
+                                  SizedBox(
+                                    height:
+                                        MediaQuery.of(context).size.height / 3,
+                                  ),
+                                  Text(
+                                    "Новых заказов в сборку пока нет :(",
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ])
+                              : ListView.builder(
+                                  shrinkWrap: true,
+                                  itemCount: state.orders?.length,
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    Order order = state.orders![index];
+                                    return OrderTile(
+                                        buildContext: cntx,
+                                        index: index,
+                                        order: order);
+                                  }),
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              )),
+        )));
   }
 }

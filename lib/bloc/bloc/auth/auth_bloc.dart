@@ -14,7 +14,6 @@ class AuthenticationBloc
   final AuthenticationRepository _authenticationRepository;
   // late final ordersBloc = GetIt.I.get<OrdersBloc>();
   final FlutterSecureStorage storage = const FlutterSecureStorage();
-  final notes = Notifications();
 
   AuthenticationBloc({
     required AuthenticationRepository authenticationRepository,
@@ -24,7 +23,7 @@ class AuthenticationBloc
     on<AuthenticationInit>(_onEventAuthenticationInit);
     on<AuthenticationLogout>(_onEventAuthenticationLogout);
   }
-
+  final notes = Notifications();
   //логаут
   Future<void> _onEventAuthenticationLogout(
     AuthenticationLogout event,
@@ -110,9 +109,9 @@ class AuthenticationBloc
     AuthenticationInit event,
     Emitter<AuthenticationState> emitter,
   ) async {
-    notes.subcscribeForNotesOfNewOrders(); //Нужно ли это здесь?
     Map<String, dynamic>? userInfo = await _initUser(onError: event.onError);
     if (userInfo != null) {
+      // notes.subcscribeForNotesOfNewOrders(); //Нужно ли это здесь?
       emitter(
         state.copyWith(
             JWT: userInfo['token'],
@@ -134,14 +133,19 @@ class AuthenticationBloc
     Function? onError,
     Function? onSuccess,
   }) async {
-    final String token = await _authenticationRepository.login(
-      login: login,
-      password: password,
-    );
+    try {
+      final String token = await _authenticationRepository.login(
+        login: login,
+        password: password,
+      );
 
-    await storage.write(key: 'token', value: 'JWT $token');
+      await storage.write(key: 'token', value: 'JWT $token');
 
-    return token;
+      return token;
+    } on Exception catch (e) {
+      onError;
+      return '';
+    }
   }
 
   Future<Map<String, dynamic>?> _initUser({Function? onError}) async {

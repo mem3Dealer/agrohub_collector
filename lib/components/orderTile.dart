@@ -12,9 +12,6 @@ import 'package:intl/intl.dart';
 class OrderTile extends StatefulWidget {
   Order order;
   BuildContext buildContext;
-
-  // Future<void> onPressed;
-  // ExpandableController controller;
   int index;
   OrderTile({
     required this.order,
@@ -59,6 +56,7 @@ class _OrderTileState extends State<OrderTile> {
     String _day =
         _dayFormat.format(widget.order.deliveryTime ?? DateTime.now());
     String _time = format.format(widget.order.deliveryTime ?? DateTime.now());
+    final _theme = Theme.of(context);
 
     return Padding(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
@@ -90,45 +88,25 @@ class _OrderTileState extends State<OrderTile> {
                                 overflow: TextOverflow.fade,
                                 softWrap: false,
                                 textAlign: TextAlign.left,
-                                style: const TextStyle(
-                                    color: Color(0xff363B3F),
-                                    fontFamily: 'Roboto',
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.w700),
+                                style: _theme.textTheme.headline3,
                               ),
                             ),
                             Padding(
                               padding: const EdgeInsets.only(left: 8.0),
-                              child: Text(
-                                _day,
-                                style: TextStyle(
-                                  color: Color(0xff999999),
-                                  fontWeight: FontWeight.w500,
-                                  fontFamily: 'Roboto',
-                                  fontSize: 16,
-                                ),
-                              ),
+                              child:
+                                  Text(_day, style: _theme.textTheme.subtitle1),
                             )
                           ],
                         )),
-                    const Divider(
-                      // height: 2,
-                      thickness: 1.5,
-                      color: Color(0xff69A8BB),
-                    ),
+                    const Divider(),
                     Padding(
                       padding: const EdgeInsets.fromLTRB(16, 16, 28, 16),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            _time,
-                            textAlign: TextAlign.end,
-                            style: const TextStyle(
-                                fontFamily: 'Roboto',
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500),
-                          ),
+                          Text(_time,
+                              textAlign: TextAlign.end,
+                              style: _theme.textTheme.subtitle2),
                           Container(
                             width: 32,
                             height: 32,
@@ -159,19 +137,16 @@ class _OrderTileState extends State<OrderTile> {
                           height: 56,
                           child: ElevatedButton(
                               style: ButtonStyle(
-                                  backgroundColor: MaterialStateProperty.all(
-                                const Color(0xff69A8BB),
-                              )),
+                                  overlayColor: MaterialStateProperty.all(
+                                      Color(0xff4a7683))
+                                  //TODO нужно стрясти этот цвет
+                                  ),
                               onPressed: () {
                                 getProduct(widget.order, context);
                               },
-                              child: Text(
-                                'Начать сборку',
-                                style: TextStyle(
-                                    fontFamily: 'Roboto',
-                                    fontWeight: FontWeight.w400,
-                                    fontSize: 18),
-                              )),
+                              child: Text('Начать сборку',
+                                  style: _theme.textTheme.headline2!
+                                      .copyWith(color: Colors.white))),
                         ),
                       )),
                 ),

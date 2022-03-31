@@ -24,7 +24,7 @@ class _ImagePlacerState extends State<ImagePlacer> {
     } else {
       _picW = 100;
     }
-    //однажды я это решу :)
+//однажды я это решу :)
 // проблема была в том, что он выкидывал ошибку битой ссылки (badUrl) в моменты когда я нажимал на кнопку
 // чтобы перейти на экран инфы. В общем - так работает.
     String badUrl = 'https://storage.yandexcloud.net/goods-images/media/';
