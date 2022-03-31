@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "505206476221",
+    "project_id": "agrohub-7cd1b",
+    "storage_bucket": "agrohub-7cd1b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:505206476221:android:cbc8b25426464b4fa416d4",
+        "android_client_info": {
+          "package_name": "com.example.agrohub_collector_flutter"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "505206476221-j5noh6vrntf1nbq6707iolgt2asof3o6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC0oMcF1q3Q7vVpm6qaoy3TZHO1yBipe8Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "505206476221-j5noh6vrntf1nbq6707iolgt2asof3o6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'product.g.dart';
@@ -39,6 +40,16 @@ class Product {
     this.unit_price,
     this.ordered_quantity,
   });
+
+  ShortProduct get toShortProduct {
+    return ShortProduct(
+      productId: product_id,
+      status: status,
+      formedQuantity: collected_quantity,
+      farmerOrderId: farmer_order_id,
+    );
+  }
+
   factory Product.fromJson(Map<String, dynamic> json) =>
       _$ProductFromJson(json);
 
@@ -164,5 +175,89 @@ class Product {
         total_price.hashCode ^
         unit_price.hashCode ^
         ordered_quantity.hashCode;
+  }
+}
+
+class ShortProduct {
+  int? productId;
+  String? status;
+  double? formedQuantity;
+  // double? orderedQuantity;
+  int? farmerOrderId;
+  ShortProduct({
+    this.productId,
+    this.status,
+    this.formedQuantity,
+    this.farmerOrderId,
+  });
+
+  Map<String, dynamic> toServerMap() {
+    return {
+      'product_id': productId,
+      'status': status,
+      'farmer_order_id': farmerOrderId,
+      'formedQuantity': formedQuantity
+    };
+  }
+
+  ShortProduct copyWith({
+    int? productId,
+    String? status,
+    double? formedQuantity,
+    int? farmerOrderId,
+  }) {
+    return ShortProduct(
+      productId: productId ?? this.productId,
+      status: status ?? this.status,
+      formedQuantity: formedQuantity ?? this.formedQuantity,
+      farmerOrderId: farmerOrderId ?? this.farmerOrderId,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'productId': productId,
+      'status': status,
+      'formedQuantity': formedQuantity,
+      'farmerOrderId': farmerOrderId,
+    };
+  }
+
+  factory ShortProduct.fromMap(Map<String, dynamic> map) {
+    return ShortProduct(
+      productId: map['productId']?.toInt(),
+      status: map['status'],
+      formedQuantity: map['formedQuantity']?.toDouble(),
+      farmerOrderId: map['farmerOrderId']?.toInt(),
+    );
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory ShortProduct.fromJson(String source) =>
+      ShortProduct.fromMap(json.decode(source));
+
+  @override
+  String toString() {
+    return 'ShortProduct(productId: $productId, status: $status, formedQuantity: $formedQuantity, farmerOrderId: $farmerOrderId)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is ShortProduct &&
+        other.productId == productId &&
+        other.status == status &&
+        other.formedQuantity == formedQuantity &&
+        other.farmerOrderId == farmerOrderId;
+  }
+
+  @override
+  int get hashCode {
+    return productId.hashCode ^
+        status.hashCode ^
+        formedQuantity.hashCode ^
+        farmerOrderId.hashCode;
   }
 }

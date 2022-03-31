@@ -1,16 +1,11 @@
-import 'dart:developer';
-
+import 'dart:async';
 import 'package:agrohub_collector_flutter/bloc/bloc/auth/auth_bloc.dart';
-import 'package:agrohub_collector_flutter/bloc/bloc/auth/auth_events.dart';
-import 'package:agrohub_collector_flutter/bloc/bloc/auth/auth_state.dart';
 import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_bloc.dart';
 import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_event.dart';
 import 'package:agrohub_collector_flutter/bloc/bloc/orders/orders_state.dart';
-import 'package:expandable/expandable.dart';
-import 'package:intl/intl.dart';
+import 'package:agrohub_collector_flutter/shared/myWidgets.dart';
 import 'package:agrohub_collector_flutter/components/orderTile.dart';
 import 'package:agrohub_collector_flutter/model/order.dart';
-import 'package:agrohub_collector_flutter/repositories/auth_rep.dart';
 import 'package:agrohub_collector_flutter/repositories/orders_rep.dart';
 import 'package:agrohub_collector_flutter/shared/myScaffold.dart';
 import 'package:flutter/material.dart';
@@ -34,64 +29,118 @@ class AllOrdersPage extends StatefulWidget {
 class _AllOrdersPageState extends State<AllOrdersPage> {
   final authBloc = GetIt.I.get<AuthenticationBloc>();
   final ordersBloc = GetIt.I.get<OrdersBloc>();
-  final ExpandableController _controller = ExpandableController();
+
+  bool isError = false;
+  late Timer refresher;
   @override
   void initState() {
-    getOrders();
     super.initState();
-    // authBloc.add(AuthenticationInit());
+
+    getOrders();
+
+    const halfMin = Duration(seconds: 30);
+    refresher = Timer.periodic(halfMin, (timer) {
+      getOrders();
+    });
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    // _t.cancel();
+    refresher.cancel();
     super.dispose();
   }
 
   Future<void> getOrders() async {
     ordersBloc.add(OrdersGetAllOrders(
-        onError: (e) {
-          inspect(e);
-        },
-        onSuccess: () => print('amaizing')));
+        onError: (e) {},
+        onSuccess: () => print('Everything`s proceeding as I have forseen')));
   }
 
   @override
-  Widget build(BuildContext context) {
-    // print();
-    return BlocBuilder<OrdersBloc, OrdersState>(
-      bloc: ordersBloc,
-      builder: (context, state) {
-        // ordersBloc.add(OrdersGetAllOrders());
-        // ord_rep.getAllOrders();
-        // print('THESE ARE: ${ordersBloc.state}');
-        return MyScaffold(
-          false,
-          title: 'Список заказов',
-          body: state.allOrders != null
-              ? Expanded(
-                  child: Center(
-                      child: ListView.builder(
-                          itemCount: state.allOrders?.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            Order order = state.allOrders![index];
-                            String time =
-                                order.delivery_time!.substring(17, 22);
-                            // DateTime time1 = DateTime.parse(
-                            //     order.delivery_time.toString());
-                            // DateTime time =
-                            //     DateTime.parse(order.delivery_time это хорошая идея, но с бека приходит неправильный формат даты
-                            return OrderTile(
-                                controller: _controller,
-                                id: order.id!,
-                                time: "К $time",
-                                deliveryId:
-                                    int.parse(order.agregator_order_id!));
-                          })),
-                )
-              : const Center(child: CircularProgressIndicator()),
-        );
-      },
-    );
+  Widget build(BuildContext cntx) {
+    final _theme = Theme.of(context);
+    final _cs = _theme.colorScheme;
+    return MyScaffold(false, false,
+        title: 'Список заказов',
+        body: Center(
+            child: ScrollConfiguration(
+          behavior: ScrollBehavior(),
+          child: GlowingOverscrollIndicator(
+              axisDirection: AxisDirection.down,
+              color: Colors.grey,
+              child: BlocConsumer<OrdersBloc, OrdersState>(
+                listener: (context, state) {
+                  if (state.errorNullProducts == true) {
+                    MyWidgets.buildSnackBar(
+                        context: context,
+                        content:
+                            "С этим заказом что-то не так.\nПопробуйте взять другой.",
+                        secs: 2,
+                        button: false);
+                  } else if (state.errorUnavailableOrder == true) {
+                    MyWidgets.buildSnackBar(
+                        context: context,
+                        content: "Заказ больше не доступен",
+                        secs: 2,
+                        button: false);
+                  }
+                },
+                builder: (context, state) {
+                  if (state.loading == true) {
+                    return CircularProgressIndicator(
+                        color: _theme.colorScheme.secondary);
+                  }
+                  if (state.orders == null) {
+                    return Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        Text(
+                          'Кажется, у нас какие-то неполадки.\nСвяжитесь с администратором.',
+                          textAlign: TextAlign.center,
+                        )
+                      ],
+                    );
+                  }
+                  return Column(
+                    // mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: RefreshIndicator(
+                          // backgroundColor: ,
+                          color: _cs.secondary,
+                          onRefresh: () async {
+                            await Future.delayed(Duration(seconds: 2));
+                            getOrders();
+                          },
+                          child: state.orders!.isEmpty
+                              ? ListView(children: [
+                                  SizedBox(
+                                    height:
+                                        MediaQuery.of(context).size.height / 3,
+                                  ),
+                                  Text(
+                                    "Новых заказов в сборку пока нет :(",
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ])
+                              : ListView.builder(
+                                  shrinkWrap: true,
+                                  itemCount: state.orders?.length,
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    Order order = state.orders![index];
+                                    return OrderTile(
+                                        buildContext: cntx,
+                                        index: index,
+                                        order: order);
+                                  }),
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              )),
+        )));
   }
 }
